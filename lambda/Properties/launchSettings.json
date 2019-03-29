@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Lambda": {
+      "commandName": "Executable",
+      "executablePath": "E:\\Lambda\\serv\\altv-server.exe",
+      "workingDirectory": "E:\\Lambda\\serv"
+    }
+  }
+}

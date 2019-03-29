@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <ApplicationIcon />
+    <Win32Resource />
+    <Configurations>Debug;Release;Publish</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <OutputPath></OutputPath>
+    <DocumentationFile></DocumentationFile>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath></OutputPath>
+    <WarningLevel>0</WarningLevel>
+    <DocumentationFile></DocumentationFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AltV.Net" Version="1.1.9" />
+    <PackageReference Include="AltV.Net.Async" Version="1.1.9" />
+    <PackageReference Include="AltV.Net.Mock" Version="1.1.9" />
+    <PackageReference Include="MySqlConnector" Version="0.51.1" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="cp -r $(ProjectDir)\bin\Release\netcoreapp2.2\publish\* E:/Lambda/serv/resources/lambda &#xD;&#xA;cp -r $(TargetPath) E:/Lambda/serv/resources/lambda&#xD;&#xA;" />
+  </Target>
+
+</Project>
