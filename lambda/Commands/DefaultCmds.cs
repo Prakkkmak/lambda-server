@@ -80,6 +80,11 @@ namespace Lambda.Commands
             CmdReturn cmdReturn = new CmdReturn($"{player.Account.Mail} : [TODO]", CmdReturn.CmdReturnType.SUCCESS);
             return cmdReturn;
         }
-
+        [Command(Command.CommandType.DEFAULT)]
+        public static CmdReturn Argent(Player player, string[] argv)
+        {
+            CmdReturn cmdReturn = new CmdReturn($"Vous avez {player.Inventory.Money} $]", CmdReturn.CmdReturnType.SUCCESS);
+            return cmdReturn;
+        }
     }
 }

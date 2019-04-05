@@ -76,8 +76,7 @@ namespace Lambda.Commands
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Vetement_Aleratoire(Player player, string[] argv)
         {
-            player.Skin = Skin.Random();
-            player.Skin.SendSkin(player);
+            player.SetSkin(Skin.Random());
             return new CmdReturn($"Vous avez un skin aléatoire", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.DEFAULT)]
@@ -85,17 +84,16 @@ namespace Lambda.Commands
         {
 
             Skin skin = Skin.GetSkinToDiscover();
-            uint id = skin.Id;
-            player.Skin = skin;
-            player.Skin.Id = id;
+
             if (skin != null)
             {
-                skin.SendSkin(player);
+                player.SetSkin(skin);
+
                 return new CmdReturn($"Vous avez changé de vetement", CmdReturn.CmdReturnType.SUCCESS);
             }
             else
             {
-                return new CmdReturn($"Aucun vetement trouvé", CmdReturn.CmdReturnType.SUCCESS);
+                return new CmdReturn($"Aucun vetement trouvé", CmdReturn.CmdReturnType.WARNING);
             }
 
         }

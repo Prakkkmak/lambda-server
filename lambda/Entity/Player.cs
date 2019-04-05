@@ -18,15 +18,17 @@ namespace Lambda.Entity
 
         private uint deathCount;
         private uint id; // The id in the database
+        private Skin skin;
 
 
-        public ulong Money { get; set; }
         public short Food { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Name => $"{FirstName}_{LastName}";
         public Account Account { get; set; }
-        public Skin Skin { get; set; }
+
+        public Skin Skin => skin;
+
         public Inventory Inventory { get; set; }
 
 
@@ -47,6 +49,8 @@ namespace Lambda.Entity
             get => AltPlayer.Position;
             set => AltPlayer.Position = value;
         }
+        public Position FeetPosition => new Position(AltPlayer.Position.X, AltPlayer.Position.Y - 1, AltPlayer.Position.Z);
+
         public Rotation Rotation
         {
             get => AltPlayer.Rotation;
@@ -61,13 +65,13 @@ namespace Lambda.Entity
             altPlayer.SetData("player", this);
             deathCount = 0;
             id = 0;
-            Money = 0;
             Food = 0;
             FirstName = "";
             LastName = "";
             Account = null;
-            Skin = new Skin();
+            skin = new Skin();
             Inventory = new Inventory();
+            Inventory.Money = 10000;
 
         }
 
@@ -97,7 +101,7 @@ namespace Lambda.Entity
             position.Z = float.Parse(datas["cha_position_z"]);
             Position = position;
             World = short.Parse(datas["cha_world"]);
-            Money = ulong.Parse(datas["cha_money"]);
+            Inventory.Money = ulong.Parse(datas["cha_money"]);
             Hp = ushort.Parse(datas["cha_hp"]);
             Food = short.Parse(datas["cha_food"]);
             deathCount = uint.Parse(datas["cha_deathcount"]);
@@ -106,6 +110,14 @@ namespace Lambda.Entity
             Skin.SendSkin(this);
             OnlinePlayers.Add(this);
             return true;
+        }
+
+        public void SetSkin(Skin skin)
+        {
+            uint id = this.skin.Id;
+            this.skin = skin;
+            this.skin.Id = id;
+            this.skin.SendSkin(this);
         }
 
         public void Spawn(Position pos)
@@ -135,6 +147,16 @@ namespace Lambda.Entity
             return players.ToArray();
         }
 
+        public static Player GetPlayerByDatabaseId(uint dbId)
+        {
+            foreach (Player onlinePlayer in OnlinePlayers)
+            {
+                if (onlinePlayer.Account.Id == dbId) return onlinePlayer;
+            }
+
+            return null;
+        }
+
 
 
         #region database
@@ -148,7 +170,7 @@ namespace Lambda.Entity
             datas["cha_position_Y"] = Position.Y.ToString();
             datas["cha_position_z"] = Position.Z.ToString();
             datas["cha_world"] = World.ToString();
-            datas["cha_money"] = Money.ToString();
+            datas["cha_money"] = Inventory.Money.ToString();
             datas["cha_hp"] = Hp.ToString();
             datas["cha_food"] = Food.ToString();
             datas["cha_deathcount"] = deathCount.ToString();
@@ -196,7 +218,7 @@ namespace Lambda.Entity
 
 
         public static string TableName = "t_character_cha";
-        public static Position SpawnPosition = new Position(131.0769f, -1302.343f, 29.22925f);
+        public static Position SpawnPosition = new Position(-1143.178f, -1621.451f, 4.375854f);
         public static List<Player> OnlinePlayers = new List<Player>();
     }
 }

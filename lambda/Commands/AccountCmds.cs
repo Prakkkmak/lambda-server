@@ -51,6 +51,7 @@ namespace Lambda.Commands
             if (player.Account != null) return new CmdReturn("Vous êtes déjà connecté", CmdReturn.CmdReturnType.WARNING);
             if (!emailAdressAttribute.IsValid(mail)) return new CmdReturn("Mail invalide.", CmdReturn.CmdReturnType.SYNTAX);
             if (password.Length < 6) return new CmdReturn("Mot de passe trop court. Il doit faire 6 caractères", CmdReturn.CmdReturnType.SYNTAX);
+            if (Account.LogIn(mail) != null) return new CmdReturn("Un compte éxiste déjà", CmdReturn.CmdReturnType.WARNING);
             Account account = new Account(mail);
             account.Register(password);
             player.Account = account;
@@ -66,6 +67,26 @@ namespace Lambda.Commands
             if (player.Account != null) return new CmdReturn("Vous êtes déjà connecté", CmdReturn.CmdReturnType.WARNING);
             if (!emailAdressAttribute.IsValid(mail) || password.Length < 6) return new CmdReturn("Identifiants incorrects", CmdReturn.CmdReturnType.SYNTAX);
             Account account = Account.LogIn(mail, password);
+            if (account == null) return new CmdReturn("Identifiants incorrects", CmdReturn.CmdReturnType.WARNING);
+            if (Player.GetPlayerByDatabaseId(account.Id) != null)
+            {
+                return new CmdReturn("Vous êtes déjà connecté", CmdReturn.CmdReturnType.WARNING);
+            }
+            player.Account = account;
+            if (!player.Load())
+            {
+                player.Account = null;
+                return new CmdReturn("Vous n'avez pas de personnage", CmdReturn.CmdReturnType.WARNING);
+
+            }
+            return new CmdReturn("Vous vous êtes connecté ! Votre log rapide est : " + account.Id, CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Command(Command.CommandType.ACCOUNT, "Id")]
+        public static CmdReturn Rapide(Player player, string[] argv)
+        {
+            uint Id = uint.Parse(argv[1]);
+            if (player.Account != null) return new CmdReturn("Vous êtes déjà connecté", CmdReturn.CmdReturnType.WARNING);
+            Account account = Account.LogIn(Id);
             if (account == null) return new CmdReturn("Identifiants incorrects", CmdReturn.CmdReturnType.WARNING);
             player.Account = account;
             if (!player.Load())

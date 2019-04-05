@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Text;
 using AltV.Net;
@@ -21,7 +22,7 @@ namespace Lambda.Commands
     {
         /// Create a checkpoint at the character position.
         /// /checkpoint creer 1 5
-        [Command(Command.CommandType.ADMIN, "type", "rayon")]
+        /*[Command(Command.CommandType.ADMIN, "type", "rayon")]
         public static CmdReturn Checkpoint_Creer(Player player, string[] argv)
         {
             if (!int.TryParse(argv[2], out int type)) return new CmdReturn("Le type doit être un nombre !", CmdReturn.CmdReturnType.SYNTAX);
@@ -29,7 +30,7 @@ namespace Lambda.Commands
             Area area = new Area(type, player.Position, radius, 1, Rgba.Zero); // Create the area
             Area.Areas.Add(area); // Add the area to the list of areas
             return new CmdReturn("Vous avez créé un checkpoint !", CmdReturn.CmdReturnType.SUCCESS);
-        }
+        }*/
         /// Give an item to the character
         /// /give 0 5
         [Command(Command.CommandType.ADMIN, "id", "nombre")]
@@ -47,6 +48,18 @@ namespace Lambda.Commands
             if (BaseItem.GetBaseItem(id) == null) return new CmdReturn("Cet objet n'existe pas", CmdReturn.CmdReturnType.WARNING);
             player.Inventory.AddItem(id, amount);
             return new CmdReturn("Vous vous êtes donné des objets", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Command(Command.CommandType.ADMIN, "montant")]
+        public static CmdReturn Give_Argent(Player player, string[] argv)
+        {
+
+            if (!uint.TryParse(argv[2], out uint amount))
+            {
+                return new CmdReturn("Veuillez entrer un nombre valide", CmdReturn.CmdReturnType.SYNTAX);
+            }
+
+            player.Inventory.Money += amount;
+            return new CmdReturn($"Vous vous êtes donné {amount}$.", CmdReturn.CmdReturnType.SUCCESS);
         }
 
         /// Give set of weapons to the  character
@@ -66,7 +79,15 @@ namespace Lambda.Commands
             string charName = argv[1];
             Player[] players = Player.GetPlayers(charName);
             CmdReturn cmdReturn = CmdReturn.OnlyOnePlayer(players);
-            return cmdReturn.Type == CmdReturn.CmdReturnType.SUCCESS ? new CmdReturn("Vous vous êtes téléporté.", CmdReturn.CmdReturnType.SUCCESS) : cmdReturn;
+            if (cmdReturn.Type == CmdReturn.CmdReturnType.SUCCESS)
+            {
+                player.Position = players[0].Position;
+                return new CmdReturn("Vous vous êtes téléporté.", CmdReturn.CmdReturnType.SUCCESS);
+            }
+
+            return cmdReturn;
+
+
         }
         /// Respawn the character
         [Command(Command.CommandType.ADMIN)]
@@ -84,13 +105,16 @@ namespace Lambda.Commands
         [Command(Command.CommandType.ADMIN, "model")]
         public static CmdReturn Vehicule(Player player, string[] argv)
         {
-            if (!Enum.TryParse(argv[1], true, out VehicleModel model) && Enum.IsDefined(typeof(VehicleModel), argv[1])) // If the model is not the name
+
+            if (!Enum.TryParse(argv[1], true, out VehicleModel model))
             {
                 return new CmdReturn("Modele incorrect", CmdReturn.CmdReturnType.WARNING);
             }
+            if (!Enum.IsDefined(typeof(VehicleModel), model)) return new CmdReturn("Modele incorrect", CmdReturn.CmdReturnType.WARNING);
 
             Vehicle vehicle = new Vehicle(Vector3.Near(player.Position), model);
             Vehicle.Vehicles.Add(vehicle);
+
             return new CmdReturn("Vous avez fait apparaitre un véhicule", CmdReturn.CmdReturnType.SUCCESS);
         }
 
@@ -120,8 +144,7 @@ namespace Lambda.Commands
                 }
                 else
                 {
-                    Alt.Log(CmdReturn.NotInVehicle.Text);
-                    Alt.Log(CmdReturn.NotInVehicle + "");
+
                     return CmdReturn.NotInVehicle;
                 }
             }
@@ -138,20 +161,39 @@ namespace Lambda.Commands
         public static CmdReturn Vehicule_Reparer(Player player, string[] argv)
         {
             IVehicle AltVehicle = player.AltPlayer.Vehicle;
+            Alt.Log("test");
 
-            if (AltVehicle == null) return new CmdReturn("Vous n'etes pas dans un véhicule", CmdReturn.CmdReturnType.WARNING);
+            if (AltVehicle == null) return CmdReturn.NotInVehicle;
 
             AltVehicle.GetData("vehicle", out Vehicle veh);
+            if (veh == null) return CmdReturn.NotInVehicle;
 
-            if (veh != null)
-            {
-                veh.Repair();
-                return new CmdReturn("Vous avez réparé votre véhicule ! ", CmdReturn.CmdReturnType.SUCCESS);
-            }
-            else
-            {
-                return CmdReturn.NotInVehicle;
-            }
+            veh.Repair();
+            return new CmdReturn("Vous avez réparé votre véhicule ! ", CmdReturn.CmdReturnType.SUCCESS);
+        }
+
+        [Command(Command.CommandType.ADMIN, "Rouge", "Vert", "Bleu")]
+        public static CmdReturn Vehicle_Couleur(Player player, string[] argv)
+        {
+            IVehicle AltVehicle = player.AltPlayer.Vehicle;
+            if (AltVehicle == null) return CmdReturn.NotInVehicle;
+            AltVehicle.GetData("vehicle", out Vehicle veh);
+            if (veh == null) return CmdReturn.NotInVehicle;
+            if (!byte.TryParse(argv[2], out byte r)) return new CmdReturn("Couleur incorecte", CmdReturn.CmdReturnType.SYNTAX);
+            if (!byte.TryParse(argv[3], out byte g)) return new CmdReturn("Couleur incorecte", CmdReturn.CmdReturnType.SYNTAX);
+            if (!byte.TryParse(argv[4], out byte b)) return new CmdReturn("Couleur incorecte", CmdReturn.CmdReturnType.SYNTAX);
+            veh.SetColor(r, g, b);
+            return new CmdReturn("Vous avez changé la couleur de votre véhicule ! ", CmdReturn.CmdReturnType.SUCCESS);
+        }
+
+        [Command(Command.CommandType.ADMIN)]
+        public static CmdReturn Vehicle_Data(Player player, string[] argv)
+        {
+            IVehicle AltVehicle = player.AltPlayer.Vehicle;
+            if (AltVehicle == null) return CmdReturn.NotInVehicle;
+            Alt.Log("DamageData " + AltVehicle.DamageData);
+            Alt.Log("HealthData " + AltVehicle.HealthData);
+            return new CmdReturn("F TEST ", CmdReturn.CmdReturnType.SUCCESS);
         }
 
         /// Delete the current vehicule from the database and from the game
@@ -159,17 +201,17 @@ namespace Lambda.Commands
         [Command(Command.CommandType.ADMIN)]
         public static CmdReturn Vehicule_Supprimer(Player player, string[] argv)
         {
-            Alt.Log("Commande Vehicule Park");
+
             if (player.AltPlayer != null)
             {
-                Alt.Log("Le joueur existe");
+
                 if (player.AltPlayer.IsInVehicle)
                 {
-                    Alt.Log("Le joueur est dans un véhicule");
-                    player.AltPlayer.Vehicle.GetData("AltVehicle", out Vehicle vehicle);
+
+                    player.AltPlayer.Vehicle.GetData("vehicle", out Vehicle vehicle);
                     if (vehicle != null)
                     {
-                        Alt.Log("Delete du veh");
+
                         vehicle.Delete();
                         return new CmdReturn("Vous avez supprimé un véhicule", CmdReturn.CmdReturnType.SUCCESS);
                     }
@@ -181,8 +223,6 @@ namespace Lambda.Commands
                 }
                 else
                 {
-                    Alt.Log(CmdReturn.NotInVehicle.Text);
-                    Alt.Log(CmdReturn.NotInVehicle + "");
                     return CmdReturn.NotInVehicle;
                 }
             }

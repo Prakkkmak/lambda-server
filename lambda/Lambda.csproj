@@ -5,6 +5,7 @@
     <ApplicationIcon />
     <Win32Resource />
     <Configurations>Debug;Release;Publish</Configurations>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -24,9 +25,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AltV.Net" Version="1.1.9" />
-    <PackageReference Include="AltV.Net.Async" Version="1.1.9" />
-    <PackageReference Include="AltV.Net.Mock" Version="1.1.9" />
+    <PackageReference Include="AltV.Net" Version="1.1.11" />
+    <PackageReference Include="AltV.Net.Async" Version="1.1.11" />
+    <PackageReference Include="AltV.Net.Mock" Version="1.1.11" />
     <PackageReference Include="MySqlConnector" Version="0.51.1" />
   </ItemGroup>
 

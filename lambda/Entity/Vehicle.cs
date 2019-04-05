@@ -52,7 +52,7 @@ namespace Lambda.Entity
 
         public Rgba Color
         {
-            get => Rgba.Zero;
+            get => AltVehicle.PrimaryColorRgb;
             set => AltVehicle.PrimaryColorRgb = value;
         }
 
@@ -74,7 +74,7 @@ namespace Lambda.Entity
             SpawnRotation = new Rotation(0, 0, 0);
             this.model = model;
             AltVehicle = Spawn();
-            AltVehicle.SetData("AltVehicle", this);
+            AltVehicle.SetData("vehicle", this);
 
             this.id = 0;
             this.Color = new Rgba(241, 196, 15, 255);
@@ -105,7 +105,7 @@ namespace Lambda.Entity
             bool result = Enum.TryParse(modelName, true, out VehicleModel model);
             this.model = model;
             if (result) AltVehicle = Spawn();
-            AltVehicle.SetData("AltVehicle", this);
+            AltVehicle.SetData("vehicle", this);
             Rgba color = new Rgba();
             color.r = byte.Parse(datas["veh_color_r"]);
             color.g = byte.Parse(datas["veh_color_g"]);
@@ -127,8 +127,18 @@ namespace Lambda.Entity
         public void Repair()
         {
             AltVehicle.BodyHealth = 100;
+            AltVehicle.EngineHealth = 100;
+            AltVehicle.BodyAdditionalHealth = 100;
+            AltVehicle.PetrolTankHealth = 100;
             hp = 100;
-            AltVehicle.DamageData = "";
+            AltVehicle.DamageData = "AA==";
+            AltVehicle.HealthData = "DwAi";
+        }
+
+        public void SetColor(byte r, byte g, byte b, byte a = 255)
+        {
+            Rgba color = new Rgba(r, g, b, a);
+            Color = color;
         }
 
         public void Park()

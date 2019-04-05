@@ -18,13 +18,29 @@ namespace Lambda.Items
         public uint Id { get; }
         public InventoryType Type { get; }
         public List<Item> Items { get; set; }
+        public ulong Money { get; set; }
 
         public Inventory(InventoryType type = InventoryType.DEFAULT, uint id = 0)
         {
             Id = id;
             Type = type;
             Items = new List<Item>();
+            Money = 10000;
         }
+
+        public bool Withdraw(uint amount)
+        {
+            if (Money < (ulong)amount) return false;
+            Money -= (ulong)amount;
+            return true;
+        }
+
+        public bool Deposit(int amount)
+        {
+            Money += (ulong)amount;
+            return true;
+        }
+
 
         public bool AddItem(uint id, uint amount)
         {

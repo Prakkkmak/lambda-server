@@ -43,6 +43,8 @@ namespace Lambda
             BaseItem.LoadAllItems();
             Alt.Log("Loading all skins");
             Skin.LoadAllSkins();
+            Alt.Log("Loading all areas");
+            Area.LoadAll();
             Alt.Log("Loading all components");
             ComponentLink.LoadAllComponentLinks();
         }

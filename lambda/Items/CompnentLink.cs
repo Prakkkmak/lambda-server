@@ -78,39 +78,11 @@ namespace Lambda.Items
         public static void AddSkinToComponentsLinks(Skin skin, Valid validity)
         {
             ComponentLink[] componentLinks = ExtractSkinLinks(skin, validity);
-            ComponentLink[] existedComponentLinks = FindExistedComponentLinks(componentLinks);
-
-            if (componentLinks.Length == existedComponentLinks.Length + 1 && validity == Valid.FALSE)
-            {
-
-                foreach (ComponentLink componentLink in componentLinks)
-                {
-                    bool founded = true;
-                    foreach (ComponentLink existedComponentLink in existedComponentLinks)
-                    {
-                        if (Equals(componentLink, existedComponentLink))
-                        {
-                            founded = false;
-                            break;
-                        }
-                    }
-
-                    if (founded)
-                    {
-                        componentLink.Validity = Valid.FALSE;
-                        ComponentLinks.Add(componentLink);
-                        return;
-                    }
-                }
-            }
-
-            if (validity == Valid.FALSE) return;
             foreach (ComponentLink componentLink in componentLinks)
             {
                 ComponentLink comp = GetComponentLink(componentLink);
                 if (comp != null)
                 {
-
                     comp.Validity = validity;
                 }
                 else
@@ -118,6 +90,7 @@ namespace Lambda.Items
                     ComponentLinks.Add(componentLink);
                 }
             }
+
 
         }
 
@@ -178,13 +151,17 @@ namespace Lambda.Items
                 badComponentLinks[0].Validity = Valid.FALSE;
 
             }
-            if (badComponentLinks.Count > 1 && isSetByPlayer) // Case where all components are true except this one
+
+            if (badComponentLinks.Count == 0)
             {
-                AddSkinToComponentsLinks(badSkin, Valid.UNKNOW);
+                foreach (ComponentLink comp in componentLink)
+                {
+                    comp.Validity = Valid.UNKNOW;
+                }
 
             }
-
         }
+
         public static void GenerateFalseComponentLinks()
         {
             foreach (Skin badSkin in Skin.BadSkins)

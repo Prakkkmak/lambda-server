@@ -40,9 +40,14 @@ namespace Lambda.Administration
             Id = (uint)Insert(password);
         }
 
-        public static Account LogIn(string mail, string password)
+        public static Account LogIn(string mail, string password = "")
         {
-            Account account = Account.GetAccount(mail, password);
+            Account account = GetAccount(mail, password);
+            return account;
+        }
+        public static Account LogIn(uint id)
+        {
+            Account account = GetAccount(id);
             return account;
         }
 
@@ -84,27 +89,30 @@ namespace Lambda.Administration
             DBConnect dbConnect = DBConnect.DbConnect;
             return dbConnect.Update(TableName, datas, wheres);
         }
-
+        //TODO Getaccount useless ?
         private static Account GetAccount(string mail, string password)
         {
-            DBConnect dbConnect = DBConnect.DbConnect;
             Dictionary<string, string> datas = Select(mail, password);
             return datas.Count > 0 ? new Account(datas) : null;
         }
+        private static Account GetAccount(uint id)
+        {
+            Dictionary<string, string> datas = Select(id);
+            return datas.Count > 0 ? new Account(datas) : null;
+        }
 
-        private static Dictionary<string, string> Select(int id)
+        private static Dictionary<string, string> Select(uint id)
         {
             Dictionary<string, string> wheres = new Dictionary<string, string>();
             wheres["acc_id"] = id.ToString();
             DBConnect dbConnect = DBConnect.DbConnect;
             return dbConnect.SelectOne(TableName, wheres);
         }
-
-        private static Dictionary<string, string> Select(string mail, string password)
+        private static Dictionary<string, string> Select(string mail, string password = "")
         {
             Dictionary<string, string> wheres = new Dictionary<string, string>();
             wheres["acc_mail"] = mail;
-            wheres["acc_password"] = password;
+            if (password.Length > 0) wheres["acc_password"] = password;
             DBConnect dbConnect = DBConnect.DbConnect;
             return dbConnect.SelectOne(TableName, wheres);
         }
