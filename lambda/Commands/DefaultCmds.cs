@@ -44,7 +44,9 @@ namespace Lambda.Commands
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Inventaire(Player player, string[] argv)
         {
-            string str = "Voici le contenu de votre inventaire: <br>";
+            string str = $"Voici votre stockage";
+            str +== "Voici le contenu de votre inventaire: <br>";
+
             foreach (Item inventoryItem in player.Inventory.Items)
             {
                 str += inventoryItem.Base.Name + " " + "(" + inventoryItem.Amount + ")";

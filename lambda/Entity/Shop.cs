@@ -24,6 +24,8 @@ namespace Lambda.Entity
             Sells = new List<Sell>();
             CheckpointTypeId = 2;
             Type = AreaType.SHOP;
+
+            SetMetaData(datas["are_metadata"]);
         }
 
         public void AddSell(uint id, int price)
@@ -88,6 +90,19 @@ namespace Lambda.Entity
             if (str.Length > 0) str.Remove(str.Length - 1);
             return str;
         }
+        public override void SetMetaData(string metadata)
+        {
+            string[] sellsString = metadata.Split(',');
+            foreach (string s in sellsString)
+            {
+                string idString = s.Split(':')[0];
+                string priceString = s.Split(':')[1];
+                Sell sell = new Sell(uint.Parse(idString), int.Parse(priceString));
+                Sells.Add(sell);
+            }
+        }
+
+
 
 
     }

@@ -81,6 +81,7 @@ namespace Lambda.Entity
             {
                 id = (uint)Insert();
                 OnlinePlayers.Add(this);
+                Freeze(false);
             }
             else
             {
@@ -109,6 +110,7 @@ namespace Lambda.Entity
             Skin.Load();
             Skin.SendSkin(this);
             OnlinePlayers.Add(this);
+            Freeze(false);
             return true;
         }
 
@@ -135,6 +137,11 @@ namespace Lambda.Entity
             Chat.Send(this, msg);
         }
 
+        public void Freeze(bool choice)
+        {
+            AltPlayer.Emit(choice ? "freeze" : "unfreeze");
+        }
+
         public static Player[] GetPlayers(string nameOrId)
         {
             List<Player> players = new List<Player>();
@@ -156,6 +163,7 @@ namespace Lambda.Entity
 
             return null;
         }
+
 
 
 

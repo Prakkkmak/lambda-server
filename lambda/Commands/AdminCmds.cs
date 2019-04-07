@@ -89,6 +89,43 @@ namespace Lambda.Commands
 
 
         }
+
+        /// Freeze a player
+        /// /freeze [player]
+        [Command(Command.CommandType.ADMIN, "joueur")]
+        public static CmdReturn Freeze(Player player, string[] argv)
+        {
+            string charName = argv[1];
+            Player[] players = Player.GetPlayers(charName);
+            CmdReturn cmdReturn = CmdReturn.OnlyOnePlayer(players);
+            if (cmdReturn.Type == CmdReturn.CmdReturnType.SUCCESS)
+            {
+                players[0].Freeze(true);
+                return new CmdReturn("Vous vous freeze un joueur.", CmdReturn.CmdReturnType.SUCCESS);
+            }
+
+            return cmdReturn;
+
+
+        }
+        /// unfreeze a player
+        /// /unfreeze [player]
+        [Command(Command.CommandType.ADMIN, "joueur")]
+        public static CmdReturn unfeeze(Player player, string[] argv)
+        {
+            string charName = argv[1];
+            Player[] players = Player.GetPlayers(charName);
+            CmdReturn cmdReturn = CmdReturn.OnlyOnePlayer(players);
+            if (cmdReturn.Type == CmdReturn.CmdReturnType.SUCCESS)
+            {
+                players[0].Freeze(false);
+                return new CmdReturn("Vous vous freeze un joueur.", CmdReturn.CmdReturnType.SUCCESS);
+            }
+
+            return cmdReturn;
+
+
+        }
         /// Respawn the character
         [Command(Command.CommandType.ADMIN)]
         public static CmdReturn Respawn(Player player, string[] argv)

@@ -87,6 +87,7 @@ namespace Lambda
         {
             Player player = new Player(altPlayer);
             player.Spawn(Player.SpawnPosition);
+            player.Freeze(true);
         }
 
         public static void OnVehicleRemove(IVehicle vehicle)

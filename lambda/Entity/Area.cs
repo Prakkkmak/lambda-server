@@ -80,6 +80,10 @@ namespace Lambda.Entity
         {
             return "";
         }
+        public virtual void SetMetaData(string metadata)
+        {
+
+        }
 
         public void Save()
         {

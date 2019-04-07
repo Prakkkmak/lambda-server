@@ -51,6 +51,7 @@ namespace Lambda.Commands
             if (player.Account != null) return new CmdReturn("Vous êtes déjà connecté", CmdReturn.CmdReturnType.WARNING);
             if (!emailAdressAttribute.IsValid(mail)) return new CmdReturn("Mail invalide.", CmdReturn.CmdReturnType.SYNTAX);
             if (password.Length < 6) return new CmdReturn("Mot de passe trop court. Il doit faire 6 caractères", CmdReturn.CmdReturnType.SYNTAX);
+            if (!password.Equals(confirmPassword)) return new CmdReturn("Mot de passe différents", CmdReturn.CmdReturnType.SYNTAX);
             if (Account.LogIn(mail) != null) return new CmdReturn("Un compte éxiste déjà", CmdReturn.CmdReturnType.WARNING);
             Account account = new Account(mail);
             account.Register(password);
