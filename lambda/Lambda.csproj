@@ -6,6 +6,8 @@
     <Win32Resource />
     <Configurations>Debug;Release;Publish</Configurations>
     <LangVersion>latest</LangVersion>
+    <OutputType>Library</OutputType>
+    <StartupObject />
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

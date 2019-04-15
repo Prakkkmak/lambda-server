@@ -21,6 +21,7 @@ namespace Lambda
         private List<Area> areas;
         private List<Spawn> spawns;
         private List<Command> commands;
+        private List<ComponentLink> componentLinks;
         private BaseItem[] baseitems;
         private DBConnect dbConnect;
         private Events events;
@@ -31,6 +32,8 @@ namespace Lambda
         public DbArea DbArea { get; }
         public DbPlayer DbPlayer { get; }
         public DbAccount DbAccount { get; }
+
+        public DbComponentLink DbComponentLink { get; }
 
         public Game()
         {
@@ -50,6 +53,7 @@ namespace Lambda
             DbArea = new DbArea(this, dbConnect, "t_area_are", "are");
             DbPlayer = new DbPlayer(this, dbConnect, "t_character_cha", "cha");
             DbAccount = new DbAccount(this, dbConnect, "t_account_acc", "acc");
+            DbComponentLink = new DbComponentLink(this, dbConnect, "t_componentlink_com", "com");
 
         }
 
@@ -73,7 +77,8 @@ namespace Lambda
             Alt.Log(">Vehicles spawned");
             AddAllBaseItems();
             Alt.Log(">Base items created");
-
+            AddAllComponentLinks();
+            Alt.Log(">Components links loaded");
         }
 
         public void AddPlayer(Player player)
@@ -293,6 +298,50 @@ namespace Lambda
             return cmds.ToArray();
         }
 
+        public void AddComponentLink(ComponentLink componentLink)
+        {
+            componentLinks.Add(componentLink);
+        }
 
+        public void AddComponentLinks(ComponentLink[] links)
+        {
+            foreach(ComponentLink componentLink in links)
+            {
+                ComponentLink actual = GetComponentLink(componentLink);
+                if(actual == null)
+                {
+                    componentLinks.Add(componentLink);
+                }
+                else
+                {
+                    actual.Validity = componentLink.Validity;
+                }
+            }
+        }
+
+        public void AddAllComponentLinks()
+        {
+            componentLinks = DbComponentLink.GetAll().ToList<ComponentLink>();
+        }
+
+        public ComponentLink GetComponentLink(ComponentLink componentLink)
+        {
+            foreach(ComponentLink comp in componentLinks)
+            {
+                if (comp.Equals(componentLink)) return comp;
+            }
+            return null;
+        }
+
+        public ComponentLink[] GetComponentLinks(ComponentLink[] componentLinks)
+        {
+            List<ComponentLink> similarities = new List<ComponentLink>();
+            foreach (ComponentLink componentLink in componentLinks)
+            {
+                ComponentLink comp = GetComponentLink(componentLink);
+                if (comp != null) similarities.Add(comp);
+            }
+            return similarities.ToArray();
+        }
     }
 }

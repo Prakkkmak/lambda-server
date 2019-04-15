@@ -13,7 +13,7 @@ using Lambda.Items;
 
 namespace Items
 {
-    public class Skin
+    public class Skin : IDBElement
     {
         public enum ClothNumber
         {
@@ -32,31 +32,32 @@ namespace Items
         }
 
 
-        private string type; //Everyone can't take every closes.
-        private string model; // The model associated with this skin
-        private bool valid;
+        public string Type { get; set; } //Everyone can't take every closes.
+        public string Model { get; set; } // The model associated with this skin
+        public bool Valid { get; set; }
 
-        private Component mask; // 1
-        private Component hair; // 2
-        private Component torso; // 3
-        private Component leg; // 4
-        private Component bag; // 5
-        private Component feet; // 6
-        private Component accessoiries; // 7
-        private Component undershirt; // 8
-        private Component bodyArmor; // 9
-        private Component decal; // 10
-        private Component top; // 11
+        public Component Mask { get; set; } // 1
+        public Component Hair { get; set; } // 2
+        public Component Torso { get; set; } // 3
+        public Component Leg { get; set; } // 4
+        public Component Bag { get; set; } // 5
+        public Component Feet { get; set; } // 6
+        public Component Accessoiries { get; set; } // 7
+        public Component Undershirt { get; set; } // 8
+        public Component BodyArmor { get; set; } // 9
+        public Component Decal { get; set; } // 10
+        public Component Top { get; set; } // 11
 
         public uint Id;
         public Player Player { get; set; }
+        uint IDBElement.Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public Skin()
         {
             Id = 0;
-            type = "DEFAULT";
-            model = "mp_m_freemode_01";
-            valid = true;
+            Type = "DEFAULT";
+            Model = "mp_m_freemode_01";
+            Valid = true;
             for (uint i = 1; i < 12; i++)
             {
                 SetComponent(i, 0);
@@ -67,9 +68,9 @@ namespace Items
         public Skin(uint[] components)
         {
             Id = 0;
-            type = "DEFAULT";
-            model = "mp_m_freemode_01";
-            valid = true;
+            Type = "DEFAULT";
+            Model = "mp_m_freemode_01";
+            Valid = true;
             for (uint i = 1; i < components.Length; i++)
             {
                 SetComponent(i, components[i]);
@@ -83,7 +84,7 @@ namespace Items
 
         public void SetModel(string value)
         {
-            model = value;
+            Model = value;
         }
 
         public void SetComponent(uint componentId, uint drawable, uint texture = 0, uint palette = 0)
@@ -92,37 +93,37 @@ namespace Items
             switch (componentId)
             {
                 case 1:
-                    mask = new Component(drawable, texture, palette);
+                    Mask = new Component(drawable, texture, palette);
                     break;
                 case 2:
-                    hair = new Component(drawable, texture, palette);
+                    Hair = new Component(drawable, texture, palette);
                     break;
                 case 3:
-                    torso = new Component(drawable, texture, palette);
+                    Torso = new Component(drawable, texture, palette);
                     break;
                 case 4:
-                    leg = new Component(drawable, texture, palette);
+                    Leg = new Component(drawable, texture, palette);
                     break;
                 case 5:
-                    bag = new Component(drawable, texture, palette);
+                    Bag = new Component(drawable, texture, palette);
                     break;
                 case 6:
-                    feet = new Component(drawable, texture, palette);
+                    Feet = new Component(drawable, texture, palette);
                     break;
                 case 7:
-                    accessoiries = new Component(drawable, texture, palette);
+                    Accessoiries = new Component(drawable, texture, palette);
                     break;
                 case 8:
-                    undershirt = new Component(drawable, texture, palette);
+                    Undershirt = new Component(drawable, texture, palette);
                     break;
                 case 9:
-                    bodyArmor = new Component(drawable, texture, palette);
+                    BodyArmor = new Component(drawable, texture, palette);
                     break;
                 case 10:
-                    decal = new Component(drawable, texture, palette);
+                    Decal = new Component(drawable, texture, palette);
                     break;
                 case 11:
-                    top = new Component(drawable, texture, palette);
+                    Top = new Component(drawable, texture, palette);
                     break;
             }
         }
@@ -132,37 +133,37 @@ namespace Items
             switch (componentId)
             {
                 case 1:
-                    return mask;
+                    return Mask;
 
                 case 2:
-                    return hair;
+                    return Hair;
 
                 case 3:
-                    return torso;
+                    return Torso;
 
                 case 4:
-                    return leg;
+                    return Leg;
 
                 case 5:
-                    return bag;
+                    return Bag;
 
                 case 6:
-                    return feet;
+                    return Feet;
 
                 case 7:
-                    return accessoiries;
+                    return Accessoiries;
 
                 case 8:
-                    return undershirt;
+                    return Undershirt;
 
                 case 9:
-                    return bodyArmor;
+                    return BodyArmor;
 
                 case 10:
-                    return decal;
+                    return Decal;
 
                 case 11:
-                    return top;
+                    return Top;
                 default:
                     return new Component();
 
@@ -187,17 +188,17 @@ namespace Items
 
         public static bool Equals(Skin skin1, Skin skin2)
         {
-            if (!Component.Equals(skin1.mask, skin2.mask)) return false;
-            if (!Component.Equals(skin1.hair, skin2.hair)) return false;
-            if (!Component.Equals(skin1.torso, skin2.torso)) return false;
-            if (!Component.Equals(skin1.leg, skin2.leg)) return false;
-            if (!Component.Equals(skin1.bag, skin2.bag)) return false;
-            if (!Component.Equals(skin1.feet, skin2.feet)) return false;
-            if (!Component.Equals(skin1.accessoiries, skin2.accessoiries)) return false;
-            if (!Component.Equals(skin1.undershirt, skin2.undershirt)) return false;
-            if (!Component.Equals(skin1.bodyArmor, skin2.bodyArmor)) return false;
-            if (!Component.Equals(skin1.decal, skin2.decal)) return false;
-            if (!Component.Equals(skin1.top, skin2.top)) return false;
+            if (!Component.Equals(skin1.Mask, skin2.Mask)) return false;
+            if (!Component.Equals(skin1.Hair, skin2.Hair)) return false;
+            if (!Component.Equals(skin1.Torso, skin2.Torso)) return false;
+            if (!Component.Equals(skin1.Leg, skin2.Leg)) return false;
+            if (!Component.Equals(skin1.Bag, skin2.Bag)) return false;
+            if (!Component.Equals(skin1.Feet, skin2.Feet)) return false;
+            if (!Component.Equals(skin1.Accessoiries, skin2.Accessoiries)) return false;
+            if (!Component.Equals(skin1.Undershirt, skin2.Undershirt)) return false;
+            if (!Component.Equals(skin1.BodyArmor, skin2.BodyArmor)) return false;
+            if (!Component.Equals(skin1.Decal, skin2.Decal)) return false;
+            if (!Component.Equals(skin1.Top, skin2.Top)) return false;
             return true;
 
         }
@@ -223,18 +224,18 @@ namespace Items
                 return;
             }
             //}TODO type
-            model = datas["ski_model"];
-            mask = new Component(datas, "ski_mask");
-            hair = new Component(datas, "ski_hair");
-            torso = new Component(datas, "ski_torso");
-            leg = new Component(datas, "ski_leg");
-            bag = new Component(datas, "ski_bag");
-            feet = new Component(datas, "ski_feet");
-            accessoiries = new Component(datas, "ski_accessoiries");
-            undershirt = new Component(datas, "ski_undershirt");
-            bodyArmor = new Component(datas, "ski_bodyarmor");
-            decal = new Component(datas, "ski_decal");
-            top = new Component(datas, "ski_top");
+            Model = datas["ski_model"];
+            Mask = new Component(datas, "ski_mask");
+            Hair = new Component(datas, "ski_hair");
+            Torso = new Component(datas, "ski_torso");
+            Leg = new Component(datas, "ski_leg");
+            Bag = new Component(datas, "ski_bag");
+            Feet = new Component(datas, "ski_feet");
+            Accessoiries = new Component(datas, "ski_accessoiries");
+            Undershirt = new Component(datas, "ski_undershirt");
+            BodyArmor = new Component(datas, "ski_bodyarmor");
+            Decal = new Component(datas, "ski_decal");
+            Top = new Component(datas, "ski_top");
         }
 
 
@@ -242,24 +243,25 @@ namespace Items
         {
             Skin skin = new Skin();
             Dictionary<string, string> datas = GetSkinData();
-            skin.model = datas["ski_model"];
-            skin.mask = new Component(datas, "ski_mask");
-            skin.hair = new Component(datas, "ski_hair");
-            skin.torso = new Component(datas, "ski_torso");
-            skin.leg = new Component(datas, "ski_leg");
-            skin.bag = new Component(datas, "ski_bag");
-            skin.feet = new Component(datas, "ski_feet");
-            skin.accessoiries = new Component(datas, "ski_accessoiries");
-            skin.undershirt = new Component(datas, "ski_undershirt");
-            skin.bodyArmor = new Component(datas, "ski_bodyarmor");
-            skin.decal = new Component(datas, "ski_decal");
-            skin.top = new Component(datas, "ski_top");
+            skin.Model = datas["ski_model"];
+            skin.Mask = new Component(datas, "ski_mask");
+            skin.Hair = new Component(datas, "ski_hair");
+            skin.Torso = new Component(datas, "ski_torso");
+            skin.Leg = new Component(datas, "ski_leg");
+            skin.Bag = new Component(datas, "ski_bag");
+            skin.Feet = new Component(datas, "ski_feet");
+            skin.Accessoiries = new Component(datas, "ski_accessoiries");
+            skin.Undershirt = new Component(datas, "ski_undershirt");
+            skin.BodyArmor = new Component(datas, "ski_bodyarmor");
+            skin.Decal = new Component(datas, "ski_decal");
+            skin.Top = new Component(datas, "ski_top");
             return skin;
         }
 
         public static int GenerateSkins()
         {
-            ComponentLink[] links = ComponentLink.ComponentLinks.ToArray();
+            return 0;
+            /*ComponentLink[] links = ComponentLink.ComponentLinks.ToArray();
             List<ComponentLink> TopToLeg = new List<ComponentLink>();
             List<ComponentLink> FeetToLeg = new List<ComponentLink>();
             List<ComponentLink> HairToMask = new List<ComponentLink>();
@@ -347,13 +349,13 @@ namespace Items
                                             //if (undershirtToLeg.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
 
                                             Skin skin = new Skin();
-                                            skin.feet = new Component(feetToLeg.DrawableA);
-                                            skin.leg = new Component(feetToLeg.DrawableB);
-                                            skin.top = new Component(topToLeg.DrawableA);
-                                            skin.torso = new Component(torsoToTop.DrawableA);
-                                            skin.undershirt = new Component(undershortToTop.DrawableA);
-                                            skin.hair = new Component(hairToMask.DrawableA);
-                                            skin.mask = new Component(hairToMask.DrawableB);
+                                            skin.Feet = new Component(feetToLeg.DrawableA);
+                                            skin.Leg = new Component(feetToLeg.DrawableB);
+                                            skin.Top = new Component(topToLeg.DrawableA);
+                                            skin.Torso = new Component(torsoToTop.DrawableA);
+                                            skin.Undershirt = new Component(undershortToTop.DrawableA);
+                                            skin.Hair = new Component(hairToMask.DrawableA);
+                                            skin.Mask = new Component(hairToMask.DrawableB);
                                             if (isGoodSkin) goodskins.Add(skin);
                                             else BadSkins.Add(skin);
 
@@ -372,7 +374,7 @@ namespace Items
 
             }
             GoodSkins = goodskins.ToArray();
-            return GoodSkins.Length;
+            return GoodSkins.Length;*/
         }
 
         public static Skin Random()
@@ -443,7 +445,7 @@ namespace Items
             return null;
         }
 
-
+        /*
         public ComponentLink[] GetLinksByType(ComponentLink.Valid type)
         {
             ComponentLink[] components = ComponentLink.ExtractSkinLinks(this, ComponentLink.Valid.UNKNOW);
@@ -468,50 +470,7 @@ namespace Items
 
         #region database
 
-
-
-        private Dictionary<string, string> GetSkinData()
-        {
-            Dictionary<string, string> datas = new Dictionary<string, string>();
-            int i = 0;
-            datas["ski_valid"] = (valid ? 1 : 0).ToString();
-            datas["ski_type"] = type;
-            datas["ski_model"] = model;
-            datas["ski_mask_drawable"] = mask.Drawable.ToString();
-            datas["ski_mask_texture"] = mask.Texture.ToString();
-            datas["ski_mask_palette"] = mask.Palette.ToString();
-            datas["ski_hair_drawable"] = hair.Drawable.ToString();
-            datas["ski_hair_texture"] = hair.Texture.ToString();
-            datas["ski_hair_palette"] = hair.Palette.ToString();
-            datas["ski_torso_drawable"] = torso.Drawable.ToString();
-            datas["ski_torso_texture"] = torso.Texture.ToString();
-            datas["ski_torso_palette"] = torso.Palette.ToString();
-            datas["ski_leg_drawable"] = leg.Drawable.ToString();
-            datas["ski_leg_texture"] = leg.Palette.ToString();
-            datas["ski_leg_palette"] = leg.Texture.ToString();
-            datas["ski_bag_drawable"] = bag.Drawable.ToString();
-            datas["ski_bag_texture"] = bag.Texture.ToString();
-            datas["ski_bag_palette"] = bag.Palette.ToString();
-            datas["ski_feet_drawable"] = feet.Drawable.ToString();
-            datas["ski_feet_texture"] = feet.Texture.ToString();
-            datas["ski_feet_palette"] = feet.Palette.ToString();
-            datas["ski_accessoiries_drawable"] = accessoiries.Drawable.ToString();
-            datas["ski_accessoiries_texture"] = accessoiries.Texture.ToString();
-            datas["ski_accessoiries_palette"] = accessoiries.Palette.ToString();
-            datas["ski_undershirt_drawable"] = undershirt.Drawable.ToString();
-            datas["ski_undershirt_texture"] = undershirt.Texture.ToString();
-            datas["ski_undershirt_palette"] = undershirt.Palette.ToString();
-            datas["ski_bodyarmor_drawable"] = bodyArmor.Drawable.ToString();
-            datas["ski_bodyarmor_texture"] = bodyArmor.Texture.ToString();
-            datas["ski_bodyarmor_palette"] = bodyArmor.Palette.ToString();
-            datas["ski_decal_drawable"] = decal.Drawable.ToString();
-            datas["ski_decal_texture"] = decal.Texture.ToString();
-            datas["ski_decal_palette"] = decal.Palette.ToString();
-            datas["ski_top_drawable"] = top.Drawable.ToString();
-            datas["ski_top_texture"] = top.Drawable.ToString();
-            datas["ski_top_palette"] = top.Drawable.ToString();
-            return datas;
-        }
+        */
 
         private long Insert()
         {
