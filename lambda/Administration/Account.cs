@@ -6,118 +6,29 @@ using Lambda.Database;
 
 namespace Lambda.Administration
 {
-    public class Account
+    public class Account : IDBElement
     {
-
-        private short note;
-        private int admin;
-        private uint hoursPlayed;
+        public short note;
+        public int admin;
+        public uint hoursPlayed;
 
         public uint Id { get; set; }
         public string Mail { get; set; }
+        public string License { get; set; }
 
-
-        public Account(string mail)
+        public Account()
         {
-            Mail = mail;
+            Mail = "";
             Id = 0;
             note = 0;
             admin = 0;
         }
 
-        public Account(Dictionary<string, string> datas)
+        public Account(string license) : this()
         {
-            Id = uint.Parse(datas["acc_id"]);
-            Mail = datas["acc_mail"];
-            hoursPlayed = uint.Parse(datas["acc_hoursplayed"]);
-            note = short.Parse(datas["acc_note"]);
-            admin = short.Parse(datas["acc_admin"]);
+            License = license;
+
         }
 
-
-        public void Register(string password)
-        {
-            Id = (uint)Insert(password);
-        }
-
-        public static Account LogIn(string mail, string password = "")
-        {
-            Account account = GetAccount(mail, password);
-            return account;
-        }
-        public static Account LogIn(uint id)
-        {
-            Account account = GetAccount(id);
-            return account;
-        }
-
-        #region database
-        private Dictionary<string, string> GetPlayerData(string password)
-        {
-            Dictionary<string, string> datas = new Dictionary<string, string>();
-            int i = 0;
-            datas["acc_mail"] = Mail;
-            datas["acc_password"] = password;
-            datas["acc_hoursplayed"] = hoursPlayed.ToString();
-            datas["acc_note"] = note.ToString();
-            datas["acc_admin"] = admin.ToString();
-            return datas;
-        }
-        private Dictionary<string, string> GetPlayerData()
-        {
-            Dictionary<string, string> datas = new Dictionary<string, string>();
-            int i = 0;
-            datas["acc_mail"] = Mail;
-            datas["acc_hoursplayed"] = hoursPlayed.ToString();
-            datas["acc_note"] = note.ToString();
-            datas["acc_admin"] = admin.ToString();
-            return datas;
-        }
-
-        private long Insert(string password)
-        {
-            Dictionary<string, string> data = GetPlayerData(password);
-            DBConnect dbConnect = DBConnect.DbConnect;
-            return dbConnect.Insert(TableName, data);
-        }
-
-        private int Update()
-        {
-            Dictionary<string, string> datas = GetPlayerData();
-            Dictionary<string, string> wheres = new Dictionary<string, string>();
-            wheres["acc_id"] = Id.ToString();
-            DBConnect dbConnect = DBConnect.DbConnect;
-            return dbConnect.Update(TableName, datas, wheres);
-        }
-        //TODO Getaccount useless ?
-        private static Account GetAccount(string mail, string password)
-        {
-            Dictionary<string, string> datas = Select(mail, password);
-            return datas.Count > 0 ? new Account(datas) : null;
-        }
-        private static Account GetAccount(uint id)
-        {
-            Dictionary<string, string> datas = Select(id);
-            return datas.Count > 0 ? new Account(datas) : null;
-        }
-
-        private static Dictionary<string, string> Select(uint id)
-        {
-            Dictionary<string, string> wheres = new Dictionary<string, string>();
-            wheres["acc_id"] = id.ToString();
-            DBConnect dbConnect = DBConnect.DbConnect;
-            return dbConnect.SelectOne(TableName, wheres);
-        }
-        private static Dictionary<string, string> Select(string mail, string password = "")
-        {
-            Dictionary<string, string> wheres = new Dictionary<string, string>();
-            wheres["acc_mail"] = mail;
-            if (password.Length > 0) wheres["acc_password"] = password;
-            DBConnect dbConnect = DBConnect.DbConnect;
-            return dbConnect.SelectOne(TableName, wheres);
-        }
-
-        #endregion
-        public static string TableName = "t_account_acc";
     }
 }

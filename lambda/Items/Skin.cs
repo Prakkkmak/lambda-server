@@ -49,6 +49,7 @@ namespace Items
         private Component top; // 11
 
         public uint Id;
+        public Player Player { get; set; }
 
         public Skin()
         {
@@ -236,18 +237,6 @@ namespace Items
             top = new Component(datas, "ski_top");
         }
 
-        public Player GetPlayer()
-        {
-            foreach (Player onlinePlayer in Player.OnlinePlayers)
-            {
-                if (onlinePlayer.Skin == this)
-                {
-                    return onlinePlayer;
-                }
-            }
-
-            return null;
-        }
 
         public Skin Copy()
         {
@@ -526,40 +515,31 @@ namespace Items
 
         private long Insert()
         {
-            Dictionary<string, string> datas = GetSkinData();
-            DBConnect dbConnect = DBConnect.DbConnect;
-            return dbConnect.Insert(TableName, datas);
+            /*Dictionary<string, string> datas = GetSkinData();
+            return DbConnect.Insert(TableName, datas);*/
+            return 0;
         }
 
         private void Update()
         {
 
-            Dictionary<string, string> datas = GetSkinData();
+            /*Dictionary<string, string> datas = GetSkinData();
             Dictionary<string, string> wheres = new Dictionary<string, string>();
             wheres["ski_id"] = Id.ToString();
             DBConnect dbConnect = DBConnect.DbConnect;
-            dbConnect.Update(TableName, datas, wheres);
+            dbConnect.Update(TableName, datas, wheres);*/
 
         }
 
         public static Dictionary<string, string> Select(uint id)
         {
-            Dictionary<string, string> wheres = new Dictionary<string, string>();
+            /*Dictionary<string, string> wheres = new Dictionary<string, string>();
             wheres["ski_id"] = id.ToString();
             DBConnect dbConnect = DBConnect.DbConnect;
-            return dbConnect.SelectOne(TableName, wheres);
+            return dbConnect.SelectOne(TableName, wheres);*/
+            return null;
         }
 
-        public static void LoadAllSkins()
-        {
-            /*DBConnect dbConnect = DBConnect.DbConnect;
-            List<Dictionary<string, string>> results = dbConnect.Select(TableName, new Dictionary<string, string>());
-            foreach (Dictionary<string, string> result in results)
-            {
-                Skin skin = new Skin(result);
-                SkinsSaved.Add(skin);
-            }*/
-        }
 
         #endregion
 

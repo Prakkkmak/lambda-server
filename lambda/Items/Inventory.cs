@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using AltV.Net;
+using Lambda.Entity;
 
 namespace Lambda.Items
 {
     public class Inventory
     {
+        public IEntity Entity;
+
         public enum InventoryType
         {
             DEFAULT,
@@ -19,6 +22,8 @@ namespace Lambda.Items
         public InventoryType Type { get; }
         public List<Item> Items { get; set; }
         public ulong Money { get; set; }
+
+
 
         public Inventory(InventoryType type = InventoryType.DEFAULT, uint id = 0)
         {
@@ -47,18 +52,18 @@ namespace Lambda.Items
             Item itemWithLessStack = GetItemWithLessStack(id);
             if (itemWithLessStack != null)
             {
-                uint nbrToAdd = itemWithLessStack.Base.MaxStack - itemWithLessStack.Amount;
+                uint nbrToAdd = itemWithLessStack.GetBaseItem().MaxStack - itemWithLessStack.Amount;
                 amount -= nbrToAdd;
                 itemWithLessStack.Amount += nbrToAdd;
             }
             Alt.Log(id + ") Création d'un item avec " + amount + " de quantité ");
-            Item item = new Item(id, amount);
-            while (item.Amount > item.Base.MaxStack)
+            Item item = new Item(Entity.Game.GetBaseItem(id), amount);
+            while (item.Amount > item.GetBaseItem().MaxStack)
             {
-                item.Amount = item.Base.MaxStack;
-                amount -= item.Base.MaxStack;
+                item.Amount = item.GetBaseItem().MaxStack;
+                amount -= item.GetBaseItem().MaxStack;
                 Items.Add(item);
-                item = new Item(id, amount);
+                item = new Item(Entity.Game.GetBaseItem(id), amount);
             }
             Items.Add(item);
             return true;

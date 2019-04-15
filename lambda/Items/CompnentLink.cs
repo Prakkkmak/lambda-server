@@ -187,37 +187,36 @@ namespace Lambda.Items
 
         private static void Delete()
         {
-            DBConnect dbConnect = DBConnect.DbConnect;
-            dbConnect.Delete(TableName, new Dictionary<string, string>());
-
+            //DbConnect.Delete(TableName, new Dictionary<string, string>());
         }
 
         private long Insert()
         {
-            Dictionary<string, string> datas = GetComponentLinkData();
+            /*Dictionary<string, string> datas = GetComponentLinkData();
             DBConnect dbConnect = DBConnect.DbConnect;
-            return dbConnect.Insert(TableName, datas);
+            return dbConnect.Insert(TableName, datas);*/
+            return 0;
         }
 
         private void Update()
         {
-            Dictionary<string, string> datas = GetComponentLinkData();
+            /*Dictionary<string, string> datas = GetComponentLinkData();
             Dictionary<string, string> wheres = new Dictionary<string, string>();
             wheres["lin_id"] = id.ToString();
             DBConnect dbConnect = DBConnect.DbConnect;
-            dbConnect.Update(TableName, datas, wheres);
+            dbConnect.Update(TableName, datas, wheres);*/
         }
 
         public static void LoadAllComponentLinks()
         {
-            DBConnect dbConnect = DBConnect.DbConnect;
+            /*DBConnect dbConnect = DBConnect.DbConnect;
             List<Dictionary<string, string>> results = dbConnect.Select(TableName, new Dictionary<string, string>());
             foreach (Dictionary<string, string> result in results)
             {
                 ComponentLink componentLink = new ComponentLink(result);
                 ComponentLinks.Add(componentLink);
 
-            }
+            }*/
         }
 
 

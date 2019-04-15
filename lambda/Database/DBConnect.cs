@@ -29,10 +29,10 @@ namespace Lambda.Database
             server = "localhost";
             database = "lambda";
             uid = "root";
-            port = "3307";
+            port = "3306";
             password = "";
-            connectionString = $"server={server}; database={database}; uid={uid}; pwd={password}; port={port}";
-
+            connectionString = $"server={server}; database={database}; uid={uid}; pwd='{password}'; port={port}";
+            connectionString = $"server=149.91.90.131; database=lambda; uid=lambda; pwd=testtest; port=3306";
         }
         /// <summary>
         /// Open the connection
@@ -40,6 +40,8 @@ namespace Lambda.Database
         public MySqlConnection OpenConnection()
         {
             MySqlConnection mySqlConnection = new MySqlConnection(connectionString);
+            Alt.Log(mySqlConnection.ConnectionString);
+            Alt.Log(mySqlConnection.Database);
             try
             {
                 //if (connection.State != ConnectionState.Open)
@@ -60,6 +62,7 @@ namespace Lambda.Database
                         break;
                     default:
                         Alt.Log("Can't connect to the database");
+                        Alt.Log(ex.ErrorCode + "");
                         break;
                 }
                 return null;
@@ -165,7 +168,9 @@ namespace Lambda.Database
             List<Dictionary<string, string>> results = new List<Dictionary<string, string>>();
 
             MySqlCommand cmd = new MySqlCommand(query, connection);
+            Alt.Log("Execute reader");
             MySqlDataReader dataReader = cmd.ExecuteReader();
+            Alt.Log("Lecture des données");
             while (dataReader.Read())
             {
                 Dictionary<string, string> result = new Dictionary<string, string>();
@@ -319,6 +324,5 @@ namespace Lambda.Database
             return query;
         }
 
-        public static DBConnect DbConnect;
     }
 }

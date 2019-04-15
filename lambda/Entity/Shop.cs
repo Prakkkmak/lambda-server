@@ -19,7 +19,7 @@ namespace Lambda.Entity
             CheckpointTypeId = 2;
         }
 
-        public Shop(Dictionary<string, string> datas) : base(datas)
+        public Shop(Dictionary<string, string> datas) : base()
         {
             Sells = new List<Sell>();
             CheckpointTypeId = 2;
@@ -92,9 +92,11 @@ namespace Lambda.Entity
         }
         public override void SetMetaData(string metadata)
         {
+            if (metadata.Length == 0) return;
             string[] sellsString = metadata.Split(',');
             foreach (string s in sellsString)
             {
+                if (s.Length == 0) return;
                 string idString = s.Split(':')[0];
                 string priceString = s.Split(':')[1];
                 Sell sell = new Sell(uint.Parse(idString), int.Parse(priceString));
