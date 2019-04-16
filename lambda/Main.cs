@@ -38,8 +38,6 @@ namespace Lambda
         {
             Game = new Game();
             Game.Init();
-            Alt.Log("Loading all components");
-            ComponentLink.LoadAllComponentLinks();
 
         }
 

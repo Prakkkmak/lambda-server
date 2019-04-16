@@ -52,38 +52,34 @@ namespace Lambda.Commands
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Vetement_Valider(Player player, string[] argv)
         {
-            ComponentLink.AddSkinToComponentsLinks(player.Skin, ComponentLink.Valid.TRUE);
-            ComponentLink.SaveAll();
+            player.Skin.AddToComponentsLinks(ComponentLink.Valid.TRUE);
+            //ComponentLink.AddSkinToComponentsLinks(player.Skin, ComponentLink.Valid.TRUE);
+            //ComponentLink.SaveAll();
             return new CmdReturn($"Vous avez validé un vetement", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Vetement_Mauvais(Player player, string[] argv)
         {
-            Skin.BadSkins.Add(player.Skin);
-            ComponentLink.GenerateFalseComponentLink(player.Skin, true);
-            ComponentLink.GenerateFalseComponentLinks();
-            ComponentLink.SaveAll();
-
+            //Skin.BadSkins.Add(player.Skin);
+            //ComponentLink.GenerateFalseComponentLink(player.Skin, true);
+            //ComponentLink.GenerateFalseComponentLinks();
+            //ComponentLink.SaveAll();
+            //TODO
+            return CmdReturn.NotExceptedError;
             return new CmdReturn($"Vous avez set un vetement comme mauvais", CmdReturn.CmdReturnType.SUCCESS);
         }
 
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Vetement_Generation(Player player, string[] argv)
         {
-            int nbr = Skin.GenerateSkins();
-            return new CmdReturn($"Il y a {nbr} skins valides", CmdReturn.CmdReturnType.SUCCESS);
-        }
-        [Command(Command.CommandType.DEFAULT)]
-        public static CmdReturn Vetement_Aleratoire(Player player, string[] argv)
-        {
-            player.SetSkin(Skin.Random());
-            return new CmdReturn($"Vous avez un skin aléatoire", CmdReturn.CmdReturnType.SUCCESS);
+            player.Game.AddAllSkins();
+            return new CmdReturn($"Il y a {player.Game.GetSkins()} skins valides", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Vetement_Tester(Player player, string[] argv)
         {
 
-            Skin skin = Skin.GetSkinToDiscover();
+            Skin skin = player.Game.GetSkinToDiscorver();
 
             if (skin != null)
             {

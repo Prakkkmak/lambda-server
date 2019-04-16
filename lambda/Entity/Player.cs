@@ -19,7 +19,7 @@ namespace Lambda.Entity
         private uint deathCount;
         private uint id; // The id in the database
         private Skin skin;
-
+        private List<Request> Requests;
 
         public uint Id { get; set; }
 
@@ -38,7 +38,7 @@ namespace Lambda.Entity
         }
 
         public Account Account { get; set; }
-
+        
         public short Food { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -80,14 +80,7 @@ namespace Lambda.Entity
 
         public Player()
         {
-            //
-        }
-
-        public Player(IPlayer altPlayer, Game game)
-        {
-            Game = game;
-            AltPlayer = altPlayer;
-            altPlayer.SetData("player", this);
+            Requests = new List<Request>();
             deathCount = 0;
             id = 0;
             Food = 0;
@@ -97,6 +90,14 @@ namespace Lambda.Entity
             skin = new Skin();
             Inventory = new Inventory();
             Inventory.Money = 10000;
+        }
+
+        public Player(IPlayer altPlayer, Game game) : this()
+        {
+            Game = game;
+            AltPlayer = altPlayer;
+            altPlayer.SetData("player", this);
+           
 
         }
 
@@ -131,7 +132,15 @@ namespace Lambda.Entity
             AltPlayer.Emit(choice ? "freeze" : "unfreeze");
         }
 
+        public void AddRequest(Request r)
+        {
+            Requests.Add(r);
+        }
 
+        public Request[] GetRequests()
+        {
+            return Requests.ToArray();
+        }
 
 
     }

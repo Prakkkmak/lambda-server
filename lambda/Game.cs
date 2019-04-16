@@ -466,6 +466,11 @@ namespace Lambda
             //return GoodSkins.Length;
         }
 
+        public Skin[] GetSkins()
+        {
+            return skins.ToArray();
+        }
+
         public Skin GetSkinToDiscorver()
         {
             foreach (Skin goodSkin in skins)

@@ -284,7 +284,7 @@ namespace Items
         }
         public ComponentLink[] GetLinksByType(ComponentLink.Valid type)
         {
-            ComponentLink[] components = ComponentLink.ExtractSkinLinks(this, ComponentLink.Valid.UNKNOW);
+            ComponentLink[] components = ExtractLinks(ComponentLink.Valid.UNKNOW);
             List<ComponentLink> links = new List<ComponentLink>();
             int nbrNotValidLink = 0;
             foreach (ComponentLink componentLink in components)
@@ -303,7 +303,24 @@ namespace Items
 
             return links.ToArray();
         }
+        public void AddToComponentsLinks(ComponentLink.Valid validity)
+        {
+            ComponentLink[] componentLinks = ExtractLinks(validity);
+            foreach (ComponentLink componentLink in componentLinks)
+            {
+                ComponentLink comp = Player.Game.GetComponentLink(componentLink);
+                if (comp != null)
+                {
+                    comp.Validity = validity;
+                }
+                else
+                {
+                    Player.Game.AddComponentLink(componentLink);
+                }
+            }
 
+
+        }
 
         public static bool Equals(Skin skin1, Skin skin2)
         {
