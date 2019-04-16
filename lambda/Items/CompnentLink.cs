@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using AltV.Net.Data;
 using Items;
@@ -49,15 +48,7 @@ namespace Lambda.Items
             return true;
         }
 
-        public static ComponentLink[] ExtractSkinLinks(Skin skin, Valid validity)
-        {
-            List<ComponentLink> links = new List<ComponentLink>();
-            foreach (Link link in Link.Links)
-            {
-                links.Add(new ComponentLink(link, skin.GetComponent(link.From).Drawable, skin.GetComponent(link.To).Drawable, validity));
-            }
-            return links.ToArray();
-        }
+     
 
 
 

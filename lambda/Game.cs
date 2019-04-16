@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using AltV.Net;
 using AltV.Net.Data;
+using Items;
 using Lambda.Commands;
 using Lambda.Database;
 using Lambda.Entity;
@@ -22,6 +23,7 @@ namespace Lambda
         private List<Spawn> spawns;
         private List<Command> commands;
         private List<ComponentLink> componentLinks;
+        private Skin[] skins;
         private BaseItem[] baseitems;
         private DBConnect dbConnect;
         private Events events;
@@ -32,6 +34,8 @@ namespace Lambda
         public DbArea DbArea { get; }
         public DbPlayer DbPlayer { get; }
         public DbAccount DbAccount { get; }
+
+        public DbSkin DbSkin { get; }
 
         public DbComponentLink DbComponentLink { get; }
 
@@ -53,8 +57,8 @@ namespace Lambda
             DbArea = new DbArea(this, dbConnect, "t_area_are", "are");
             DbPlayer = new DbPlayer(this, dbConnect, "t_character_cha", "cha");
             DbAccount = new DbAccount(this, dbConnect, "t_account_acc", "acc");
-            DbComponentLink = new DbComponentLink(this, dbConnect, "t_componentlink_com", "com");
-
+            DbComponentLink = new DbComponentLink(this, dbConnect, "t_link_lin", "lin");
+            DbSkin = new DbSkin(this, dbConnect, "t_skin_ski", "skin");
         }
 
         public void Init()
@@ -342,6 +346,183 @@ namespace Lambda
                 if (comp != null) similarities.Add(comp);
             }
             return similarities.ToArray();
+        }
+
+        public void AddAllSkins()
+        {
+            ComponentLink[] links = componentLinks.ToArray();
+            List<ComponentLink> TopToLeg = new List<ComponentLink>();
+            List<ComponentLink> FeetToLeg = new List<ComponentLink>();
+            List<ComponentLink> HairToMask = new List<ComponentLink>();
+            List<ComponentLink> TorsoToUndershirt = new List<ComponentLink>();
+            List<ComponentLink> TorsoToTop = new List<ComponentLink>();
+            List<ComponentLink> UndershirtToTop = new List<ComponentLink>();
+            List<ComponentLink> UndershirtToLeg = new List<ComponentLink>();
+            List<ComponentLink> MaskToTop = new List<ComponentLink>();
+            List<Skin> goodskins = new List<Skin>();
+            foreach (ComponentLink link in links)
+            {
+                if (Link.Equals(link.Link, Link.TopToLeg))
+                {
+                    TopToLeg.Add(link);
+                }
+                else if (Link.Equals(link.Link, Link.FeetToLeg))
+                {
+                    FeetToLeg.Add(link);
+                }
+                else if (Link.Equals(link.Link, Link.HairToMask))
+                {
+                    HairToMask.Add(link);
+                }
+                else if (Link.Equals(link.Link, Link.TorsoToUndershirt))
+                {
+                    TorsoToUndershirt.Add(link);
+                }
+                else if (Link.Equals(link.Link, Link.TorsoToTop))
+                {
+                    TorsoToTop.Add(link);
+                }
+                else if (Link.Equals(link.Link, Link.UndershirtToTop))
+                {
+                    UndershirtToTop.Add(link);
+                }
+                else if (Link.Equals(link.Link, Link.MaskToTop))
+                {
+                    MaskToTop.Add(link);
+                }
+                else if (Link.Equals(link.Link, Link.UndershirtToLeg))
+                {
+                    UndershirtToLeg.Add(link);
+                }
+            }
+
+            foreach (ComponentLink feetToLeg in FeetToLeg)
+            {
+                bool isGoodSkin = true;
+                if (feetToLeg.Validity != ComponentLink.Valid.TRUE) continue;
+                //if (feetToLeg.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
+                foreach (ComponentLink topToLeg in TopToLeg)
+                {
+                    if (topToLeg.Validity != ComponentLink.Valid.TRUE ||
+                        topToLeg.DrawableB != feetToLeg.DrawableB) continue;
+                    //if (topToLeg.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
+                    foreach (ComponentLink torsoToTop in TorsoToTop)
+                    {
+                        if (torsoToTop.Validity != ComponentLink.Valid.TRUE ||
+                            torsoToTop.DrawableB != topToLeg.DrawableA) continue;
+                        //if (torsoToTop.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
+                        foreach (ComponentLink torsoToUndershirt in TorsoToUndershirt)
+                        {
+                            if (torsoToUndershirt.Validity != ComponentLink.Valid.TRUE ||
+                                torsoToUndershirt.DrawableA != torsoToTop.DrawableA) continue;
+                            //if (torsoToUndershirt.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
+                            foreach (ComponentLink undershortToTop in UndershirtToTop)
+                            {
+                                //if (torsoToUndershirt.Link.To != undershortToTop.Link.From) continue;
+                                if (undershortToTop.Validity != ComponentLink.Valid.TRUE ||
+                                    undershortToTop.DrawableB != torsoToTop.DrawableB) continue;
+                                // if (undershortToTop.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
+                                foreach (ComponentLink hairToMask in HairToMask)
+                                {
+                                    if (hairToMask.Validity != ComponentLink.Valid.TRUE) continue;
+                                    // if (hairToMask.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
+                                    foreach (ComponentLink maskToTop in MaskToTop)
+                                    {
+                                        if (maskToTop.Validity != ComponentLink.Valid.TRUE ||
+                                            maskToTop.DrawableB != topToLeg.DrawableA) continue;
+                                        // if (maskToTop.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
+                                        foreach (ComponentLink undershirtToLeg in UndershirtToLeg)
+                                        {
+                                            if (undershirtToLeg.Validity != ComponentLink.Valid.TRUE ||
+                                                undershirtToLeg.DrawableA != undershortToTop.DrawableA) continue;
+                                            //if (undershirtToLeg.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
+
+                                            Skin skin = new Skin();
+                                            skin.Feet = new Component(feetToLeg.DrawableA);
+                                            skin.Leg = new Component(feetToLeg.DrawableB);
+                                            skin.Top = new Component(topToLeg.DrawableA);
+                                            skin.Torso = new Component(torsoToTop.DrawableA);
+                                            skin.Undershirt = new Component(undershortToTop.DrawableA);
+                                            skin.Hair = new Component(hairToMask.DrawableA);
+                                            skin.Mask = new Component(hairToMask.DrawableB);
+                                            if (isGoodSkin) goodskins.Add(skin);
+                                            //else BadSkins.Add(skin);
+
+                                        }
+
+                                    }
+
+
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+
+            }
+            skins = goodskins.ToArray();
+            //return GoodSkins.Length;
+        }
+
+        public Skin GetSkinToDiscorver()
+        {
+            foreach (Skin goodSkin in skins)
+            {
+                Skin skinToDiscover = goodSkin.Copy();
+                for (int nbrDiff = 1; nbrDiff <= 11; nbrDiff++)
+                {
+                    uint i;
+
+                    for (i = 0; i < Component.HairMaxValue; i++)
+                    {
+                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.HAIR, i);
+                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
+                        ComponentLink[] links = skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW);
+                        if (links.Length == nbrDiff) return skinToDiscover;
+                    }
+                    for (i = 0; i < Component.MaskMaxValue; i++)
+                    {
+                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.MASK, i);
+                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
+                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
+                    }
+                    for (i = 0; i < Component.TopMaxValue; i++)
+                    {
+                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.TOP, i);
+                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
+                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
+                    }
+                    for (i = 0; i < Component.UndershirtMaxValue; i++)
+                    {
+                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.UNDERSHIRT, i);
+                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
+                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
+                    }
+                    for (i = 0; i < Component.TorsoMaxValue; i++)
+                    {
+                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.TORSO, i);
+                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
+                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
+                    }
+                    for (i = 0; i < Component.FeetMaxValue; i++)
+                    {
+                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.FEET, i);
+                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
+                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
+                    }
+                    for (i = 0; i < Component.LegMaxValue; i++)
+                    {
+                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.LEG, i);
+                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
+                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
+                    }
+                }
+
+            }
+
+            return null;
         }
     }
 }

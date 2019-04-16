@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Lambda.Database
 {
-    class DbSkin : DbElement<Skin>
+    public class DbSkin : DbElement<Skin>
     {
         public DbSkin(Game game, DBConnect dbConnect, string tableName, string prefix) : base(game, dbConnect, tableName, prefix)
         {
