@@ -40,15 +40,11 @@ namespace Lambda.Entity
         }
 
         public Account Account { get; set; }
-        
+
         public short Food { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Name => $"{FirstName}_{LastName}";
-
-
-        public Skin Skin => skin;
-
         public Inventory Inventory { get; set; }
 
 
@@ -90,9 +86,8 @@ namespace Lambda.Entity
             FirstName = "";
             LastName = "";
             Account = null;
-            skin = new Skin();
-            Inventory = new Inventory();
-            Inventory.Money = 10000;
+            skin = new Skin { Player = this };
+            Inventory = new Inventory(this) { Money = 10000 };
         }
 
         public Player(IPlayer altPlayer, Game game) : this()
@@ -100,7 +95,7 @@ namespace Lambda.Entity
             Game = game;
             AltPlayer = altPlayer;
             altPlayer.SetData("player", this);
-           
+
 
         }
 
@@ -108,10 +103,14 @@ namespace Lambda.Entity
 
         public void SetSkin(Skin skin)
         {
-            uint id = this.skin.Id;
             this.skin = skin;
-            this.skin.Id = id;
+            this.skin.Player = this;
             this.skin.SendSkin(this);
+        }
+
+        public Skin GetSkin()
+        {
+            return skin;
         }
 
         public void Spawn(Position pos)
@@ -148,7 +147,7 @@ namespace Lambda.Entity
         public void AddPermission(string permission)
         {
             RemovePermission(permission);
-            Permissions.Add(permission);
+            Permissions.Add(permission.ToUpper());
         }
         public void RemovePermission(string permission)
         {
@@ -157,7 +156,7 @@ namespace Lambda.Entity
         }
         public bool PermissionExist(string permission)
         {
-            foreach(string perm in Permissions)
+            foreach (string perm in Permissions)
             {
                 if (permission.StartsWith(perm)) return true;
             }

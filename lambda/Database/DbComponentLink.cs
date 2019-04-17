@@ -24,7 +24,7 @@ namespace Lambda.Database
 
         public override void SetData(ComponentLink componentLink, Dictionary<string, string> data)
         {
-            componentLink.Id = uint.Parse(data["lin_id"]);
+            //componentLink.Id = uint.Parse(data["lin_id"]);
             componentLink.Link = new Link(uint.Parse(data["lin_from"]), uint.Parse(data["lin_to"]));
             componentLink.DrawableA = uint.Parse(data["lin_fromdrawable"]);
             componentLink.DrawableB = uint.Parse(data["lin_todrawable"]);

@@ -42,11 +42,14 @@ namespace Lambda.Entity
         public float Radius { get; set; }
         public float Height { get; set; }
         public byte CheckpointTypeId { get; set; }
+        public Position SpawnPosition;
 
         public Position Position
         {
-            get => AltCheckpoint.Position;
-            set => AltCheckpoint.Position = value;
+            get => AltCheckpoint?.Position ?? SpawnPosition;
+            set {
+                if (AltCheckpoint != null) AltCheckpoint.Position = value;
+            }
         }
         public Rotation Rotation { get; set; }
         public Game Game { get; }
@@ -54,12 +57,12 @@ namespace Lambda.Entity
 
         public Area()
         {
-            //
+            //Spawn(0, new Position(0, 0, 0), new Rgba(0, 0, 0, 255));
         }
 
-        public Area(float radius, float height, AreaType type = AreaType.NORMAL)
+        public Area(float radius, float height, AreaType type = AreaType.NORMAL) : this()
         {
-            Inventory = new Inventory();
+            Inventory = new Inventory(this);
             Radius = radius;
             Height = height;
             Type = type;
@@ -67,9 +70,9 @@ namespace Lambda.Entity
 
         }
 
-        public void Spawn(int checkpointId, Position position, Rgba color)
+        public void Spawn(Position position)
         {
-            AltCheckpoint = Alt.CreateCheckpoint((byte)checkpointId, position, Radius, 2, color);
+            AltCheckpoint = Alt.CreateCheckpoint((byte)this.CheckpointTypeId, position, Radius, 2, new Rgba(0, 0, 0, 255));
         }
 
         public virtual string GetMetaData()

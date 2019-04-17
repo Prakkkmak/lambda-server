@@ -18,7 +18,7 @@ namespace Lambda.Commands
         {
             Shop shop = new Shop();
             player.Game.AddArea(shop);
-            shop.Spawn(shop.CheckpointTypeId, player.FeetPosition, new Rgba(255, 255, 255, 255));
+            shop.Spawn(player.FeetPosition);
             player.Game.DbArea.Save(shop);
             return new CmdReturn("Vous avez créé un magasin !", CmdReturn.CmdReturnType.SUCCESS);
         }

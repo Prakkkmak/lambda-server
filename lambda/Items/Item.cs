@@ -21,8 +21,9 @@ namespace Lambda.Items
         public Item(BaseItem baseItem, uint amount)
         {
             this.baseItem = baseItem;
-            int size = GetBaseItem().MetaDataDescription.Length;
-            MetaData = new string[size];
+            int sizeMetaDate = baseItem.MetaDataDescription.Length;
+            MetaData = new string[sizeMetaDate];
+            Amount = amount;
         }
 
         public BaseItem GetBaseItem()

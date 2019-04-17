@@ -19,7 +19,6 @@ namespace Lambda.Items
             FALSE
         }
         public uint Id { get; set; }
-        private uint id;
         public Valid Validity;
         public Link Link;
         public uint DrawableA;
@@ -30,7 +29,7 @@ namespace Lambda.Items
 
         }
 
-        public ComponentLink(Link link, uint drawableA, uint drawableB, Valid isValid): this()
+        public ComponentLink(Link link, uint drawableA, uint drawableB, Valid isValid) : this()
         {
             Link = link;
             DrawableA = drawableA;
@@ -48,7 +47,7 @@ namespace Lambda.Items
             return true;
         }
 
-     
+
 
 
 
@@ -106,6 +105,6 @@ namespace Lambda.Items
         public static List<ComponentLink> ComponentLinks = new List<ComponentLink>();
         public static string TableName = "t_link_lin";*/
 
-        
+
     }
 }

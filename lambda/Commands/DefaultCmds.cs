@@ -33,7 +33,7 @@ namespace Lambda.Commands
             string str = "";
             Player[] players = player.Game.GetPlayers();
 
-            str += " Il y a " + players.Length + " joueurs sur le serveur.";
+            str += "Il y a " + players.Length + " joueurs sur le serveur. <br>";
             foreach (Player p in players)
             {
                 str += $"[{p.ServerId}]{p.FirstName} {p.LastName} <br>";

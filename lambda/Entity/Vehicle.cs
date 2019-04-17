@@ -22,9 +22,6 @@ namespace Lambda.Entity
             ORGANIZATION
         }
 
-
-        private bool saved;
-
         private ushort fuel;
         private OwnerType ownerType;
         private uint ownerId;
@@ -89,7 +86,7 @@ namespace Lambda.Entity
             this.ownerId = 0;
             this.rank = 0;
             this.hp = 100;
-            this.Inventory = new Inventory();
+            this.Inventory = new Inventory(this);
         }
 
         public Vehicle(Position position) : this()
@@ -103,10 +100,6 @@ namespace Lambda.Entity
             this.Model = model;
         }
 
-        public void SetSaved(Boolean b)
-        {
-            this.saved = b;
-        }
 
         public void Spawn()
         {

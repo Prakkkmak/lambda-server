@@ -36,22 +36,7 @@ namespace Lambda
 
         public void OnPlayerConnect(IPlayer altPlayer, string reason)
         {
-            /*Player player = new Player(altPlayer, game);
-            player.Spawn(game.GetSpawn(0).Position);
-            player.Freeze(true);
-            Account account = game.DbAccount.Get(player.license);
-            if (account != null)
-            {
-                game.DbPlayer.Get(account, player);
-                player.Spawn(game.GetSpawn(0).Position);
-            }
-            else
-            {
-                player.Account = new Account();
-                game.DbAccount.Save(player.Account);
-                game.DbPlayer.Save(player);
 
-            }*/
         }
 
         private void OnPlayerDisconnect(IPlayer altPlayer, string reason)
@@ -80,12 +65,14 @@ namespace Lambda
             altPlayer.SetData("license", (string)args[0]);
             Player player = new Player(altPlayer, game);
             player.Spawn(game.GetSpawn(0).Position);
-            player.Freeze(true);
+            player.Freeze(false);
             Account account = game.DbAccount.Get(player.license);
             if (account != null)
             {
                 game.DbPlayer.Get(account, player);
                 player.Account = account;
+                game.DbSkin.Get(player.GetSkin().Id, player.GetSkin());
+                player.GetSkin().SendSkin(player);
             }
             else
             {
@@ -94,7 +81,7 @@ namespace Lambda
                 game.DbPlayer.Save(player);
 
             }
-            player.Spawn(game.GetSpawn(0).Position);
+            game.AddPlayer(player);
         }
 
     }

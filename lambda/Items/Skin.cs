@@ -48,9 +48,8 @@ namespace Items
         public Component Decal { get; set; } // 10
         public Component Top { get; set; } // 11
 
-        public uint Id;
         public Player Player { get; set; }
-        uint IDBElement.Id { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public uint Id { get; set; }
 
         public Skin()
         {
@@ -65,8 +64,9 @@ namespace Items
 
         }
 
-        public Skin(uint[] components)
+        public Skin(Player player, uint[] components)
         {
+            this.Player = player;
             Id = 0;
             Type = "DEFAULT";
             Model = "mp_m_freemode_01";
@@ -178,6 +178,8 @@ namespace Items
                 clothes.Add(GetComponent(i).Drawable);
             }
 
+            player.Game.DbSkin.Save(this);
+
             player.AltPlayer.Emit("setSkin", clothes.ToArray());
         }
 
@@ -192,7 +194,7 @@ namespace Items
         public Skin Copy()
         {
             Skin skin = new Skin();
-            
+
             Dictionary<string, string> data = Player.Game.DbSkin.GetData(this);
             Player.Game.DbSkin.SetData(skin, data);
             /*
@@ -312,14 +314,57 @@ namespace Items
                 if (comp != null)
                 {
                     comp.Validity = validity;
+                    Player.Game.DbComponentLink.Save(comp);
                 }
                 else
                 {
                     Player.Game.AddComponentLink(componentLink);
+                    Player.Game.DbComponentLink.Save(componentLink);
+                }
+
+            }
+        }
+        public void GenerateFalseComponentLink(bool isSetByPlayer = false)
+        {
+            ComponentLink[] componentLink = ExtractLinks(ComponentLink.Valid.UNKNOW);
+            List<ComponentLink> badComponentLinks = new List<ComponentLink>();
+            foreach (ComponentLink comp in componentLink)
+            {
+                ComponentLink storedComp = Player.Game.GetComponentLink(comp);
+                if (storedComp == null)
+                {
+                    badComponentLinks.Add(comp);
+                    Player.Game.AddComponentLink(comp);
+                    //TODO DEPLACER le save autre part
+                    Player.Game.DbComponentLink.Save(comp);
+
+                }
+                else if (storedComp.Validity != ComponentLink.Valid.TRUE)
+                {
+                    badComponentLinks.Add(storedComp);
+
                 }
             }
 
+            if (badComponentLinks.Count == 1) // Case where all components are true except this one
+            {
+                badComponentLinks[0].Validity = ComponentLink.Valid.FALSE;
+                //TODO DEPLACER le save autre part
+                Player.Game.DbComponentLink.Save(badComponentLinks[0]);
 
+            }
+
+            if (badComponentLinks.Count == 0)
+            {
+                foreach (ComponentLink comp in componentLink)
+                {
+                    comp.Validity = ComponentLink.Valid.UNKNOW;
+                    ComponentLink storedComp = Player.Game.GetComponentLink(comp);
+                    //TODO DEPLACER le save autre part
+                    Player.Game.DbComponentLink.Save(storedComp);
+                }
+
+            }
         }
 
         public static bool Equals(Skin skin1, Skin skin2)
@@ -336,7 +381,6 @@ namespace Items
             if (!Component.Equals(skin1.Decal, skin2.Decal)) return false;
             if (!Component.Equals(skin1.Top, skin2.Top)) return false;
             return true;
-
         }
     }
 

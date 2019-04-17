@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using AltV.Net.Data;
 using Items;
@@ -29,7 +30,8 @@ namespace Lambda.Database
             data["cha_food"] = player.Food.ToString();
             data["cha_deathcount"] = "0";
             data["acc_id"] = player.Account.Id.ToString();
-            data["ski_id"] = player.Skin.Id.ToString();
+            data["ski_id"] = player.GetSkin().Id.ToString();
+            data["cha_permissions"] = string.Join(",", player.Permissions);
             //data["inv_id"] = Inventory.Id.ToString();
             //data["baa_id"] = bankAccount.Id.ToString();
             //data["lic_id"] = license.Id.ToString();
@@ -51,7 +53,8 @@ namespace Lambda.Database
             player.Inventory.Money = ulong.Parse(data["cha_money"]);
             player.Hp = ushort.Parse(data["cha_hp"]);
             player.Food = short.Parse(data["cha_food"]);
-            player.Skin.Id = uint.Parse(data["ski_id"]);
+            player.GetSkin().Id = uint.Parse(data["ski_id"]);
+            player.Permissions = data["cha_permissions"].Split(',').ToList();
             //player.Skin.Load();
             //player.Skin.SendSkin(player);
         }
@@ -65,6 +68,8 @@ namespace Lambda.Database
             SetData(player, result);
             return player;
         }
+
+
 
     }
 }

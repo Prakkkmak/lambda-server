@@ -74,7 +74,11 @@ namespace Lambda.Database
 
         public void Delete(T entity)
         {
-            throw new NotImplementedException();
+            //Dictionary<string, string> datas = GetData(entity);
+            Dictionary<string, string> where = new Dictionary<string, string>();
+            string index = Prefix + "_id";
+            where[index] = entity.Id.ToString();
+            DbConnect.Delete(TableName, where);
         }
 
         public void SaveAll(T[] entities)
@@ -90,6 +94,7 @@ namespace Lambda.Database
             {
                 T entity = new T();
                 SetData(entity, result);
+                entity.Id = uint.Parse(result[Prefix + "_id"]);
                 entities.Add(entity);
             }
 

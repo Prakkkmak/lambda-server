@@ -25,12 +25,13 @@ namespace Lambda.Items
 
 
 
-        public Inventory(InventoryType type = InventoryType.DEFAULT, uint id = 0)
+        public Inventory(IEntity entity, InventoryType type = InventoryType.DEFAULT, uint id = 0)
         {
             Id = id;
             Type = type;
             Items = new List<Item>();
             Money = 10000;
+            Entity = entity;
         }
 
         public bool Withdraw(uint amount)
@@ -87,6 +88,5 @@ namespace Lambda.Items
 
             return currentItem;
         }
-        public static Inventory Empty = new Inventory();
     }
 }

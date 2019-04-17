@@ -31,7 +31,6 @@ namespace Lambda.Database
 
         public override void SetData(Vehicle vehicle, Dictionary<string, string> data)
         {
-            vehicle.SetSaved(true);
             Position position = new Position();
             position.X = float.Parse(data["veh_position_x"]);
             position.Y = float.Parse(data["veh_position_y"]);

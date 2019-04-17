@@ -99,9 +99,9 @@ namespace Lambda.Commands
                 return Syntax();
             }
 
-            if (!player.PermissionExist(permission))
+            if (!string.IsNullOrWhiteSpace(permission) && !player.PermissionExist(permission))
             {
-                return new CmdReturn("Vous n'avez pas la permission de faire ceci", CmdReturn.CmdReturnType.WARNING)
+                return new CmdReturn("Vous n'avez pas la permission de faire ceci", CmdReturn.CmdReturnType.WARNING);
             }
 
             if (func == null) throw new NullReferenceException("Aucune fonction n'est définie");

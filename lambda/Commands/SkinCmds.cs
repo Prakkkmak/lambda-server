@@ -18,8 +18,8 @@ namespace Lambda.Commands
         {
             uint componentId = uint.Parse(argv[1]);
             uint value = uint.Parse(argv[2]);
-            player.Skin.SetComponent(componentId, value);
-            player.Skin.SendSkin(player);
+            player.GetSkin().SetComponent(componentId, value);
+            player.GetSkin().SendSkin(player);
 
             return new CmdReturn("Vous avez set un skin !", CmdReturn.CmdReturnType.SUCCESS);
         }
@@ -29,9 +29,9 @@ namespace Lambda.Commands
         public static CmdReturn Vetement_Suivant(Player player, string[] argv)
         {
             uint componentId = uint.Parse(argv[2]);
-            Component comp = player.Skin.GetComponent(componentId);
-            player.Skin.SetComponent(componentId, comp.Drawable + 1);
-            player.Skin.SendSkin(player);
+            Component comp = player.GetSkin().GetComponent(componentId);
+            player.GetSkin().SetComponent(componentId, comp.Drawable + 1);
+            player.GetSkin().SendSkin(player);
             string clothName = Enum.GetName(typeof(Skin.ClothNumber), componentId);
             return new CmdReturn("Vous avez changé votre vetement en slot " + clothName.ToLower() + " valeur: " + (comp.Drawable + 1), CmdReturn.CmdReturnType.SUCCESS);
         }
@@ -42,17 +42,17 @@ namespace Lambda.Commands
         public static CmdReturn Vetement_Precedent(Player player, string[] argv)
         {
             uint componentId = uint.Parse(argv[2]);
-            Component comp = player.Skin.GetComponent(componentId);
+            Component comp = player.GetSkin().GetComponent(componentId);
             if (comp.Drawable < 1) comp.Drawable++;
-            player.Skin.SetComponent(componentId, comp.Drawable - 1);
-            player.Skin.SendSkin(player);
+            player.GetSkin().SetComponent(componentId, comp.Drawable - 1);
+            player.GetSkin().SendSkin(player);
             string clothName = Enum.GetName(typeof(Skin.ClothNumber), componentId);
             return new CmdReturn("Vous avez changé votre vetement en slot " + clothName.ToLower() + " valeur: " + (comp.Drawable - 1), CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Vetement_Valider(Player player, string[] argv)
         {
-            player.Skin.AddToComponentsLinks(ComponentLink.Valid.TRUE);
+            player.GetSkin().AddToComponentsLinks(ComponentLink.Valid.TRUE);
             //ComponentLink.AddSkinToComponentsLinks(player.Skin, ComponentLink.Valid.TRUE);
             //ComponentLink.SaveAll();
             return new CmdReturn($"Vous avez validé un vetement", CmdReturn.CmdReturnType.SUCCESS);
@@ -60,12 +60,13 @@ namespace Lambda.Commands
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Vetement_Mauvais(Player player, string[] argv)
         {
+            player.GetSkin().GenerateFalseComponentLink(true);
             //Skin.BadSkins.Add(player.Skin);
             //ComponentLink.GenerateFalseComponentLink(player.Skin, true);
             //ComponentLink.GenerateFalseComponentLinks();
             //ComponentLink.SaveAll();
             //TODO
-            return CmdReturn.NotExceptedError;
+            //return CmdReturn.NotExceptedError;
             return new CmdReturn($"Vous avez set un vetement comme mauvais", CmdReturn.CmdReturnType.SUCCESS);
         }
 
@@ -73,7 +74,7 @@ namespace Lambda.Commands
         public static CmdReturn Vetement_Generation(Player player, string[] argv)
         {
             player.Game.AddAllSkins();
-            return new CmdReturn($"Il y a {player.Game.GetSkins()} skins valides", CmdReturn.CmdReturnType.SUCCESS);
+            return new CmdReturn($"Il y a {player.Game.GetSkins().Length} skins valides", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Vetement_Tester(Player player, string[] argv)

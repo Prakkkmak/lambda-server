@@ -46,10 +46,11 @@ namespace Lambda
             areas = new List<Area>();
             spawns = new List<Spawn>();
             commands = new List<Command>();
+            componentLinks = new List<ComponentLink>();
             baseitems = new BaseItem[0];
             dbConnect = new DBConnect();
             events = new Events(this);
-
+            skins = new Skin[0];
 
             Chat = new Chat();
             DbVehicle = new DbVehicle(this, dbConnect, "t_vehicle_veh", "veh");
@@ -58,7 +59,7 @@ namespace Lambda
             DbPlayer = new DbPlayer(this, dbConnect, "t_character_cha", "cha");
             DbAccount = new DbAccount(this, dbConnect, "t_account_acc", "acc");
             DbComponentLink = new DbComponentLink(this, dbConnect, "t_link_lin", "lin");
-            DbSkin = new DbSkin(this, dbConnect, "t_skin_ski", "skin");
+            DbSkin = new DbSkin(this, dbConnect, "t_skin_ski", "ski");
         }
 
         public void Init()
@@ -83,6 +84,8 @@ namespace Lambda
             Alt.Log(">Base items created");
             AddAllComponentLinks();
             Alt.Log(">Components links loaded");
+            AddAllAreas();
+            Alt.Log(">All areas loaded");
         }
 
         public void AddPlayer(Player player)
@@ -130,8 +133,9 @@ namespace Lambda
         public void RemoveVehicle(Vehicle vehicle)
         {
             vehicles.Remove(vehicle);
-            DbVehicle.Delete(vehicle);
+            if (vehicle.Id != 0) DbVehicle.Delete(vehicle);
             vehicle.AltVehicle.Remove();
+            //
         }
 
         public void AddAllBaseItems()
@@ -142,6 +146,11 @@ namespace Lambda
         public BaseItem GetBaseItem(uint id)
         {
             return baseitems.FirstOrDefault(baseitem => baseitem.Id == id);
+        }
+
+        public BaseItem[] GetBaseItems()
+        {
+            return baseitems.ToArray();
         }
 
         public Area GetArea(Position position)
@@ -178,6 +187,10 @@ namespace Lambda
         public void AddAllAreas()
         {
             areas = DbArea.GetAll().ToList();
+            areas.ForEach((area) =>
+            {
+                //area.Spawn();
+            });
         }
 
         public void RemoveArea(Area area)
@@ -312,10 +325,10 @@ namespace Lambda
 
         public void AddComponentLinks(ComponentLink[] links)
         {
-            foreach(ComponentLink componentLink in links)
+            foreach (ComponentLink componentLink in links)
             {
                 ComponentLink actual = GetComponentLink(componentLink);
-                if(actual == null)
+                if (actual == null)
                 {
                     componentLinks.Add(componentLink);
                 }
@@ -328,14 +341,14 @@ namespace Lambda
 
         public void AddAllComponentLinks()
         {
-            componentLinks = DbComponentLink.GetAll().ToList<ComponentLink>();
+            componentLinks = DbComponentLink.GetAll().ToList();
         }
 
         public ComponentLink GetComponentLink(ComponentLink componentLink)
         {
-            foreach(ComponentLink comp in componentLinks)
+            foreach (ComponentLink comp in componentLinks)
             {
-                if (comp.Equals(componentLink)) return comp;
+                if (ComponentLink.Equals(comp, componentLink)) return comp;
             }
             return null;
         }
