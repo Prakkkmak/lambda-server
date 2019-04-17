@@ -231,7 +231,10 @@ namespace Lambda
                         Command.CommandFunc function = (Command.CommandFunc)Delegate.CreateDelegate(typeof(Command.CommandFunc), method, false); // Create the delegate of my méthod
                         if (function == null) Alt.Log("FUNCTION NULL" + method.Name);
                         CommandAttribute attribute = (CommandAttribute)method.GetCustomAttributes(typeof(CommandAttribute), false)[0];
-                        Command command = new Command(method.Name.ToLower(), function, attribute.Type, attribute.Syntax);
+                        PermissionAttribute[] permissionAttributes = (PermissionAttribute[])method.GetCustomAttributes(typeof(PermissionAttribute), false);
+                        string permission = "";
+                        if (permissionAttributes.Length > 0) permission = permissionAttributes[0].Permission;
+                        Command command = new Command(method.Name.ToLower(), function, attribute.Type, attribute.Syntax, permission);
                         AddCommand(command); // Register the command
                     }
                 }

@@ -140,6 +140,7 @@ namespace Lambda.Commands
         /// /vehicule Sultan
 
         [Command(Command.CommandType.ADMIN, "model")]
+        [Permission("ADMIN_VEHICLE_CREATE")]
         public static CmdReturn Vehicule(Player player, string[] argv)
         {
 
@@ -287,5 +288,17 @@ namespace Lambda.Commands
             player.Skin.Insert();
             return new CmdReturn("Vous avez sauvegardé un mauvais skin", CmdReturn.CmdReturnType.SUCCESS);
         }*/
+        [Command(Command.CommandType.ADMIN, "Permission")]
+        public static CmdReturn Permission_Ajouter(Player player, string[] argv)
+        {
+            player.AddPermission(argv[2]);
+            return new CmdReturn("Vous avez ajouté une permission", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Command(Command.CommandType.ADMIN, "Permission")]
+        public static CmdReturn Permission_Retirer(Player player, string[] argv)
+        {
+            player.RemovePermission(argv[2]);
+            return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
+        }
     }
 }

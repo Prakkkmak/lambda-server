@@ -23,6 +23,15 @@ namespace Lambda.Commands
         }
     }
 
+    public class PermissionAttribute : Attribute
+    {
+        public string Permission;
+        public PermissionAttribute(string permission)
+        {
+            Permission = permission;
+        }
+    }
+
     /// <summary>
     /// A command is an action triggered by the player with the command in game or with an UI
     /// </summary>
@@ -41,17 +50,19 @@ namespace Lambda.Commands
         private CommandFunc func; // The function associed
         private CommandType type;
         private string[] syntax;
+        private string permission;
         /// <summary>
         /// Construct a command
         /// </summary>
         /// <param Name="name">The Name of the command</param>
         /// <param Name="func">The function to perform</param>
-        public Command(string name, CommandFunc func, CommandType type, string[] syntax)
+        public Command(string name, CommandFunc func, CommandType type, string[] syntax, string permission = "")
         {
             this.Name = name;
             this.func = func;
             this.syntax = syntax;
             this.type = type;
+            this.permission = permission;
         }
         /// <summary>
         /// Generate the syntax of the command
@@ -78,7 +89,7 @@ namespace Lambda.Commands
         public CmdReturn Execute(Player player, string[] parameters)
         {
             if (syntax == null) throw new NullReferenceException();
-            if (player.Account == null && type != CommandType.ACCOUNT)
+            if (player.Account == null)
             {
                 return new CmdReturn("Vous n etes pas connecté", CmdReturn.CmdReturnType.WARNING);
             }
@@ -86,6 +97,11 @@ namespace Lambda.Commands
             if (parameters.Length < syntax.Length + Name.Split("_").Length)  // syntax.length is parameters. The strict is for the Name
             {
                 return Syntax();
+            }
+
+            if (!player.PermissionExist(permission))
+            {
+                return new CmdReturn("Vous n'avez pas la permission de faire ceci", CmdReturn.CmdReturnType.WARNING)
             }
 
             if (func == null) throw new NullReferenceException("Aucune fonction n'est définie");

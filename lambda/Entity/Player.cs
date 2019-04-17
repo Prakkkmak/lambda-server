@@ -23,6 +23,8 @@ namespace Lambda.Entity
 
         public uint Id { get; set; }
 
+        public List<string> Permissions;
+
         public string license
         {
             get {
@@ -80,6 +82,7 @@ namespace Lambda.Entity
 
         public Player()
         {
+            Permissions = new List<string>();
             Requests = new List<Request>();
             deathCount = 0;
             id = 0;
@@ -142,6 +145,24 @@ namespace Lambda.Entity
             return Requests.ToArray();
         }
 
+        public void AddPermission(string permission)
+        {
+            RemovePermission(permission);
+            Permissions.Add(permission);
+        }
+        public void RemovePermission(string permission)
+        {
+            permission = permission.ToUpper();
+            Permissions.RemoveAll(perm => perm.StartsWith(permission));
+        }
+        public bool PermissionExist(string permission)
+        {
+            foreach(string perm in Permissions)
+            {
+                if (permission.StartsWith(perm)) return true;
+            }
+            return false;
+        }
 
     }
 }
