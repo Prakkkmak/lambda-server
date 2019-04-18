@@ -7,23 +7,28 @@ namespace Lambda.Items
 {
     public class Item
     {
+        private Inventory inventory;
+        private BaseItem baseItem;
+
+
         public uint Id { get; set; }
         public uint Amount { get; set; }
         public string[] MetaData { get; set; }
 
-        public BaseItem Base
+
+
+
+        public Item(BaseItem baseItem, uint amount)
         {
-            get {
-                return BaseItem.BaseItems.FirstOrDefault(baseItem => baseItem.Id == Id);
-            }
+            this.baseItem = baseItem;
+            int sizeMetaDate = baseItem.MetaDataDescription.Length;
+            MetaData = new string[sizeMetaDate];
+            Amount = amount;
         }
 
-        public Item(uint id, uint amount)
+        public BaseItem GetBaseItem()
         {
-            Id = id;
-            Amount = amount;
-            int size = Base.MetaDataDescription.Length;
-            MetaData = new string[size];
+            return baseItem;
         }
 
 

@@ -13,27 +13,45 @@ using Lambda.Utils;
 
 namespace Lambda.Entity
 {
-    public class Player
+    public class Player : IDBElement, IEntity
     {
 
         private uint deathCount;
         private uint id; // The id in the database
         private Skin skin;
+        private List<Request> Requests;
 
+        public uint Id { get; set; }
+
+        public List<string> Permissions;
+
+        public string license
+        {
+            get {
+                if (AltPlayer != null)
+                {
+                    AltPlayer.GetData("license", out string result);
+                    return result;
+                }
+
+                return "";
+            }
+
+        }
+
+        public Account Account { get; set; }
 
         public short Food { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Name => $"{FirstName}_{LastName}";
-        public Account Account { get; set; }
-
-        public Skin Skin => skin;
-
         public Inventory Inventory { get; set; }
 
 
         public IPlayer AltPlayer { get; }
         public ushort ServerId => AltPlayer.Id;
+        public Game Game { get; }
+
         public short World
         {
             get => AltPlayer.Dimension;
@@ -57,74 +75,48 @@ namespace Lambda.Entity
             set => AltPlayer.Rotation = value;
         }
 
-        public bool IsDefaultPlayer => Account == null; // Check if the player have an account
 
-        public Player(IPlayer altPlayer)
+        public Player()
         {
-            AltPlayer = altPlayer;
-            altPlayer.SetData("player", this);
+            Permissions = new List<string>();
+            Requests = new List<Request>();
             deathCount = 0;
             id = 0;
             Food = 0;
             FirstName = "";
             LastName = "";
             Account = null;
-            skin = new Skin();
-            Inventory = new Inventory();
-            Inventory.Money = 10000;
+            skin = new Skin { Player = this };
+            Inventory = new Inventory(this) { Money = 10000 };
+        }
+
+        public Player(IPlayer altPlayer, Game game) : this()
+        {
+            Game = game;
+            AltPlayer = altPlayer;
+            altPlayer.SetData("player", this);
+
 
         }
 
-        public void Save()
-        {
-            if (id == 0)
-            {
-                id = (uint)Insert();
-                OnlinePlayers.Add(this);
-                Freeze(false);
-            }
-            else
-            {
-                Update();
-            }
-            Skin.Save();
-        }
-        public bool Load()
-        {
-            Dictionary<string, string> datas = SelectByAccountId(Account.Id);
-            if (datas.Count == 0) return false;
-            id = uint.Parse(datas["cha_id"]);
-            FirstName = datas["cha_firstname"];
-            LastName = datas["cha_lastname"];
-            Position position = new Position();
-            position.X = float.Parse(datas["cha_position_x"]);
-            position.Y = float.Parse(datas["cha_position_y"]);
-            position.Z = float.Parse(datas["cha_position_z"]);
-            Position = position;
-            World = short.Parse(datas["cha_world"]);
-            Inventory.Money = ulong.Parse(datas["cha_money"]);
-            Hp = ushort.Parse(datas["cha_hp"]);
-            Food = short.Parse(datas["cha_food"]);
-            deathCount = uint.Parse(datas["cha_deathcount"]);
-            Skin.Id = uint.Parse(datas["ski_id"]);
-            Skin.Load();
-            Skin.SendSkin(this);
-            OnlinePlayers.Add(this);
-            Freeze(false);
-            return true;
-        }
+
 
         public void SetSkin(Skin skin)
         {
-            uint id = this.skin.Id;
             this.skin = skin;
-            this.skin.Id = id;
+            this.skin.Player = this;
             this.skin.SendSkin(this);
+        }
+
+        public Skin GetSkin()
+        {
+            return skin;
         }
 
         public void Spawn(Position pos)
         {
             AltPlayer.Spawn(pos);
+            Freeze(false);
         }
 
         public override string ToString()
@@ -134,7 +126,7 @@ namespace Lambda.Entity
 
         public void SendMessage(string msg)
         {
-            Chat.Send(this, msg);
+            Game.Chat.Send(this, msg);
         }
 
         public void Freeze(bool choice)
@@ -142,91 +134,45 @@ namespace Lambda.Entity
             AltPlayer.Emit(choice ? "freeze" : "unfreeze");
         }
 
-        public static Player[] GetPlayers(string nameOrId)
+        public void Goto(Position pos)
         {
-            List<Player> players = new List<Player>();
-            foreach (Player onlinePlayer in OnlinePlayers)
+            this.Position = pos;
+        }
+        public void Goto(Interior interior)
+        {
+            this.AltPlayer.Emit("loadipl", interior.IPL);
+            this.Position = interior.Position;
+            
+        }
+
+        public void AddRequest(Request r)
+        {
+            Requests.Add(r);
+        }
+
+        public Request[] GetRequests()
+        {
+            return Requests.ToArray();
+        }
+
+        public void AddPermission(string permission)
+        {
+            RemovePermission(permission);
+            Permissions.Add(permission.ToUpper());
+        }
+        public void RemovePermission(string permission)
+        {
+            permission = permission.ToUpper();
+            Permissions.RemoveAll(perm => perm.StartsWith(permission));
+        }
+        public bool PermissionExist(string permission)
+        {
+            foreach (string perm in Permissions)
             {
-                if (onlinePlayer.ServerId.ToString().Equals(nameOrId)) players.Add(onlinePlayer);
-                else if (onlinePlayer.Name.StartsWith(nameOrId)) players.Add(onlinePlayer);
+                if (permission.StartsWith(perm)) return true;
             }
-
-            return players.ToArray();
+            return false;
         }
 
-        public static Player GetPlayerByDatabaseId(uint dbId)
-        {
-            foreach (Player onlinePlayer in OnlinePlayers)
-            {
-                if (onlinePlayer.Account.Id == dbId) return onlinePlayer;
-            }
-
-            return null;
-        }
-
-
-
-
-        #region database
-
-        private Dictionary<string, string> GetPlayerData()
-        {
-            Dictionary<string, string> datas = new Dictionary<string, string>();
-            datas["cha_firstname"] = FirstName;
-            datas["cha_lastname"] = LastName;
-            datas["cha_position_x"] = Position.X.ToString();
-            datas["cha_position_Y"] = Position.Y.ToString();
-            datas["cha_position_z"] = Position.Z.ToString();
-            datas["cha_world"] = World.ToString();
-            datas["cha_money"] = Inventory.Money.ToString();
-            datas["cha_hp"] = Hp.ToString();
-            datas["cha_food"] = Food.ToString();
-            datas["cha_deathcount"] = deathCount.ToString();
-            datas["acc_id"] = Account.Id.ToString();
-            datas["ski_id"] = Skin.Id.ToString();
-            //datas["inv_id"] = Inventory.Id.ToString();
-            //datas["baa_id"] = bankAccount.Id.ToString();
-            //datas["lic_id"] = license.Id.ToString();
-            return datas;
-        }
-
-        private long Insert()
-        {
-            Dictionary<string, string> datas = GetPlayerData();
-            DBConnect dbConnect = DBConnect.DbConnect;
-            return dbConnect.Insert(TableName, datas);
-        }
-
-        private void Update()
-        {
-            Dictionary<string, string> datas = GetPlayerData();
-            Dictionary<string, string> wheres = new Dictionary<string, string>();
-            wheres["cha_id"] = id.ToString();
-            DBConnect dbConnect = DBConnect.DbConnect;
-            dbConnect.Update(TableName, datas, wheres);
-        }
-
-        public static Dictionary<string, string> Select(uint id)
-        {
-            Dictionary<string, string> wheres = new Dictionary<string, string>();
-            wheres["cha_id"] = id.ToString();
-            DBConnect dbConnect = DBConnect.DbConnect;
-            return dbConnect.SelectOne(TableName, wheres);
-        }
-
-        public static Dictionary<string, string> SelectByAccountId(uint id)
-        {
-            Dictionary<string, string> wheres = new Dictionary<string, string>();
-            wheres["acc_id"] = id.ToString();
-            DBConnect dbConnect = DBConnect.DbConnect;
-            return dbConnect.SelectOne(TableName, wheres);
-        }
-
-        #endregion
-
-
-        public static string TableName = "t_character_cha";
-        public static Position SpawnPosition = new Position(-1143.178f, -1621.451f, 4.375854f);
-        public static List<Player> OnlinePlayers = new List<Player>();
     }
 }

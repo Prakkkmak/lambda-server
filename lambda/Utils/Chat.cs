@@ -10,14 +10,25 @@ namespace Lambda.Utils
 {
     public class Chat
     {
-        public static void RegisterEvents()
+        public void RegisterEvents()
         {
             Alt.OnClient("chatmessage", OnClientChatMessage);
+            Alt.On<string>("test", Test);
+            Alt.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            Alt.Emit("test", "test");
         }
 
-        public static void OnClientChatMessage(IPlayer altPlayer, object[] args)
+        public void Test(string args)
         {
+            Alt.Log("args = " + args);
+        }
+        public void OnClientChatMessage(IPlayer altPlayer, object[] args)
+        {
+            Alt.Log(args[0] + "");
             string msg = (string)args[0];
+            Alt.Log(msg);
+            Alt.Log(altPlayer.Name);
+            Alt.Log(args.Length + "");
             if (string.IsNullOrWhiteSpace(msg)) return;
             if (altPlayer.GetData("player", out Player player))
             {
@@ -34,16 +45,12 @@ namespace Lambda.Utils
                     player.SendMessage($"{player.Name} : {msg}");
                 }
             }
-            else
-            {
-                //throw new Exception("Can't access to <Account> of player");
-            }
         }
 
-        public static CmdReturn InvokeCmd(Player player, string msg)
+        public CmdReturn InvokeCmd(Player player, string msg)
         {
             string[] parameters = TextToArgs(msg);
-            Command[] cmd = Command.GetCommands(parameters);
+            Command[] cmd = player.Game.GetCommands(parameters);
             CmdReturn cmdReturn = new CmdReturn();
             string commandstring = "";
             foreach (Command command in cmd)
@@ -58,7 +65,7 @@ namespace Lambda.Utils
             return cmdReturn;
         }
 
-        public static string SendCmdReturn(CmdReturn cmdReturn)
+        public string SendCmdReturn(CmdReturn cmdReturn)
         {
             Alt.Log("Cmd return du send cmd return " + cmdReturn.Text);
             switch (cmdReturn.Type)
@@ -84,17 +91,12 @@ namespace Lambda.Utils
         }
 
 
-        public static void Send(Player player, string msg)
+        public void Send(Player player, string msg)
         {
-            msg = msg.Replace("é", "Ã©");
-            msg = msg.Replace("è", "Ã¨");
-            msg = msg.Replace("à", "Ã");
-            msg = msg.Replace("ê", "Ãª");
-            msg = msg.Replace("ç", "Ã§"); ;
             player.AltPlayer.Emit("chatmessage", null, msg);
         }
 
-        public static string[] TextToArgs(string msg)
+        public string[] TextToArgs(string msg)
         {
             msg = msg.Replace("/", "");
             return msg.Split(" ");

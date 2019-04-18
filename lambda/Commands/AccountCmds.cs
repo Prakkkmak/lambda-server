@@ -23,14 +23,9 @@ namespace Lambda.Commands
             int minSize = 10;
             string text = "";
             string sender;
-            if (player.Account != null)
-            {
-                sender = player.Account.Mail + " - " + player.Name; //used for have the mail and the character name of the sender
-            }
-            else
-            {
-                sender = player.AltPlayer.Name;
-            }
+
+            sender = player.AltPlayer.Name;
+
             for (int i = 1; i < argv.Length; i++)
             {
                 text += argv[i] + " ";
@@ -41,7 +36,14 @@ namespace Lambda.Commands
             return new CmdReturn("Vous avez envoyé votre bug !", CmdReturn.CmdReturnType.SUCCESS);
         }
 
-        [Command(Command.CommandType.ACCOUNT, "mail", "motdepasse", "motdepasse")]
+        [Command(Command.CommandType.ACCOUNT)]
+        public static CmdReturn License(Player player, string[] argv)
+        {
+            player.AltPlayer.GetData("license", out string result);
+            return new CmdReturn(result, CmdReturn.CmdReturnType.SUCCESS);
+        }
+
+        /*[Command(Command.CommandType.ACCOUNT, "mail", "motdepasse", "motdepasse")]
         public static CmdReturn Enregistrer(Player player, string[] argv)
         {
             string mail = argv[1];
@@ -52,11 +54,12 @@ namespace Lambda.Commands
             if (!emailAdressAttribute.IsValid(mail)) return new CmdReturn("Mail invalide.", CmdReturn.CmdReturnType.SYNTAX);
             if (password.Length < 6) return new CmdReturn("Mot de passe trop court. Il doit faire 6 caractères", CmdReturn.CmdReturnType.SYNTAX);
             if (!password.Equals(confirmPassword)) return new CmdReturn("Mot de passe différents", CmdReturn.CmdReturnType.SYNTAX);
-            if (Account.LogIn(mail) != null) return new CmdReturn("Un compte éxiste déjà", CmdReturn.CmdReturnType.WARNING);
+            if (player.Game.DbAccount.Get(mail) != null) return new CmdReturn("Un compte éxiste déjà", CmdReturn.CmdReturnType.WARNING);
             Account account = new Account(mail);
-            account.Register(password);
+            player.Game.DbAccount.Save(account, password);
             player.Account = account;
-            player.Save();
+            player.Game.DbPlayer.Save(player);
+            player.Spawn(player.Game.GetSpawn(0).Position);
             return new CmdReturn("Vous vous êtes enregistré !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.ACCOUNT, "Mail", "motdepasse")]
@@ -67,29 +70,34 @@ namespace Lambda.Commands
             EmailAddressAttribute emailAdressAttribute = new EmailAddressAttribute();
             if (player.Account != null) return new CmdReturn("Vous êtes déjà connecté", CmdReturn.CmdReturnType.WARNING);
             if (!emailAdressAttribute.IsValid(mail) || password.Length < 6) return new CmdReturn("Identifiants incorrects", CmdReturn.CmdReturnType.SYNTAX);
-            Account account = Account.LogIn(mail, password);
+            Account account = player.Game.DbAccount.Get(mail, password);
             if (account == null) return new CmdReturn("Identifiants incorrects", CmdReturn.CmdReturnType.WARNING);
-            if (Player.GetPlayerByDatabaseId(account.Id) != null)
+            /*if (Player.GetPlayerByDatabaseId(account.Id) != null)
             {
                 return new CmdReturn("Vous êtes déjà connecté", CmdReturn.CmdReturnType.WARNING);
             }
-            player.Account = account;
+        player.Account = account;
+            /*
             if (!player.Load())
             {
                 player.Account = null;
                 return new CmdReturn("Vous n'avez pas de personnage", CmdReturn.CmdReturnType.WARNING);
 
             }
+            player.Spawn(player.Game.GetSpawn(0).Position);
+
             return new CmdReturn("Vous vous êtes connecté ! Votre log rapide est : " + account.Id, CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.ACCOUNT, "Id")]
         public static CmdReturn Rapide(Player player, string[] argv)
         {
-            uint Id = uint.Parse(argv[1]);
+            uint id = uint.Parse(argv[1]);
             if (player.Account != null) return new CmdReturn("Vous êtes déjà connecté", CmdReturn.CmdReturnType.WARNING);
-            Account account = Account.LogIn(Id);
+            Account account = player.Game.DbAccount.Get(id);
             if (account == null) return new CmdReturn("Identifiants incorrects", CmdReturn.CmdReturnType.WARNING);
             player.Account = account;
+            player.Spawn(player.Game.GetSpawn(0).Position);
+            /*
             if (!player.Load())
             {
                 player.Account = null;
@@ -97,7 +105,7 @@ namespace Lambda.Commands
 
             }
             return new CmdReturn("Vous vous êtes connecté !", CmdReturn.CmdReturnType.SUCCESS);
-        }
+        }*/
 
         [Command(Command.CommandType.ACCOUNT, "Prénom", "Nom")]
         public static CmdReturn Personnage_Nom(Player player, string[] argv)
@@ -110,14 +118,7 @@ namespace Lambda.Commands
             player.FirstName = firstName;
             player.LastName = lastName;
             player.AltPlayer.Name = player.Name;
-            player.Save();
             return new CmdReturn("Vous avez changé de nom !", CmdReturn.CmdReturnType.SUCCESS);
-        }
-        [Command(Command.CommandType.ACCOUNT)]
-        public static CmdReturn Personnage_Sauvegarder(Player player, string[] argv)
-        {
-            player.Save();
-            return new CmdReturn("Vous avez sauvegardé votre personnage !", CmdReturn.CmdReturnType.SUCCESS);
         }
 
 

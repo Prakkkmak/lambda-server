@@ -45,7 +45,7 @@ namespace Lambda.Commands
             {
                 return new CmdReturn("Veuillez entrer un nombre valide", CmdReturn.CmdReturnType.SYNTAX);
             }
-            if (BaseItem.GetBaseItem(id) == null) return new CmdReturn("Cet objet n'existe pas", CmdReturn.CmdReturnType.WARNING);
+            if (player.Game.GetBaseItem(id) == null) return new CmdReturn("Cet objet n'existe pas", CmdReturn.CmdReturnType.WARNING);
             player.Inventory.AddItem(id, amount);
             return new CmdReturn("Vous vous êtes donné des objets", CmdReturn.CmdReturnType.SUCCESS);
         }
@@ -77,7 +77,7 @@ namespace Lambda.Commands
         {
             if (argv.Length < 2) throw new ArgumentException("Cmd Goto need 1 params", nameof(argv));
             string charName = argv[1];
-            Player[] players = Player.GetPlayers(charName);
+            Player[] players = player.Game.GetPlayers(charName);
             CmdReturn cmdReturn = CmdReturn.OnlyOnePlayer(players);
             if (cmdReturn.Type == CmdReturn.CmdReturnType.SUCCESS)
             {
@@ -96,7 +96,7 @@ namespace Lambda.Commands
         public static CmdReturn Freeze(Player player, string[] argv)
         {
             string charName = argv[1];
-            Player[] players = Player.GetPlayers(charName);
+            Player[] players = player.Game.GetPlayers(charName);
             CmdReturn cmdReturn = CmdReturn.OnlyOnePlayer(players);
             if (cmdReturn.Type == CmdReturn.CmdReturnType.SUCCESS)
             {
@@ -111,10 +111,10 @@ namespace Lambda.Commands
         /// unfreeze a player
         /// /unfreeze [player]
         [Command(Command.CommandType.ADMIN, "joueur")]
-        public static CmdReturn unfeeze(Player player, string[] argv)
+        public static CmdReturn unfreeze(Player player, string[] argv)
         {
             string charName = argv[1];
-            Player[] players = Player.GetPlayers(charName);
+            Player[] players = player.Game.GetPlayers(charName);
             CmdReturn cmdReturn = CmdReturn.OnlyOnePlayer(players);
             if (cmdReturn.Type == CmdReturn.CmdReturnType.SUCCESS)
             {
@@ -131,7 +131,7 @@ namespace Lambda.Commands
         public static CmdReturn Respawn(Player player, string[] argv)
         {
             if (argv.Length < 1) throw new ArgumentException("Cmd Goto need 1 params", nameof(argv));
-            player.Spawn(Player.SpawnPosition);
+            player.Spawn(player.Game.GetSpawn(0).Position);
             player.Hp = 100;
             return new CmdReturn("Vous vous avez respawn!", CmdReturn.CmdReturnType.SUCCESS);
         }
@@ -140,6 +140,7 @@ namespace Lambda.Commands
         /// /vehicule Sultan
 
         [Command(Command.CommandType.ADMIN, "model")]
+        [Permission("ADMIN_VEHICLE_CREATE")]
         public static CmdReturn Vehicule(Player player, string[] argv)
         {
 
@@ -150,8 +151,7 @@ namespace Lambda.Commands
             if (!Enum.IsDefined(typeof(VehicleModel), model)) return new CmdReturn("Modele incorrect", CmdReturn.CmdReturnType.WARNING);
 
             Vehicle vehicle = new Vehicle(Vector3.Near(player.Position), model);
-            Vehicle.Vehicles.Add(vehicle);
-
+            player.Game.AddVehicle(vehicle);
             return new CmdReturn("Vous avez fait apparaitre un véhicule", CmdReturn.CmdReturnType.SUCCESS);
         }
 
@@ -167,11 +167,11 @@ namespace Lambda.Commands
                 if (player.AltPlayer.IsInVehicle)
                 {
 
-                    player.AltPlayer.Vehicle.GetData("AltVehicle", out Vehicle vehicle);
+                    player.AltPlayer.Vehicle.GetData("vehicle", out Vehicle vehicle);
                     if (vehicle != null)
                     {
-
                         vehicle.Park();
+                        vehicle.Game.DbVehicle.Save(vehicle);
                     }
                     else
                     {
@@ -219,7 +219,7 @@ namespace Lambda.Commands
             if (!byte.TryParse(argv[2], out byte r)) return new CmdReturn("Couleur incorecte", CmdReturn.CmdReturnType.SYNTAX);
             if (!byte.TryParse(argv[3], out byte g)) return new CmdReturn("Couleur incorecte", CmdReturn.CmdReturnType.SYNTAX);
             if (!byte.TryParse(argv[4], out byte b)) return new CmdReturn("Couleur incorecte", CmdReturn.CmdReturnType.SYNTAX);
-            veh.SetColor(r, g, b);
+            veh.Color = new Rgba(r, g, b, 255);
             return new CmdReturn("Vous avez changé la couleur de votre véhicule ! ", CmdReturn.CmdReturnType.SUCCESS);
         }
 
@@ -248,8 +248,7 @@ namespace Lambda.Commands
                     player.AltPlayer.Vehicle.GetData("vehicle", out Vehicle vehicle);
                     if (vehicle != null)
                     {
-
-                        vehicle.Delete();
+                        player.Game.RemoveVehicle(vehicle);
                         return new CmdReturn("Vous avez supprimé un véhicule", CmdReturn.CmdReturnType.SUCCESS);
                     }
                     else
@@ -289,5 +288,17 @@ namespace Lambda.Commands
             player.Skin.Insert();
             return new CmdReturn("Vous avez sauvegardé un mauvais skin", CmdReturn.CmdReturnType.SUCCESS);
         }*/
+        [Command(Command.CommandType.ADMIN, "Permission")]
+        public static CmdReturn Permission_Ajouter(Player player, string[] argv)
+        {
+            player.AddPermission(argv[2]);
+            return new CmdReturn("Vous avez ajouté une permission", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Command(Command.CommandType.ADMIN, "Permission")]
+        public static CmdReturn Permission_Retirer(Player player, string[] argv)
+        {
+            player.RemovePermission(argv[2]);
+            return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
+        }
     }
 }
