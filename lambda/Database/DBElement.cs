@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using AltV.Net;
+using AltV.Net.Data;
 using Lambda.Entity;
 
 namespace Lambda.Database
@@ -109,6 +110,15 @@ namespace Lambda.Database
         public string ToString()
         {
             return $"Table : {TableName} / Prefix : {Prefix}";
+        }
+
+        public Position GetPosition(Dictionary<string,string> data)
+        {
+            Position position = new Position(0, 0, 0);
+            position.X = float.Parse(data[Prefix + "_position_x"]);
+            position.Y = float.Parse(data[Prefix + "_position_y"]);
+            position.Z = float.Parse(data[Prefix + "_position_z"]);
+            return position;
         }
     }
 }

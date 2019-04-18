@@ -23,6 +23,8 @@ namespace Lambda
         private List<Spawn> spawns;
         private List<Command> commands;
         private List<ComponentLink> componentLinks;
+
+        private Interior[] interiors;
         private Skin[] skins;
         private BaseItem[] baseitems;
         private DBConnect dbConnect;
@@ -38,7 +40,7 @@ namespace Lambda
         public DbSkin DbSkin { get; }
 
         public DbComponentLink DbComponentLink { get; }
-
+        public DbInterior DbInterior { get; }
         public Game()
         {
             players = new List<Player>();
@@ -51,6 +53,7 @@ namespace Lambda
             dbConnect = new DBConnect();
             events = new Events(this);
             skins = new Skin[0];
+            interiors = new Interior[0];
 
             Chat = new Chat();
             DbVehicle = new DbVehicle(this, dbConnect, "t_vehicle_veh", "veh");
@@ -60,6 +63,7 @@ namespace Lambda
             DbAccount = new DbAccount(this, dbConnect, "t_account_acc", "acc");
             DbComponentLink = new DbComponentLink(this, dbConnect, "t_link_lin", "lin");
             DbSkin = new DbSkin(this, dbConnect, "t_skin_ski", "ski");
+            DbInterior = new DbInterior(this, dbConnect, "t_interior_int", "int");
         }
 
         public void Init()
@@ -544,6 +548,22 @@ namespace Lambda
             }
 
             return null;
+        }
+        public void AddAllInteriors()
+        {
+            interiors = DbInterior.GetAll();
+        }
+        public Interior GetInterior(uint id)
+        {
+            foreach(Interior interior in interiors)
+            {
+                if (interior.Id == id) return interior;
+            }
+            return null;
+        }
+        public Interior[] GetInteriors()
+        {
+            return interiors;
         }
     }
 }

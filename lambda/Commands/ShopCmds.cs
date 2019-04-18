@@ -6,6 +6,7 @@ using System.Text;
 using AltV.Net.Data;
 using Lambda.Entity;
 using Lambda.Items;
+using Lambda.Utils;
 
 namespace Lambda.Commands
 {
@@ -21,6 +22,38 @@ namespace Lambda.Commands
             shop.Spawn(player.FeetPosition);
             player.Game.DbArea.Save(shop);
             return new CmdReturn("Vous avez créé un magasin !", CmdReturn.CmdReturnType.SUCCESS);
+        }
+
+        // Set a skin in a specific slot
+        // /vetement 1 0
+        [Command(Command.CommandType.DEFAULT)]
+        public static CmdReturn Banque_Creer(Player player, string[] argv)
+        {
+            Area bank = new Area();
+            player.Game.AddArea(bank);
+            bank.Spawn(player.FeetPosition);
+            player.Game.DbArea.Save(bank);
+            return new CmdReturn("Vous avez créé une banque !", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Command(Command.CommandType.DEFAULT)]
+        public static CmdReturn Interieurs(Player player, string[] argv)
+        {
+            Interior[] interiors = player.Game.GetInteriors();
+            string txt = "Voici la liste des interieurs : <br>";
+            foreach(Interior interior in interiors)
+            {
+                txt += interior.Id + " - " + interior.IPL;
+            }
+            return new CmdReturn(txt, CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Command(Command.CommandType.DEFAULT, "ID")]
+        public static CmdReturn Interieur(Player player, string[] argv)
+        {
+            if (!uint.TryParse(argv[1], out uint result)) return new CmdReturn("Syntaxe incorrecte", CmdReturn.CmdReturnType.SYNTAX);
+            Interior interior = player.Game.GetInterior(result);
+            if(interior == null) return new CmdReturn("Cet interrieur n'existe pas", CmdReturn.CmdReturnType.WARNING);
+            player.Goto(interior);
+            return new CmdReturn("Vous vous etes téléporté dans un interieur", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Magasin_Supprimer(Player player, string[] argv)

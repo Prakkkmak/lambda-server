@@ -134,6 +134,17 @@ namespace Lambda.Entity
             AltPlayer.Emit(choice ? "freeze" : "unfreeze");
         }
 
+        public void Goto(Position pos)
+        {
+            this.Position = pos;
+        }
+        public void Goto(Interior interior)
+        {
+            this.AltPlayer.Emit("loadipl", interior.IPL);
+            this.Position = interior.Position;
+            
+        }
+
         public void AddRequest(Request r)
         {
             Requests.Add(r);

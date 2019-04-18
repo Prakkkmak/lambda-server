@@ -19,15 +19,6 @@ namespace Lambda.Entity
             CheckpointTypeId = 2;
         }
 
-        public Shop(Dictionary<string, string> datas) : base()
-        {
-            Sells = new List<Sell>();
-            CheckpointTypeId = 2;
-            Type = AreaType.SHOP;
-
-            SetMetaData(datas["are_metadata"]);
-        }
-
         public void AddSell(uint id, int price)
         {
             Sell sell = GetSell(id);
