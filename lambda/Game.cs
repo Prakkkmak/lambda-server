@@ -6,12 +6,16 @@ using System.Runtime.InteropServices;
 using System.Text;
 using AltV.Net;
 using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
 using Items;
 using Lambda.Commands;
 using Lambda.Database;
 using Lambda.Entity;
 using Lambda.Items;
+using Lambda.Organizations;
 using Lambda.Utils;
+using Player = Lambda.Entity.Player;
+using Vehicle = Lambda.Entity.Vehicle;
 
 namespace Lambda
 {
@@ -23,21 +27,23 @@ namespace Lambda
         private List<Spawn> spawns;
         private List<Command> commands;
         private List<ComponentLink> componentLinks;
+        private List<Organization> organizations;
 
         private Interior[] interiors;
         private Skin[] skins;
         private BaseItem[] baseitems;
         private DBConnect dbConnect;
         private Events events;
-
         public Chat Chat;
+        public IVoiceChannel VoiceChannel;
+
         public DbVehicle DbVehicle { get; }
         public DbBaseItem DbBaseItem { get; }
         public DbArea DbArea { get; }
         public DbPlayer DbPlayer { get; }
         public DbAccount DbAccount { get; }
-
         public DbSkin DbSkin { get; }
+        public DbOrganization DbOrganization { get; }
 
         public DbComponentLink DbComponentLink { get; }
         public DbInterior DbInterior { get; }
@@ -49,11 +55,13 @@ namespace Lambda
             spawns = new List<Spawn>();
             commands = new List<Command>();
             componentLinks = new List<ComponentLink>();
+            organizations = new List<Organization>();
             baseitems = new BaseItem[0];
             dbConnect = new DBConnect();
             events = new Events(this);
             skins = new Skin[0];
             interiors = new Interior[0];
+            VoiceChannel = Alt.CreateVoiceChannel(true, 10);
 
             Chat = new Chat();
             DbVehicle = new DbVehicle(this, dbConnect, "t_vehicle_veh", "veh");
@@ -64,10 +72,12 @@ namespace Lambda
             DbComponentLink = new DbComponentLink(this, dbConnect, "t_link_lin", "lin");
             DbSkin = new DbSkin(this, dbConnect, "t_skin_ski", "ski");
             DbInterior = new DbInterior(this, dbConnect, "t_interior_int", "int");
+            DbOrganization = new DbOrganization(this, dbConnect, "t_organization_org", "org");
         }
 
         public void Init()
         {
+
             Alt.Log("=== Register events... ===");
             events.RegisterEvents();
             Alt.Log(">Server events registered");
@@ -75,26 +85,32 @@ namespace Lambda
             Alt.Log(">Chat registered");
             Alt.Log("=== Events are registered ===");
             Alt.Log("=== Register Spawns... ===");
-            AddSpawn(new Spawn(new Position(-1023.89f, -487.7407f, 36.96338f)));
+            AddSpawn(new Spawn(new Position(-167.8418f, 921.5604f, 235.6395f)));
             Alt.Log("=== Spawns added... ===");
             Alt.Log("=== Register Commands... ===");
             AddAllCommands();
             Alt.Log("=== Commands are registered ===");
             Alt.Log("=== Load in database... ===");
-            Alt.Log(DbVehicle.ToString());
-            AddAllVehicles();
-            Alt.Log(">Vehicles spawned");
+            AddAllInteriors();
+            Alt.Log(">All interiors loaded");
             AddAllBaseItems();
             Alt.Log(">Base items created");
+            AddAllVehicles();
+            Alt.Log(">Vehicles spawned");
             AddAllComponentLinks();
             Alt.Log(">Components links loaded");
             AddAllAreas();
             Alt.Log(">All areas loaded");
+            AddAllOrganizations();
+            Alt.Log(">All organizations loaded");
+            Alt.Log("Il y a : " + GetNumberOfSkins() + "");
         }
 
         public void AddPlayer(Player player)
         {
             players.Add(player);
+            VoiceChannel.AddPlayer(player.AltPlayer);
+            Alt.EmitAllClients("chatmessage", null, $"{player.AltPlayer.Name} c'est connecté!");
         }
 
         public Player[] GetPlayers()
@@ -116,6 +132,8 @@ namespace Lambda
         public void RemovePlayer(Player player)
         {
             players.Remove(player);
+            VoiceChannel.RemovePlayer(player.AltPlayer);
+            Alt.EmitAllClients("chatmessage", $"{player.AltPlayer.Name} c'est déconnecté!");
         }
 
         public void AddVehicle(Vehicle vehicle)
@@ -169,6 +187,22 @@ namespace Lambda
 
             return null;
         }
+        public Location GetDestination(Position position)
+        {
+            foreach (Area area in areas)
+            {
+                if (area.InteriorLocation.Position.Distance(position) < area.Radius)
+                {
+                    return area.ExteriorLocation;
+                }
+                if (area.ExteriorLocation.Position.Distance(position) < area.Radius)
+                {
+                    return area.InteriorLocation;
+                }
+            }
+
+            return default;
+        }
         public Area GetArea(Position position, Area.AreaType type)
         {
             foreach (Area area in areas)
@@ -193,7 +227,7 @@ namespace Lambda
             areas = DbArea.GetAll().ToList();
             areas.ForEach((area) =>
             {
-                //area.Spawn();
+                //area.Spawn(); //TODO
             });
         }
 
@@ -201,6 +235,7 @@ namespace Lambda
         {
             areas.Remove(area);
             DbArea.Delete(area);
+            area.AltCheckpoint.Remove();
         }
 
         public void AddSpawn(Spawn spawn)
@@ -368,7 +403,7 @@ namespace Lambda
             return similarities.ToArray();
         }
 
-        public void AddAllSkins()
+        public long GetNumberOfSkins()
         {
             ComponentLink[] links = componentLinks.ToArray();
             List<ComponentLink> TopToLeg = new List<ComponentLink>();
@@ -379,7 +414,8 @@ namespace Lambda
             List<ComponentLink> UndershirtToTop = new List<ComponentLink>();
             List<ComponentLink> UndershirtToLeg = new List<ComponentLink>();
             List<ComponentLink> MaskToTop = new List<ComponentLink>();
-            List<Skin> goodskins = new List<Skin>();
+            //List<Skin> goodskins = new List<Skin>();
+            long nbr = 0;
             foreach (ComponentLink link in links)
             {
                 if (Link.Equals(link.Link, Link.TopToLeg))
@@ -457,7 +493,8 @@ namespace Lambda
                                                 undershirtToLeg.DrawableA != undershortToTop.DrawableA) continue;
                                             //if (undershirtToLeg.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
 
-                                            Skin skin = new Skin();
+                                            //Skin skin = new Skin();
+                                            SkinData skin = new SkinData();
                                             skin.Feet = new Component(feetToLeg.DrawableA);
                                             skin.Leg = new Component(feetToLeg.DrawableB);
                                             skin.Top = new Component(topToLeg.DrawableA);
@@ -465,8 +502,10 @@ namespace Lambda
                                             skin.Undershirt = new Component(undershortToTop.DrawableA);
                                             skin.Hair = new Component(hairToMask.DrawableA);
                                             skin.Mask = new Component(hairToMask.DrawableB);
-                                            if (isGoodSkin) goodskins.Add(skin);
+                                            if (isGoodSkin) nbr++;
                                             //else BadSkins.Add(skin);
+                                            if (nbr % 1000000 == 0) Alt.Log(nbr + " skins dispos availible");
+
 
                                         }
 
@@ -482,8 +521,8 @@ namespace Lambda
 
 
             }
-            skins = goodskins.ToArray();
-            //return GoodSkins.Length;
+            //skins = goodskins.ToArray();
+            return nbr;
         }
 
         public Skin[] GetSkins()
@@ -491,11 +530,13 @@ namespace Lambda
             return skins.ToArray();
         }
 
-        public Skin GetSkinToDiscorver()
+        public Skin GetSkinToDiscorver(Player player)
         {
-            foreach (Skin goodSkin in skins)
+            return null;
+            /*foreach (Skin goodSkin in skins)
             {
-                Skin skinToDiscover = goodSkin.Copy();
+                goodSkin.Player = player;
+                Skin skinToDiscover = goodSkin.Copy(player);
                 for (int nbrDiff = 1; nbrDiff <= 11; nbrDiff++)
                 {
                     uint i;
@@ -543,27 +584,53 @@ namespace Lambda
                         if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
                         if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
                     }
-                }
+                }*/
 
-            }
+        }
 
             return null;
         }
-        public void AddAllInteriors()
-        {
-            interiors = DbInterior.GetAll();
-        }
-        public Interior GetInterior(uint id)
-        {
-            foreach(Interior interior in interiors)
-            {
-                if (interior.Id == id) return interior;
-            }
-            return null;
-        }
-        public Interior[] GetInteriors()
-        {
-            return interiors;
-        }
+    public void AddAllInteriors()
+    {
+        interiors = DbInterior.GetAll();
     }
+    public Interior GetInterior(uint id)
+    {
+        foreach (Interior interior in interiors)
+        {
+            if (interior.Id == id) return interior;
+        }
+        return null;
+    }
+    public Interior[] GetInteriors()
+    {
+        return interiors;
+    }
+
+    public void AddOrganization(Organization org)
+    {
+        organizations.Add(org);
+    }
+
+    public void AddAllOrganizations()
+    {
+        organizations = DbOrganization.GetAll().ToList();
+    }
+    public Organization GetOrganization(uint id)
+    {
+        foreach (Organization organization in organizations)
+        {
+            if (organization.Id == id) return organization;
+        }
+
+        return null;
+    }
+    public void RemoveOrganization(Organization organization)
+    {
+        organizations.Remove(organization);
+        //if (organization.Id != 0) DbVehicle.Delete(organization);
+
+    }
+
+}
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using AltV.Net.Data;
 using Lambda.Entity;
+using Lambda.Utils;
 
 namespace Lambda.Database
 {
@@ -21,6 +22,16 @@ namespace Lambda.Database
             data["are_position_z"] = area.Position.Z.ToString();
             data["are_radius"] = area.Radius.ToString();
             data["are_metadata"] = area.GetMetaData();
+            if (area.InteriorLocation.Equals(default(Location)))
+            {
+                data["are_interior"] = "0";
+
+            }
+            else
+            {
+                data["are_interior"] = area.InteriorLocation.Interior.Id.ToString();
+            }
+
             //datas["are_checkpoint"] = Type.ToString();
             return data;
         }
@@ -34,9 +45,13 @@ namespace Lambda.Database
             position.Y = float.Parse(data["are_position_y"]);
             position.Z = float.Parse(data["are_position_z"]);
             area.Radius = float.Parse(data["are_radius"]);
+            area.Spawn(position); //TODO a verifier si le spawn est au bon endroit
             area.SetMetaData(data["are_metadata"]);
-            area.Spawn(position);
-
+            Interior interior = Game.GetInterior(uint.Parse(data["are_interior"]));
+            if (interior != null)
+            {
+                area.SetLocations(interior);
+            }
         }
         public Area[] GetAll()
         {
@@ -50,6 +65,11 @@ namespace Lambda.Database
                     area = new Shop();
                     //Shop shop = new Shop();
 
+
+                }
+                else if (result["are_type"] == "HOUSE")
+                {
+                    area = new House();
                 }
                 else
                 {

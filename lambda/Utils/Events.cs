@@ -4,8 +4,8 @@ using System.Text;
 using AltV.Net;
 using AltV.Net.Elements.Entities;
 using Lambda.Administration;
-using IEntity = Lambda.Entity.IEntity;
 using Player = Lambda.Entity.Player;
+using Vehicle = Lambda.Entity.Vehicle;
 
 namespace Lambda
 {
@@ -31,7 +31,9 @@ namespace Lambda
             Alt.OnVehicleRemove += OnVehicleRemove;
             Alt.Log("[EVENT] OnPlayerDisconnect registered");
             Alt.OnClient("setlicense", OnPlayerSetLicenseHash);
-
+            Alt.Log("[EVENT] OnVehicleEnter registered");
+            Alt.OnPlayerEnterVehicle += OnVehicleEnter;
+            Alt.OnPlayerLeaveVehicle += OnVehicleLeave;
         }
 
         public void OnPlayerConnect(IPlayer altPlayer, string reason)
@@ -59,6 +61,21 @@ namespace Lambda
             //veh?.Spawn();
         }
 
+        public void OnVehicleEnter(IVehicle altVehicle, IPlayer altPlayer, byte seat)
+        {
+            altVehicle.GetData("vehicle", out Vehicle vehicle);
+            game.VoiceChannel.RemovePlayer(altPlayer);
+            vehicle.VoiceChannel.AddPlayer(altPlayer);
+        }
+
+        public void OnVehicleLeave(IVehicle altVehicle, IPlayer altPlayer, byte seat)
+        {
+            altVehicle.GetData("vehicle", out Vehicle vehicle);
+            if (vehicle == null) return;
+            game.VoiceChannel.AddPlayer(altPlayer);
+            vehicle.VoiceChannel.RemovePlayer(altPlayer);
+        }
+
         public void OnPlayerSetLicenseHash(IPlayer altPlayer, object[] args)
         {
             Alt.Log("License set to " + (string)args[0]);
@@ -79,10 +96,13 @@ namespace Lambda
                 player.Account = new Account(player.license);
                 game.DbAccount.Save(player.Account);
                 game.DbPlayer.Save(player);
+                game.DbSkin.Save(player.GetSkin());
 
             }
             game.AddPlayer(player);
         }
+
+
 
     }
 }

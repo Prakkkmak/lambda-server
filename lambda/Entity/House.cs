@@ -9,12 +9,13 @@ namespace Lambda.Entity
     {
         private int rent;
 
-        public Interior interior { get; set; }
-        public uint interiorDim { get; set; }
-        public House() : base(2, 1, AreaType.SHOP)
+
+        public short interiorDim { get; set; }
+        public House() : base(2, 1, AreaType.HOUSE)
         {
             CheckpointTypeId = 10;
         }
+
 
     }
 }

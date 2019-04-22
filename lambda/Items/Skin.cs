@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using AltV.Net;
 using AltV.Net.Data;
+using Lambda;
 using Lambda.Administration;
 using Lambda.Database;
 using Lambda.Entity;
@@ -51,6 +52,8 @@ namespace Items
         public Player Player { get; set; }
         public uint Id { get; set; }
 
+
+
         public Skin()
         {
             Id = 0;
@@ -63,7 +66,6 @@ namespace Items
             }
 
         }
-
         public Skin(Player player, uint[] components)
         {
             this.Player = player;
@@ -76,17 +78,20 @@ namespace Items
                 SetComponent(i, components[i]);
             }
         }
-
         public Skin(Dictionary<string, string> datas)
         {
 
         }
-
+        public bool IsValidSkin()
+        {
+            ComponentLink[] badLinks = GetLinksByType(ComponentLink.Valid.FALSE);
+            ComponentLink[] unknowLinks = GetLinksByType(ComponentLink.Valid.UNKNOW);
+            return badLinks.Length > 0 || unknowLinks.Length > 0;
+        }
         public void SetModel(string value)
         {
             Model = value;
         }
-
         public void SetComponent(uint componentId, uint drawable, uint texture = 0, uint palette = 0)
         {
             if (componentId < 0) componentId = 0;
@@ -127,7 +132,6 @@ namespace Items
                     break;
             }
         }
-
         public Component GetComponent(uint componentId)
         {
             switch (componentId)
@@ -169,7 +173,6 @@ namespace Items
 
             }
         }
-
         public void SendSkin(Player player)
         {
             List<uint> clothes = new List<uint>();
@@ -182,99 +185,14 @@ namespace Items
 
             player.AltPlayer.Emit("setSkin", clothes.ToArray());
         }
-
-
-
-
-
-
-
-
-
-        public Skin Copy()
+        public Skin Copy(Player player)
         {
             Skin skin = new Skin();
-
             Dictionary<string, string> data = Player.Game.DbSkin.GetData(this);
             Player.Game.DbSkin.SetData(skin, data);
-            /*
-            skin.Model = datas["ski_model"];
-            skin.Mask = new Component(datas, "ski_mask");
-            skin.Hair = new Component(datas, "ski_hair");
-            skin.Torso = new Component(datas, "ski_torso");
-            skin.Leg = new Component(datas, "ski_leg");
-            skin.Bag = new Component(datas, "ski_bag");
-            skin.Feet = new Component(datas, "ski_feet");
-            skin.Accessoiries = new Component(datas, "ski_accessoiries");
-            skin.Undershirt = new Component(datas, "ski_undershirt");
-            skin.BodyArmor = new Component(datas, "ski_bodyarmor");
-            skin.Decal = new Component(datas, "ski_decal");
-            skin.Top = new Component(datas, "ski_top");*/
+            skin.Player = player;
             return skin;
         }
-
-
-        //public static List<Skin> LastSkinDiscovered = new List<Skin>();
-        /*public static Skin GetSkinToDiscover()
-        {
-
-            foreach (Skin goodSkin in GoodSkins)
-            {
-                Skin skinToDiscover = goodSkin.Copy();
-                for (int nbrDiff = 1; nbrDiff <= 11; nbrDiff++)
-                {
-                    uint i;
-
-                    for (i = 0; i < Component.HairMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)ClothNumber.HAIR, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        ComponentLink[] links = skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW);
-                        if (links.Length == nbrDiff) return skinToDiscover;
-                    }
-                    for (i = 0; i < Component.MaskMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)ClothNumber.MASK, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
-                    }
-                    for (i = 0; i < Component.TopMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)ClothNumber.TOP, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
-                    }
-                    for (i = 0; i < Component.UndershirtMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)ClothNumber.UNDERSHIRT, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
-                    }
-                    for (i = 0; i < Component.TorsoMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)ClothNumber.TORSO, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
-                    }
-                    for (i = 0; i < Component.FeetMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)ClothNumber.FEET, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
-                    }
-                    for (i = 0; i < Component.LegMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)ClothNumber.LEG, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
-                    }
-                }
-
-            }
-
-            return null;
-        }*/
-
         public ComponentLink[] ExtractLinks(ComponentLink.Valid validity)
         {
             List<ComponentLink> links = new List<ComponentLink>();
@@ -366,7 +284,6 @@ namespace Items
 
             }
         }
-
         public static bool Equals(Skin skin1, Skin skin2)
         {
             if (!Component.Equals(skin1.Mask, skin2.Mask)) return false;
@@ -382,6 +299,7 @@ namespace Items
             if (!Component.Equals(skin1.Top, skin2.Top)) return false;
             return true;
         }
+
     }
 
 }

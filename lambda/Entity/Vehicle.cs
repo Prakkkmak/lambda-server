@@ -30,6 +30,8 @@ namespace Lambda.Entity
         private Rgba color;
 
 
+        public IVoiceChannel VoiceChannel { get; set; }
+
         public Game Game { get; set; }
 
         public uint Id { get; set; }
@@ -71,7 +73,7 @@ namespace Lambda.Entity
             }
         }
 
-        public short World { get; set; }
+        public short Dimension { get; set; }
 
         public Vehicle()
         {
@@ -87,6 +89,7 @@ namespace Lambda.Entity
             this.rank = 0;
             this.hp = 100;
             this.Inventory = new Inventory(this);
+            this.VoiceChannel = Alt.CreateVoiceChannel(true, 10);
         }
 
         public Vehicle(Position position) : this()

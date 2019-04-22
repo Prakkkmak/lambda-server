@@ -84,7 +84,8 @@ namespace Lambda.Commands
         /// Execute the f° associated with the command
         /// </summary>
         /// <param name="account">The account who perform the command</param>
-        /// <param name="parameters">The parameters list given</param>
+        /// <param name="parameters">The parameters list
+        /// n</param>
         /// <returns></returns>
         public CmdReturn Execute(Player player, string[] parameters)
         {

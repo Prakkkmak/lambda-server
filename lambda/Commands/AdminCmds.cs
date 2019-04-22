@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -58,7 +59,7 @@ namespace Lambda.Commands
                 return new CmdReturn("Veuillez entrer un nombre valide", CmdReturn.CmdReturnType.SYNTAX);
             }
 
-            player.Inventory.Money += amount;
+            player.Inventory.Deposit(amount);
             return new CmdReturn($"Vous vous êtes donné {amount}$.", CmdReturn.CmdReturnType.SUCCESS);
         }
 
@@ -73,19 +74,30 @@ namespace Lambda.Commands
         /// Teleport the player who perform the command to another character
         /// /goto John_Smith
         [Command(Command.CommandType.ADMIN, "joueur")]
-        public static CmdReturn Goto(Player player, string[] argv)
+        public static CmdReturn Goto_Joueur(Player player, string[] argv)
         {
-            if (argv.Length < 2) throw new ArgumentException("Cmd Goto need 1 params", nameof(argv));
-            string charName = argv[1];
+            string charName = argv[2];
             Player[] players = player.Game.GetPlayers(charName);
             CmdReturn cmdReturn = CmdReturn.OnlyOnePlayer(players);
-            if (cmdReturn.Type == CmdReturn.CmdReturnType.SUCCESS)
-            {
-                player.Position = players[0].Position;
-                return new CmdReturn("Vous vous êtes téléporté.", CmdReturn.CmdReturnType.SUCCESS);
-            }
+            if (cmdReturn.Type != CmdReturn.CmdReturnType.SUCCESS) return cmdReturn;
+            player.Goto(players[0]);
+            return new CmdReturn("Vous vous êtes téléporté.", CmdReturn.CmdReturnType.SUCCESS);
 
-            return cmdReturn;
+
+        }
+        [Command(Command.CommandType.ADMIN, "x", "y", "z")]
+        public static CmdReturn Goto_Position(Player player, string[] argv)
+        {
+            argv[2] = argv[2].Replace(",", "");
+            argv[3] = argv[3].Replace(",", "");
+            argv[4] = argv[4].Replace(",", "");
+            if (!float.TryParse(argv[2], NumberStyles.Any, CultureInfo.InvariantCulture, out float x)) return new CmdReturn("Mauvaise coordonées", CmdReturn.CmdReturnType.WARNING);
+            if (!float.TryParse(argv[3], NumberStyles.Any, CultureInfo.InvariantCulture, out float y)) return new CmdReturn("Mauvaise coordonées", CmdReturn.CmdReturnType.WARNING);
+            if (!float.TryParse(argv[4], NumberStyles.Any, CultureInfo.InvariantCulture, out float z)) return new CmdReturn("Mauvaise coordonées", CmdReturn.CmdReturnType.WARNING);
+            Position pos = new Position(x, y, z);
+            player.Goto(pos);
+            return new CmdReturn("Vous vous êtes téléporté.", CmdReturn.CmdReturnType.SUCCESS);
+
 
 
         }
@@ -101,7 +113,7 @@ namespace Lambda.Commands
             if (cmdReturn.Type == CmdReturn.CmdReturnType.SUCCESS)
             {
                 players[0].Freeze(true);
-                return new CmdReturn("Vous vous freeze un joueur.", CmdReturn.CmdReturnType.SUCCESS);
+                return new CmdReturn("Vous avez freeze un joueur.", CmdReturn.CmdReturnType.SUCCESS);
             }
 
             return cmdReturn;
@@ -119,7 +131,7 @@ namespace Lambda.Commands
             if (cmdReturn.Type == CmdReturn.CmdReturnType.SUCCESS)
             {
                 players[0].Freeze(false);
-                return new CmdReturn("Vous vous freeze un joueur.", CmdReturn.CmdReturnType.SUCCESS);
+                return new CmdReturn("Vous avez défreeze un joueur.", CmdReturn.CmdReturnType.SUCCESS);
             }
 
             return cmdReturn;
@@ -222,6 +234,19 @@ namespace Lambda.Commands
             veh.Color = new Rgba(r, g, b, 255);
             return new CmdReturn("Vous avez changé la couleur de votre véhicule ! ", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Command(Command.CommandType.ADMIN, "Rouge", "Vert", "Bleu")]
+        public static CmdReturn Vehicle_Secondaire(Player player, string[] argv)
+        {
+            IVehicle AltVehicle = player.AltPlayer.Vehicle;
+            if (AltVehicle == null) return CmdReturn.NotInVehicle;
+            AltVehicle.GetData("vehicle", out Vehicle veh);
+            if (veh == null) return CmdReturn.NotInVehicle;
+            if (!byte.TryParse(argv[2], out byte r)) return new CmdReturn("Couleur incorecte", CmdReturn.CmdReturnType.SYNTAX);
+            if (!byte.TryParse(argv[3], out byte g)) return new CmdReturn("Couleur incorecte", CmdReturn.CmdReturnType.SYNTAX);
+            if (!byte.TryParse(argv[4], out byte b)) return new CmdReturn("Couleur incorecte", CmdReturn.CmdReturnType.SYNTAX);
+            veh.SecondaryColor = new Rgba(r, g, b, 255);
+            return new CmdReturn("Vous avez changé la couleur secondaire de votre véhicule ! ", CmdReturn.CmdReturnType.SUCCESS);
+        }
 
         [Command(Command.CommandType.ADMIN)]
         public static CmdReturn Vehicle_Data(Player player, string[] argv)
@@ -298,6 +323,13 @@ namespace Lambda.Commands
         public static CmdReturn Permission_Retirer(Player player, string[] argv)
         {
             player.RemovePermission(argv[2]);
+            return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
+        }
+
+        [Command(Command.CommandType.ADMIN, "id")]
+        public static CmdReturn Dimension(Player player, string[] argv)
+        {
+            player.Dimension = short.Parse(argv[1]);
             return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
         }
     }

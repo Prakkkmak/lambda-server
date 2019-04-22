@@ -23,35 +23,116 @@ namespace Lambda.Commands
             player.Game.DbArea.Save(shop);
             return new CmdReturn("Vous avez créé un magasin !", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Command(Command.CommandType.DEFAULT)]
+        public static CmdReturn Maison_Creer(Player player, string[] argv)
+        {
+            House house = new House();
+            player.Game.AddArea(house);
+            house.Spawn(player.FeetPosition);
+            player.Game.DbArea.Save(house);
+
+            return new CmdReturn("Vous avez créé une maison !", CmdReturn.CmdReturnType.SUCCESS);
+        }
+
+        [Command(Command.CommandType.DEFAULT, "ID")]
+        public static CmdReturn Maison_Interieur(Player player, string[] argv)
+        {
+            House house = (House)player.Game.GetArea(player.Position, Area.AreaType.HOUSE);
+            if (house == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
+            if (!uint.TryParse(argv[2], out uint interiorid)) return new CmdReturn("Parametre incorrect", CmdReturn.CmdReturnType.WARNING);
+            Interior interior = player.Game.GetInterior(interiorid);
+            if (interior == null) return new CmdReturn("Aucun interieur trouvé", CmdReturn.CmdReturnType.WARNING);
+            //Location location = new Location(interior.Position, interior, 10);
+            house.SetLocations(interior);
+            player.Game.DbArea.Save(house);
+            return new CmdReturn("Vous avez changé l'interieur!", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Command(Command.CommandType.DEFAULT)]
+        public static CmdReturn Maison_Entrer(Player player, string[] argv)
+        {
+            House house = (House)player.Game.GetArea(player.Position, Area.AreaType.HOUSE);
+            if (house == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
+            if (house.InteriorLocation.Equals(default(Location))) return new CmdReturn("La maison n'a pas d'interieur", CmdReturn.CmdReturnType.LOCATION);
+            player.GotoLocation(house.InteriorLocation);
+            return new CmdReturn("Vous avez etes entré dans la maison", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Command(Command.CommandType.DEFAULT)]
+        public static CmdReturn TP(Player player, string[] argv)
+        {
+            Location location = player.Game.GetDestination(player.Position);
+            //if (area == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
+            if (location.Equals(default(Location))) return new CmdReturn("", CmdReturn.CmdReturnType.LOCATION);
+            player.GotoLocation(location);
+            return new CmdReturn("Vous vous êtes téléporté", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Command(Command.CommandType.DEFAULT)]
+        public static CmdReturn Maison_Sortir(Player player, string[] argv)
+        {
+            if (player.Interior == null) return new CmdReturn("Vous n'êtes pas das un intérieur", CmdReturn.CmdReturnType.LOCATION);
+            player.ExitInterior();
+            return new CmdReturn("Vous avez etes sorti d'une maison", CmdReturn.CmdReturnType.SUCCESS);
+        }
 
         // Set a skin in a specific slot
         // /vetement 1 0
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Banque_Creer(Player player, string[] argv)
         {
-            Area bank = new Area();
+            Area bank = new Area(2, 2, Area.AreaType.BANK);
             player.Game.AddArea(bank);
             bank.Spawn(player.FeetPosition);
             player.Game.DbArea.Save(bank);
             return new CmdReturn("Vous avez créé une banque !", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Command(Command.CommandType.DEFAULT, "amount")]
+        public static CmdReturn Retirer(Player player, string[] argv)
+        {
+
+            Area shop = player.Game.GetArea(player.Position, Area.AreaType.BANK);
+            if (shop == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
+            if (!uint.TryParse(argv[1], out uint amount)) return new CmdReturn("Montant Incorrect", CmdReturn.CmdReturnType.WARNING);
+            player.Withdraw(amount);
+            return new CmdReturn("Vous avez retiré de l'argent !", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Command(Command.CommandType.DEFAULT, "amount")]
+        public static CmdReturn Deposer(Player player, string[] argv)
+        {
+
+            Area shop = player.Game.GetArea(player.Position, Area.AreaType.BANK);
+            if (shop == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
+            if (!uint.TryParse(argv[1], out uint amount)) return new CmdReturn("Montant Incorrect", CmdReturn.CmdReturnType.WARNING);
+            player.Deposit(amount);
+            return new CmdReturn("Vous avez déposé de l'argent !", CmdReturn.CmdReturnType.SUCCESS);
+        }
         [Command(Command.CommandType.DEFAULT)]
-        public static CmdReturn Interieurs(Player player, string[] argv)
+        public static CmdReturn Balance(Player player, string[] argv)
+        {
+            return new CmdReturn($"Vous avez {player.GetBankMoney()}$ sur votre compte.");
+        }
+        [Command(Command.CommandType.DEFAULT)]
+        public static CmdReturn Interieur_Liste(Player player, string[] argv)
         {
             Interior[] interiors = player.Game.GetInteriors();
             string txt = "Voici la liste des interieurs : <br>";
-            foreach(Interior interior in interiors)
+            foreach (Interior interior in interiors)
             {
-                txt += interior.Id + " - " + interior.IPL;
+                txt += interior.Id + " - " + interior.GetIPLs()[0] + "<br>";
             }
             return new CmdReturn(txt, CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Command(Command.CommandType.DEFAULT, "ID")]
-        public static CmdReturn Interieur(Player player, string[] argv)
+        [Command(Command.CommandType.DEFAULT)]
+        public static CmdReturn Interieur_Recharger(Player player, string[] argv)
         {
-            if (!uint.TryParse(argv[1], out uint result)) return new CmdReturn("Syntaxe incorrecte", CmdReturn.CmdReturnType.SYNTAX);
+            player.Game.AddAllInteriors();
+            return new CmdReturn("tonton", CmdReturn.CmdReturnType.SUCCESS);
+        }
+
+        [Command(Command.CommandType.DEFAULT, "ID")]
+        public static CmdReturn Interieur_Goto(Player player, string[] argv)
+        {
+            if (!uint.TryParse(argv[2], out uint result)) return new CmdReturn("Syntaxe incorrecte", CmdReturn.CmdReturnType.SYNTAX);
             Interior interior = player.Game.GetInterior(result);
-            if(interior == null) return new CmdReturn("Cet interrieur n'existe pas", CmdReturn.CmdReturnType.WARNING);
+            if (interior == null) return new CmdReturn("Cet interrieur n'existe pas", CmdReturn.CmdReturnType.WARNING);
             player.Goto(interior);
             return new CmdReturn("Vous vous etes téléporté dans un interieur", CmdReturn.CmdReturnType.SUCCESS);
         }
@@ -110,7 +191,7 @@ namespace Lambda.Commands
             if (!int.TryParse(argv[3], out int amount)) return new CmdReturn("Prix invalide", CmdReturn.CmdReturnType.WARNING);
             CmdReturn returnType = shop.Sell(id, (uint)amount, player.Inventory);
             if (returnType.Type != CmdReturn.CmdReturnType.SUCCESS) return returnType;
-            return new CmdReturn("Vous avez acheté un objet !", CmdReturn.CmdReturnType.SUCCESS);
+            return new CmdReturn("Vous avez acheté des objets !", CmdReturn.CmdReturnType.SUCCESS);
         }
     }
 }

@@ -73,14 +73,14 @@ namespace Lambda.Commands
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Vetement_Generation(Player player, string[] argv)
         {
-            player.Game.AddAllSkins();
-            return new CmdReturn($"Il y a {player.Game.GetSkins().Length} skins valides", CmdReturn.CmdReturnType.SUCCESS);
+
+            return new CmdReturn($"Il y a {player.Game.GetNumberOfSkins()} skins valides", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Vetement_Tester(Player player, string[] argv)
         {
 
-            Skin skin = player.Game.GetSkinToDiscorver();
+            Skin skin = player.Game.GetSkinToDiscorver(player);
 
             if (skin != null)
             {

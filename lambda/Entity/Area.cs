@@ -26,6 +26,8 @@ namespace Lambda.Entity
         {
             NORMAL,
             SHOP,
+            HOUSE,
+            BANK
         }
 
 
@@ -35,6 +37,8 @@ namespace Lambda.Entity
         private OwnerType ownerType;
         private uint ownerId;
 
+        //public Interior Interior { get; set; }
+
         public uint Id { get; set; }
         public AreaType Type { get; set; }
         public ICheckpoint AltCheckpoint { get; set; }
@@ -42,6 +46,10 @@ namespace Lambda.Entity
         public float Radius { get; set; }
         public float Height { get; set; }
         public byte CheckpointTypeId { get; set; }
+
+        public Location InteriorLocation;
+        public Location ExteriorLocation;
+
         public Position SpawnPosition;
 
         public Position Position
@@ -53,7 +61,7 @@ namespace Lambda.Entity
         }
         public Rotation Rotation { get; set; }
         public Game Game { get; }
-        public short World { get; set; }
+        public short Dimension { get; set; }
 
         public Area()
         {
@@ -84,6 +92,24 @@ namespace Lambda.Entity
 
         }
 
+        public void SetLocations(Interior interior)
+        {
+            Location interiorLocation = new Location(interior.Position, interior, (short)Id);
+            Location exteriorLocation = new Location(Position, null, 0);
+            SetInteriorLocation(interiorLocation);
+            SetExteriorLocation(exteriorLocation);
+        }
+
+        public void SetInteriorLocation(Location interior)
+        {
+            InteriorLocation = interior;
+
+
+        }
+        public void SetExteriorLocation(Location interior)
+        {
+            ExteriorLocation = interior;
+        }
 
 
 

@@ -21,7 +21,7 @@ namespace Lambda.Database
         public override void SetData(Interior interior, Dictionary<string, string> data)
         {
             interior.Id = uint.Parse(data["int_id"]);
-            interior.IPL = data["int_ipl"];
+            interior.SetIPLs(data["int_ipl"]);
             interior.Position = GetPosition(data);
         }
     }

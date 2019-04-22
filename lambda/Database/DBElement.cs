@@ -60,6 +60,7 @@ namespace Lambda.Database
             string index = Prefix + "_id";
             where[index] = id.ToString();
             Dictionary<string, string> result = DbConnect.SelectOne(TableName, where);
+            if (result.Count < 1) return entity;
             SetData(entity, result);
             return entity;
         }
@@ -112,7 +113,7 @@ namespace Lambda.Database
             return $"Table : {TableName} / Prefix : {Prefix}";
         }
 
-        public Position GetPosition(Dictionary<string,string> data)
+        public Position GetPosition(Dictionary<string, string> data)
         {
             Position position = new Position(0, 0, 0);
             position.X = float.Parse(data[Prefix + "_position_x"]);

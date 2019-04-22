@@ -1,5 +1,6 @@
 ﻿using System;
 using AltV.Net;
+using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using Lambda.Administration;
 using Lambda.Commands;
@@ -13,22 +14,11 @@ namespace Lambda.Utils
         public void RegisterEvents()
         {
             Alt.OnClient("chatmessage", OnClientChatMessage);
-            Alt.On<string>("test", Test);
-            Alt.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            Alt.Emit("test", "test");
         }
 
-        public void Test(string args)
-        {
-            Alt.Log("args = " + args);
-        }
         public void OnClientChatMessage(IPlayer altPlayer, object[] args)
         {
-            Alt.Log(args[0] + "");
             string msg = (string)args[0];
-            Alt.Log(msg);
-            Alt.Log(altPlayer.Name);
-            Alt.Log(args.Length + "");
             if (string.IsNullOrWhiteSpace(msg)) return;
             if (altPlayer.GetData("player", out Player player))
             {
@@ -39,16 +29,16 @@ namespace Lambda.Utils
                 }
                 else
                 {
+
                     Alt.Log($"[chat:msg] {player.Name}:{msg}");
-                    Console.WriteLine($"[chat:msg CONSOLE] {player.Name}:{msg}");
-                    player.SendMessage("Test de la lettre => Ã© Ã¯ Ã¨");
-                    player.SendMessage($"{player.Name} : {msg}");
+                    SendInRange(player, 20, msg);
                 }
             }
         }
 
         public CmdReturn InvokeCmd(Player player, string msg)
         {
+            if (string.IsNullOrWhiteSpace(msg)) return default;
             string[] parameters = TextToArgs(msg);
             Command[] cmd = player.Game.GetCommands(parameters);
             CmdReturn cmdReturn = new CmdReturn();
@@ -67,7 +57,6 @@ namespace Lambda.Utils
 
         public string SendCmdReturn(CmdReturn cmdReturn)
         {
-            Alt.Log("Cmd return du send cmd return " + cmdReturn.Text);
             switch (cmdReturn.Type)
             {
                 case CmdReturn.CmdReturnType.WARNING:
@@ -93,7 +82,20 @@ namespace Lambda.Utils
 
         public void Send(Player player, string msg)
         {
+            if (string.IsNullOrWhiteSpace(msg)) return;
             player.AltPlayer.Emit("chatmessage", null, msg);
+        }
+
+        public void SendInRange(Player player, int range, string msg, bool named = true)
+        {
+            foreach (Player player2 in player.Game.GetPlayers())
+            {
+                if (player.Position.Distance(player2.Position) < range)
+                {
+                    player2.AltPlayer.Emit("chatmessage", named ? player.Name : null, msg);
+                }
+            }
+
         }
 
         public string[] TextToArgs(string msg)

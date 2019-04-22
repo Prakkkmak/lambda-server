@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lambda.Organization
+namespace Lambda.Organizations
 {
     class Payday
     {

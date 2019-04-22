@@ -24,7 +24,7 @@ namespace Lambda.Database
             data["cha_position_x"] = player.Position.X.ToString();
             data["cha_position_Y"] = player.Position.Y.ToString();
             data["cha_position_z"] = player.Position.Z.ToString();
-            data["cha_world"] = player.World.ToString();
+            data["cha_world"] = player.Dimension.ToString();
             data["cha_money"] = player.Inventory.Money.ToString();
             data["cha_hp"] = player.Hp.ToString();
             data["cha_food"] = player.Food.ToString();
@@ -49,8 +49,8 @@ namespace Lambda.Database
             position.Y = float.Parse(data["cha_position_y"]);
             position.Z = float.Parse(data["cha_position_z"]);
             player.Position = position;
-            player.World = short.Parse(data["cha_world"]);
-            player.Inventory.Money = ulong.Parse(data["cha_money"]);
+            player.Dimension = short.Parse(data["cha_world"]);
+            player.Inventory.Deposit(long.Parse(data["cha_money"]));
             player.Hp = ushort.Parse(data["cha_hp"]);
             player.Food = short.Parse(data["cha_food"]);
             player.GetSkin().Id = uint.Parse(data["ski_id"]);

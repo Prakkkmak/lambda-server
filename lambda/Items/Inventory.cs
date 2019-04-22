@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using AltV.Net;
 using Lambda.Entity;
@@ -21,8 +22,7 @@ namespace Lambda.Items
         public uint Id { get; }
         public InventoryType Type { get; }
         public List<Item> Items { get; set; }
-        public ulong Money { get; set; }
-
+        public long Money { get; private set; }
 
 
         public Inventory(IEntity entity, InventoryType type = InventoryType.DEFAULT, uint id = 0)
@@ -34,16 +34,16 @@ namespace Lambda.Items
             Entity = entity;
         }
 
-        public bool Withdraw(uint amount)
+        public bool Withdraw(long amount)
         {
-            if (Money < (ulong)amount) return false;
-            Money -= (ulong)amount;
+            if (Money < amount) return false;
+            Money -= amount;
             return true;
         }
 
-        public bool Deposit(int amount)
+        public bool Deposit(long amount)
         {
-            Money += (ulong)amount;
+            Money += amount;
             return true;
         }
 
@@ -59,7 +59,8 @@ namespace Lambda.Items
             }
             Alt.Log(id + ") Création d'un item avec " + amount + " de quantité ");
             Item item = new Item(Entity.Game.GetBaseItem(id), amount);
-            while (item.Amount > item.GetBaseItem().MaxStack)
+            //if (item.GetBaseItem().MaxStack < 1) item.Amount = amount;
+            while (item.Amount > item.GetBaseItem().MaxStack && item.GetBaseItem().MaxStack > 0)
             {
                 item.Amount = item.GetBaseItem().MaxStack;
                 amount -= item.GetBaseItem().MaxStack;

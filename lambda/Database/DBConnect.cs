@@ -40,8 +40,8 @@ namespace Lambda.Database
         public MySqlConnection OpenConnection()
         {
             MySqlConnection mySqlConnection = new MySqlConnection(connectionString);
-            Alt.Log(mySqlConnection.ConnectionString);
-            Alt.Log(mySqlConnection.Database);
+            //Alt.Log(mySqlConnection.ConnectionString);
+            //Alt.Log(mySqlConnection.Database);
             try
             {
                 //if (connection.State != ConnectionState.Open)
