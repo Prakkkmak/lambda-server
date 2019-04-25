@@ -38,6 +38,7 @@ namespace Lambda
         {
             Game = new Game();
             Game.Init();
+            //Game.BaseGame = Game;
 
         }
 

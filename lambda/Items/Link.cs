@@ -2,34 +2,92 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using Lambda.Database;
 
 namespace Lambda.Items
 {
-    public struct Link
+    public class Link : IDBElement, IEquatable<Link>
     {
-        public uint From { get; set; }
-        public uint To { get; set; }
-
-        public Link(uint from, uint to)
+        public enum LinkType
         {
-            From = from;
-            To = to;
+            UNKNOW,
+            VALID,
+            UNVALID
+        }
+        public uint Id { get; set; }
+        public Tuple<byte, ushort> Component1;
+        public Tuple<byte, ushort> Component2;
+        public LinkType Type;
+
+        public Link()
+        {
+            Id = 0;
+            Type = LinkType.UNKNOW;
+        }
+        public Link(byte from, byte to, ushort fromd, ushort tod, LinkType type = LinkType.UNKNOW) : this()
+        {
+            Component1 = new Tuple<byte, ushort>(from, fromd);
+            Component2 = new Tuple<byte, ushort>(to, tod);
+            Type = type;
         }
 
-        public static bool Equals(Link linkA, Link linkB)
+        public bool Equals(Link link)
         {
-            return linkA.From == linkB.From && linkA.To == linkB.To;
+            if (!Component1.Equals(link.Component1)) return false;
+            if (!Component2.Equals(link.Component2)) return false;
+            return true;
+        }
+        public override int GetHashCode()
+        {
+            int code = Component1.Item1 ^ Component1.Item2 + 10;
+
+            //Calculate the hash code for the product. 
+            //Alt.Log(code + "");
+            return code;
         }
 
-        public static Link HairToMask = new Link(2, 1);
-        public static Link TorsoToUndershirt = new Link(3, 8);
-        public static Link TorsoToTop = new Link(3, 11);
-        public static Link UndershirtToTop = new Link(8, 11);
-        public static Link TopToLeg = new Link(11, 4);
-        public static Link FeetToLeg = new Link(6, 4);
-        public static Link UndershirtToLeg = new Link(8, 4);
-        public static Link MaskToTop = new Link(1, 11);
+        public static bool GetCompatibility(params Link[] links)
+        {
+            for (int index = 0; index < links.Length; index++)
+            {
+                Link link = links[index];
+                for (int i = index + 1; i < links.Length; i++)
+                {
+                    Link link1 = links[i];
+                    if (link1.Component1.Item1 == link.Component1.Item1)
+                    {
+                        if (link1.Component1.Item2 != link.Component1.Item2) return false;
+                    }
 
-        public static Link[] Links = { HairToMask, TorsoToUndershirt, TorsoToTop, UndershirtToTop, TopToLeg, FeetToLeg, UndershirtToLeg, MaskToTop };
+                    if (link1.Component1.Item1 == link.Component2.Item1)
+                    {
+                        if (link1.Component1.Item2 != link.Component2.Item2) return false;
+                    }
+
+                    if (link1.Component2.Item1 == link.Component1.Item1)
+                    {
+                        if (link1.Component2.Item2 != link.Component1.Item2) return false;
+                    }
+
+                    if (link1.Component2.Item1 == link.Component2.Item1)
+                    {
+                        if (link1.Component2.Item2 != link.Component2.Item2) return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+        public static Tuple<byte, byte>[] LinksPairs =
+        {
+            new Tuple<byte, byte>(1, 2),
+            new Tuple<byte, byte>(1, 11),
+            new Tuple<byte, byte>(3, 8),
+            new Tuple<byte, byte>(3, 11),
+            new Tuple<byte, byte>(4, 6),
+            new Tuple<byte, byte>(4, 8),
+            new Tuple<byte, byte>(4, 11),
+            new Tuple<byte, byte>(8, 11),
+        };
     }
 }

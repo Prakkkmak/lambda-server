@@ -94,7 +94,7 @@ namespace Lambda.Entity
             FirstName = "";
             LastName = "";
             Account = null;
-            skin = new Skin { Player = this };
+            skin = new Skin();
             Inventory = new Inventory(this);
             Inventory.Deposit(100000);
 
@@ -106,8 +106,7 @@ namespace Lambda.Entity
             Game = game;
             AltPlayer = altPlayer;
             altPlayer.SetData("player", this);
-
-
+            skin.Game = game;
         }
 
 
@@ -115,7 +114,7 @@ namespace Lambda.Entity
         public void SetSkin(Skin skin)
         {
             this.skin = skin;
-            this.skin.Player = this;
+            //this.skin.Player = this;
             this.skin.SendSkin(this);
         }
 

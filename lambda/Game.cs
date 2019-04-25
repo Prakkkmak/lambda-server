@@ -26,8 +26,9 @@ namespace Lambda
         private List<Area> areas;
         private List<Spawn> spawns;
         private List<Command> commands;
-        private List<ComponentLink> componentLinks;
+        //private List<ComponentLink> componentLinks;
         private List<Organization> organizations;
+        public List<Link> links;
 
         private Interior[] interiors;
         private Skin[] skins;
@@ -36,6 +37,9 @@ namespace Lambda
         private Events events;
         public Chat Chat;
         public IVoiceChannel VoiceChannel;
+        //public Links Links { get; set; }
+
+
 
         public DbVehicle DbVehicle { get; }
         public DbBaseItem DbBaseItem { get; }
@@ -44,9 +48,12 @@ namespace Lambda
         public DbAccount DbAccount { get; }
         public DbSkin DbSkin { get; }
         public DbOrganization DbOrganization { get; }
-
-        public DbComponentLink DbComponentLink { get; }
+        public DbLink DbLink { get; }
+        public DbLink DbComponentLink { get; }
         public DbInterior DbInterior { get; }
+
+
+
         public Game()
         {
             players = new List<Player>();
@@ -54,8 +61,9 @@ namespace Lambda
             areas = new List<Area>();
             spawns = new List<Spawn>();
             commands = new List<Command>();
-            componentLinks = new List<ComponentLink>();
+            //componentLinks = new List<ComponentLink>();
             organizations = new List<Organization>();
+            links = new List<Link>();
             baseitems = new BaseItem[0];
             dbConnect = new DBConnect();
             events = new Events(this);
@@ -64,15 +72,18 @@ namespace Lambda
             VoiceChannel = Alt.CreateVoiceChannel(true, 10);
 
             Chat = new Chat();
+
             DbVehicle = new DbVehicle(this, dbConnect, "t_vehicle_veh", "veh");
             DbBaseItem = new DbBaseItem(this, dbConnect, "t_itemdata_itd", "itd");
             DbArea = new DbArea(this, dbConnect, "t_area_are", "are");
             DbPlayer = new DbPlayer(this, dbConnect, "t_character_cha", "cha");
             DbAccount = new DbAccount(this, dbConnect, "t_account_acc", "acc");
-            DbComponentLink = new DbComponentLink(this, dbConnect, "t_link_lin", "lin");
+            DbComponentLink = new DbLink(this, dbConnect, "t_link_lin", "lin");
             DbSkin = new DbSkin(this, dbConnect, "t_skin_ski", "ski");
             DbInterior = new DbInterior(this, dbConnect, "t_interior_int", "int");
             DbOrganization = new DbOrganization(this, dbConnect, "t_organization_org", "org");
+            DbLink = new DbLink(this, dbConnect, "t_link_lin", "lin");
+
         }
 
         public void Init()
@@ -97,13 +108,12 @@ namespace Lambda
             Alt.Log(">Base items created");
             AddAllVehicles();
             Alt.Log(">Vehicles spawned");
-            AddAllComponentLinks();
-            Alt.Log(">Components links loaded");
             AddAllAreas();
             Alt.Log(">All areas loaded");
             AddAllOrganizations();
             Alt.Log(">All organizations loaded");
-            Alt.Log("Il y a : " + GetNumberOfSkins() + "");
+            AddAllLinks();
+
         }
 
         public void AddPlayer(Player player)
@@ -357,280 +367,103 @@ namespace Lambda
             return cmds.ToArray();
         }
 
-        public void AddComponentLink(ComponentLink componentLink)
-        {
-            componentLinks.Add(componentLink);
-        }
-
-        public void AddComponentLinks(ComponentLink[] links)
-        {
-            foreach (ComponentLink componentLink in links)
-            {
-                ComponentLink actual = GetComponentLink(componentLink);
-                if (actual == null)
-                {
-                    componentLinks.Add(componentLink);
-                }
-                else
-                {
-                    actual.Validity = componentLink.Validity;
-                }
-            }
-        }
-
-        public void AddAllComponentLinks()
-        {
-            componentLinks = DbComponentLink.GetAll().ToList();
-        }
-
-        public ComponentLink GetComponentLink(ComponentLink componentLink)
-        {
-            foreach (ComponentLink comp in componentLinks)
-            {
-                if (ComponentLink.Equals(comp, componentLink)) return comp;
-            }
-            return null;
-        }
-
-        public ComponentLink[] GetComponentLinks(ComponentLink[] componentLinks)
-        {
-            List<ComponentLink> similarities = new List<ComponentLink>();
-            foreach (ComponentLink componentLink in componentLinks)
-            {
-                ComponentLink comp = GetComponentLink(componentLink);
-                if (comp != null) similarities.Add(comp);
-            }
-            return similarities.ToArray();
-        }
-
-        public long GetNumberOfSkins()
-        {
-            ComponentLink[] links = componentLinks.ToArray();
-            List<ComponentLink> TopToLeg = new List<ComponentLink>();
-            List<ComponentLink> FeetToLeg = new List<ComponentLink>();
-            List<ComponentLink> HairToMask = new List<ComponentLink>();
-            List<ComponentLink> TorsoToUndershirt = new List<ComponentLink>();
-            List<ComponentLink> TorsoToTop = new List<ComponentLink>();
-            List<ComponentLink> UndershirtToTop = new List<ComponentLink>();
-            List<ComponentLink> UndershirtToLeg = new List<ComponentLink>();
-            List<ComponentLink> MaskToTop = new List<ComponentLink>();
-            //List<Skin> goodskins = new List<Skin>();
-            long nbr = 0;
-            foreach (ComponentLink link in links)
-            {
-                if (Link.Equals(link.Link, Link.TopToLeg))
-                {
-                    TopToLeg.Add(link);
-                }
-                else if (Link.Equals(link.Link, Link.FeetToLeg))
-                {
-                    FeetToLeg.Add(link);
-                }
-                else if (Link.Equals(link.Link, Link.HairToMask))
-                {
-                    HairToMask.Add(link);
-                }
-                else if (Link.Equals(link.Link, Link.TorsoToUndershirt))
-                {
-                    TorsoToUndershirt.Add(link);
-                }
-                else if (Link.Equals(link.Link, Link.TorsoToTop))
-                {
-                    TorsoToTop.Add(link);
-                }
-                else if (Link.Equals(link.Link, Link.UndershirtToTop))
-                {
-                    UndershirtToTop.Add(link);
-                }
-                else if (Link.Equals(link.Link, Link.MaskToTop))
-                {
-                    MaskToTop.Add(link);
-                }
-                else if (Link.Equals(link.Link, Link.UndershirtToLeg))
-                {
-                    UndershirtToLeg.Add(link);
-                }
-            }
-
-            foreach (ComponentLink feetToLeg in FeetToLeg)
-            {
-                bool isGoodSkin = true;
-                if (feetToLeg.Validity != ComponentLink.Valid.TRUE) continue;
-                //if (feetToLeg.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
-                foreach (ComponentLink topToLeg in TopToLeg)
-                {
-                    if (topToLeg.Validity != ComponentLink.Valid.TRUE ||
-                        topToLeg.DrawableB != feetToLeg.DrawableB) continue;
-                    //if (topToLeg.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
-                    foreach (ComponentLink torsoToTop in TorsoToTop)
-                    {
-                        if (torsoToTop.Validity != ComponentLink.Valid.TRUE ||
-                            torsoToTop.DrawableB != topToLeg.DrawableA) continue;
-                        //if (torsoToTop.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
-                        foreach (ComponentLink torsoToUndershirt in TorsoToUndershirt)
-                        {
-                            if (torsoToUndershirt.Validity != ComponentLink.Valid.TRUE ||
-                                torsoToUndershirt.DrawableA != torsoToTop.DrawableA) continue;
-                            //if (torsoToUndershirt.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
-                            foreach (ComponentLink undershortToTop in UndershirtToTop)
-                            {
-                                //if (torsoToUndershirt.Link.To != undershortToTop.Link.From) continue;
-                                if (undershortToTop.Validity != ComponentLink.Valid.TRUE ||
-                                    undershortToTop.DrawableB != torsoToTop.DrawableB) continue;
-                                // if (undershortToTop.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
-                                foreach (ComponentLink hairToMask in HairToMask)
-                                {
-                                    if (hairToMask.Validity != ComponentLink.Valid.TRUE) continue;
-                                    // if (hairToMask.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
-                                    foreach (ComponentLink maskToTop in MaskToTop)
-                                    {
-                                        if (maskToTop.Validity != ComponentLink.Valid.TRUE ||
-                                            maskToTop.DrawableB != topToLeg.DrawableA) continue;
-                                        // if (maskToTop.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
-                                        foreach (ComponentLink undershirtToLeg in UndershirtToLeg)
-                                        {
-                                            if (undershirtToLeg.Validity != ComponentLink.Valid.TRUE ||
-                                                undershirtToLeg.DrawableA != undershortToTop.DrawableA) continue;
-                                            //if (undershirtToLeg.Validity == ComponentLink.Valid.FALSE) isGoodSkin = false;
-
-                                            //Skin skin = new Skin();
-                                            SkinData skin = new SkinData();
-                                            skin.Feet = new Component(feetToLeg.DrawableA);
-                                            skin.Leg = new Component(feetToLeg.DrawableB);
-                                            skin.Top = new Component(topToLeg.DrawableA);
-                                            skin.Torso = new Component(torsoToTop.DrawableA);
-                                            skin.Undershirt = new Component(undershortToTop.DrawableA);
-                                            skin.Hair = new Component(hairToMask.DrawableA);
-                                            skin.Mask = new Component(hairToMask.DrawableB);
-                                            if (isGoodSkin) nbr++;
-                                            //else BadSkins.Add(skin);
-                                            if (nbr % 1000000 == 0) Alt.Log(nbr + " skins dispos availible");
 
 
-                                        }
-
-                                    }
-
-
-                                }
-                            }
-                        }
-                    }
-                }
-
-
-
-            }
-            //skins = goodskins.ToArray();
-            return nbr;
-        }
 
         public Skin[] GetSkins()
         {
             return skins.ToArray();
         }
 
-        public Skin GetSkinToDiscorver(Player player)
+
+        public void AddAllInteriors()
         {
-            return null;
-            /*foreach (Skin goodSkin in skins)
+            interiors = DbInterior.GetAll();
+        }
+        public Interior GetInterior(uint id)
+        {
+            foreach (Interior interior in interiors)
             {
-                goodSkin.Player = player;
-                Skin skinToDiscover = goodSkin.Copy(player);
-                for (int nbrDiff = 1; nbrDiff <= 11; nbrDiff++)
-                {
-                    uint i;
-
-                    for (i = 0; i < Component.HairMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.HAIR, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        ComponentLink[] links = skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW);
-                        if (links.Length == nbrDiff) return skinToDiscover;
-                    }
-                    for (i = 0; i < Component.MaskMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.MASK, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
-                    }
-                    for (i = 0; i < Component.TopMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.TOP, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
-                    }
-                    for (i = 0; i < Component.UndershirtMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.UNDERSHIRT, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
-                    }
-                    for (i = 0; i < Component.TorsoMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.TORSO, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
-                    }
-                    for (i = 0; i < Component.FeetMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.FEET, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
-                    }
-                    for (i = 0; i < Component.LegMaxValue; i++)
-                    {
-                        skinToDiscover.SetComponent((uint)Skin.ClothNumber.LEG, i);
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.FALSE).Length > 0) continue;
-                        if (skinToDiscover.GetLinksByType(ComponentLink.Valid.UNKNOW).Length == nbrDiff) return skinToDiscover;
-                    }
-                }*/
-
+                if (interior.Id == id) return interior;
+            }
+            return null;
         }
+        public Interior[] GetInteriors()
+        {
+            return interiors;
+        }
+
+        public void AddOrganization(Organization org)
+        {
+            organizations.Add(org);
+        }
+
+        public void AddAllOrganizations()
+        {
+            organizations = DbOrganization.GetAll().ToList();
+        }
+        public Organization GetOrganization(uint id)
+        {
+            foreach (Organization organization in organizations)
+            {
+                if (organization.Id == id) return organization;
+            }
 
             return null;
         }
-    public void AddAllInteriors()
-    {
-        interiors = DbInterior.GetAll();
-    }
-    public Interior GetInterior(uint id)
-    {
-        foreach (Interior interior in interiors)
+        public void RemoveOrganization(Organization organization)
         {
-            if (interior.Id == id) return interior;
-        }
-        return null;
-    }
-    public Interior[] GetInteriors()
-    {
-        return interiors;
-    }
+            organizations.Remove(organization);
+            //if (organization.Id != 0) DbVehicle.Delete(organization);
 
-    public void AddOrganization(Organization org)
-    {
-        organizations.Add(org);
-    }
-
-    public void AddAllOrganizations()
-    {
-        organizations = DbOrganization.GetAll().ToList();
-    }
-    public Organization GetOrganization(uint id)
-    {
-        foreach (Organization organization in organizations)
-        {
-            if (organization.Id == id) return organization;
         }
 
-        return null;
-    }
-    public void RemoveOrganization(Organization organization)
-    {
-        organizations.Remove(organization);
-        //if (organization.Id != 0) DbVehicle.Delete(organization);
+
+        public Link AddLink(Link link)
+        {
+            Link sLink = GetLink(link);
+            if (sLink == null)
+            {
+                links.Add(link);
+                return link;
+            }
+            else
+            {
+                sLink.Type = link.Type;
+                return sLink;
+            }
+        }
+        public void AddAllLinks()
+        {
+            links = DbLink.GetAll().ToList();
+        }
+
+        public Link GetLink(byte from, byte to, ushort drawableFrom, ushort drawableTo)
+        {
+            foreach (Link link in links)
+            {
+                if (link.Component1.Item1 == from &&
+                    link.Component1.Item2 == drawableFrom &&
+                    link.Component2.Item1 == to &&
+                    link.Component2.Item2 == drawableTo)
+                {
+                    return link;
+                }
+            }
+
+            return null;
+
+        }
+        public Link GetLink(Link link)
+        {
+            return GetLink(link.Component1.Item1, link.Component2.Item1, link.Component1.Item2, link.Component2.Item2);
+        }
+        public Link[] GetLinks()
+        {
+            return links.ToArray();
+        }
+
+        public static Game BaseGame = new Game();
 
     }
-
-}
 }
