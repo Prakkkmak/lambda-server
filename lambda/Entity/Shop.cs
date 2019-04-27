@@ -13,10 +13,10 @@ namespace Lambda.Entity
         public List<Sell> Sells { get; set; }
 
 
-        public Shop() : base(2, 1, AreaType.SHOP)
+        public Shop() : base(1, 1, AreaType.SHOP)
         {
             Sells = new List<Sell>();
-            CheckpointTypeId = 2;
+            CheckpointTypeId = 1;
         }
 
         public void AddSell(uint id, int price)

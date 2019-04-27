@@ -82,7 +82,7 @@ namespace Lambda.Commands
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Vetement_Tester(Player player, string[] argv)
         {
-
+            return new CmdReturn("EN CONSTRUCTION", CmdReturn.CmdReturnType.ERROR);
             Skin skin = player.GetSkin();
             skin.SetNextNotValidSkin();
             skin.SendSkin(player);

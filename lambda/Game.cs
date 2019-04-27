@@ -48,8 +48,9 @@ namespace Lambda
         public DbAccount DbAccount { get; }
         public DbSkin DbSkin { get; }
         public DbOrganization DbOrganization { get; }
+        public DbRank DbRank { get; }
         public DbLink DbLink { get; }
-        public DbLink DbComponentLink { get; }
+        //public DbLink DbComponentLink { get; }
         public DbInterior DbInterior { get; }
 
 
@@ -78,10 +79,11 @@ namespace Lambda
             DbArea = new DbArea(this, dbConnect, "t_area_are", "are");
             DbPlayer = new DbPlayer(this, dbConnect, "t_character_cha", "cha");
             DbAccount = new DbAccount(this, dbConnect, "t_account_acc", "acc");
-            DbComponentLink = new DbLink(this, dbConnect, "t_link_lin", "lin");
+            //DbComponentLink = new DbLink(this, dbConnect, "t_link_lin", "lin");
             DbSkin = new DbSkin(this, dbConnect, "t_skin_ski", "ski");
             DbInterior = new DbInterior(this, dbConnect, "t_interior_int", "int");
             DbOrganization = new DbOrganization(this, dbConnect, "t_organization_org", "org");
+            DbRank = new DbRank(this, dbConnect, "t_rank_ran", "ran");
             DbLink = new DbLink(this, dbConnect, "t_link_lin", "lin");
 
         }
@@ -150,16 +152,13 @@ namespace Lambda
         {
             vehicles.Add(vehicle);
             vehicle.Game = this;
-            vehicle.Spawn();
+            //vehicle.Spawn();
         }
 
         public void AddAllVehicles()
         {
             vehicles = DbVehicle.GetAll().ToList();
-            vehicles.ForEach((veh) =>
-            {
-                veh.Spawn();
-            });
+            vehicles.ForEach((veh) => { veh.Game = this; });
         }
 
         public void RemoveVehicle(Vehicle vehicle)
@@ -197,15 +196,15 @@ namespace Lambda
 
             return null;
         }
-        public Location GetDestination(Position position)
+        public Location GetDestination(Position position, short dimension)
         {
             foreach (Area area in areas)
             {
-                if (area.InteriorLocation.Position.Distance(position) < area.Radius)
+                if (area.InteriorLocation.Position.Distance(position) < area.Radius && area.Id == dimension)
                 {
                     return area.ExteriorLocation;
                 }
-                if (area.ExteriorLocation.Position.Distance(position) < area.Radius)
+                if (area.ExteriorLocation.Position.Distance(position) < area.Radius && area.Dimension == dimension)
                 {
                     return area.InteriorLocation;
                 }
@@ -237,6 +236,7 @@ namespace Lambda
             areas = DbArea.GetAll().ToList();
             areas.ForEach((area) =>
             {
+                area.Game = this;
                 //area.Spawn(); //TODO
             });
         }
@@ -401,6 +401,14 @@ namespace Lambda
         public void AddAllOrganizations()
         {
             organizations = DbOrganization.GetAll().ToList();
+            foreach (Organization organization in organizations)
+            {
+                Rank[] ranks = DbRank.GetAll(organization.Id);
+                foreach (Rank rank in ranks)
+                {
+                    organization.AddRank(rank);
+                }
+            }
         }
         public Organization GetOrganization(uint id)
         {
@@ -411,9 +419,14 @@ namespace Lambda
 
             return null;
         }
+        public Organization[] GetOrganizations()
+        {
+            return organizations.ToArray();
+        }
         public void RemoveOrganization(Organization organization)
         {
             organizations.Remove(organization);
+            DbOrganization.Delete(organization);
             //if (organization.Id != 0) DbVehicle.Delete(organization);
 
         }

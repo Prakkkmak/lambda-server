@@ -47,7 +47,7 @@ namespace Lambda.Commands
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Inventaire(Player player, string[] argv)
         {
-            string str = $"Voici votre stockage";
+            string str = $"Voici votre stockage ! 0/0 <br>";
             str += "Voici le contenu de votre inventaire: <br>";
 
             foreach (Item inventoryItem in player.Inventory.Items)
@@ -65,7 +65,7 @@ namespace Lambda.Commands
         public static CmdReturn Pos(Player player, string[] argv)
         {
             Position pos = player.Position;
-            CmdReturn cmdReturn = new CmdReturn($"Votre position ( X:{pos.X} | Y:{pos.Y} | Z:{pos.Z} )", CmdReturn.CmdReturnType.SUCCESS);
+            CmdReturn cmdReturn = new CmdReturn($"Votre position ( X:{pos.X} | Y:{pos.Y} | Z:{pos.Z} ) Dim : {player.Dimension}", CmdReturn.CmdReturnType.SUCCESS);
             return cmdReturn;
         }
 

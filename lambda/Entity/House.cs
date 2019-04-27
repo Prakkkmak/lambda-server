@@ -13,7 +13,7 @@ namespace Lambda.Entity
         public short interiorDim { get; set; }
         public House() : base(2, 1, AreaType.HOUSE)
         {
-            CheckpointTypeId = 10;
+            CheckpointTypeId = 0;
         }
 
 

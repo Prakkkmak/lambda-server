@@ -38,6 +38,7 @@ namespace Lambda.Database
 
         public override void SetData(Area area, Dictionary<string, string> data)
         {
+            //area.Id = uint.Parse("are_id");
             Enum.TryParse(data["are_type"], out Area.AreaType type);
             area.Type = type;
             Position position = new Position();
@@ -50,7 +51,7 @@ namespace Lambda.Database
             Interior interior = Game.GetInterior(uint.Parse(data["are_interior"]));
             if (interior != null)
             {
-                area.SetLocations(interior);
+                area.SetLocations(interior, short.Parse(data["are_id"]));
             }
         }
         public Area[] GetAll()

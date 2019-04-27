@@ -43,6 +43,8 @@ namespace Lambda.Commands
         public static CmdReturn NoPlayerAttached = new CmdReturn("Aucun player vous est attaché. Merci de contacter un admin.", CmdReturnType.ERROR);
         public static CmdReturn NotExceptedError = new CmdReturn("Erreur non attendue, contactez un admin.", CmdReturnType.ERROR);
         public static CmdReturn NotInVehicle = new CmdReturn("Vous n etes pas dans un véhicule", CmdReturnType.LOCATION);
+        public static CmdReturn NotInOrg = new CmdReturn("Vous n etes pas dans une organisation", CmdReturnType.WARNING);
+        public static CmdReturn NotImplemented = new CmdReturn("Non implémenté", CmdReturnType.ERROR);
 
     }
 }

@@ -60,7 +60,7 @@ namespace Lambda.Entity
             }
         }
         public Rotation Rotation { get; set; }
-        public Game Game { get; }
+        public Game Game { get; set; }
         public short Dimension { get; set; }
 
         public Area()
@@ -92,9 +92,9 @@ namespace Lambda.Entity
 
         }
 
-        public void SetLocations(Interior interior)
+        public void SetLocations(Interior interior, short dim)
         {
-            Location interiorLocation = new Location(interior.Position, interior, (short)Id);
+            Location interiorLocation = new Location(interior.Position, interior, dim);
             Location exteriorLocation = new Location(Position, null, 0);
             SetInteriorLocation(interiorLocation);
             SetExteriorLocation(exteriorLocation);
@@ -109,6 +109,7 @@ namespace Lambda.Entity
         public void SetExteriorLocation(Location interior)
         {
             ExteriorLocation = interior;
+
         }
 
 

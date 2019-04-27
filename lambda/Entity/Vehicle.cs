@@ -65,6 +65,8 @@ namespace Lambda.Entity
             }
         }
 
+
+
         public Rgba SecondaryColor
         {
             get => AltVehicle?.SecondaryColorRgb ?? new Rgba(0, 0, 0, 0);
@@ -121,12 +123,16 @@ namespace Lambda.Entity
             AltVehicle.HealthData = "DwAi";
         }
 
-
-
         public void Park()
         {
             SpawnPosition = Position;
 
+        }
+
+        public void Park(Rotation rot)
+        {
+            SpawnPosition = Position;
+            SpawnRotation = rot;
         }
     }
 }

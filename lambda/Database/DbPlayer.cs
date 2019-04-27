@@ -44,19 +44,29 @@ namespace Lambda.Database
             player.Id = uint.Parse(data["cha_id"]);
             player.FirstName = data["cha_firstname"];
             player.LastName = data["cha_lastname"];
+            player.Inventory.Deposit(long.Parse(data["cha_money"]));
+            player.Food = short.Parse(data["cha_food"]);
+            if (player.AltPlayer == null) return;
             Position position = new Position();
             position.X = float.Parse(data["cha_position_x"]);
             position.Y = float.Parse(data["cha_position_y"]);
             position.Z = float.Parse(data["cha_position_z"]);
             player.Position = position;
             player.Dimension = short.Parse(data["cha_world"]);
-            player.Inventory.Deposit(long.Parse(data["cha_money"]));
             player.Hp = ushort.Parse(data["cha_hp"]);
-            player.Food = short.Parse(data["cha_food"]);
             player.GetSkin().Id = uint.Parse(data["ski_id"]);
             player.Permissions = data["cha_permissions"].Split(',').ToList();
-            //player.Skin.Load();
-            //player.Skin.SendSkin(player);
+            Skin skin = player.Game.DbSkin.Get(uint.Parse(data["ski_id"]));
+            if (skin == null)
+            {
+                player.SetSkin(new Skin(player.Game));
+                player.Game.DbSkin.Save(player.GetSkin());
+            }
+            else
+            {
+                player.SetSkin(skin);
+            }
+
         }
         public Player Get(Account account, Player player)
         {

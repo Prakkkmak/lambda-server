@@ -164,6 +164,7 @@ namespace Lambda.Commands
 
             Vehicle vehicle = new Vehicle(Vector3.Near(player.Position), model);
             player.Game.AddVehicle(vehicle);
+            vehicle.Spawn();
             return new CmdReturn("Vous avez fait apparaitre un véhicule", CmdReturn.CmdReturnType.SUCCESS);
         }
 
@@ -178,12 +179,12 @@ namespace Lambda.Commands
 
                 if (player.AltPlayer.IsInVehicle)
                 {
-
+                    if (player.AltPlayer.Vehicle == null) return CmdReturn.NotInVehicle;
                     player.AltPlayer.Vehicle.GetData("vehicle", out Vehicle vehicle);
                     if (vehicle != null)
                     {
                         vehicle.Park();
-                        vehicle.Game.DbVehicle.Save(vehicle);
+                        player.Game.DbVehicle.Save(vehicle);
                     }
                     else
                     {
@@ -218,11 +219,11 @@ namespace Lambda.Commands
             if (veh == null) return CmdReturn.NotInVehicle;
 
             veh.Repair();
-            return new CmdReturn("Vous avez réparé votre véhicule ! ", CmdReturn.CmdReturnType.SUCCESS);
+            return new CmdReturn("LA COMMANDE NE FONCTIONNE PAS ! ", CmdReturn.CmdReturnType.SUCCESS);
         }
 
         [Command(Command.CommandType.ADMIN, "Rouge", "Vert", "Bleu")]
-        public static CmdReturn Vehicle_Couleur(Player player, string[] argv)
+        public static CmdReturn Vehicule_Couleur(Player player, string[] argv)
         {
             IVehicle AltVehicle = player.AltPlayer.Vehicle;
             if (AltVehicle == null) return CmdReturn.NotInVehicle;
@@ -235,7 +236,7 @@ namespace Lambda.Commands
             return new CmdReturn("Vous avez changé la couleur de votre véhicule ! ", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.ADMIN, "Rouge", "Vert", "Bleu")]
-        public static CmdReturn Vehicle_Secondaire(Player player, string[] argv)
+        public static CmdReturn Vehicule_Secondaire(Player player, string[] argv)
         {
             IVehicle AltVehicle = player.AltPlayer.Vehicle;
             if (AltVehicle == null) return CmdReturn.NotInVehicle;
@@ -249,7 +250,7 @@ namespace Lambda.Commands
         }
 
         [Command(Command.CommandType.ADMIN)]
-        public static CmdReturn Vehicle_Data(Player player, string[] argv)
+        public static CmdReturn Vehicule_Data(Player player, string[] argv)
         {
             IVehicle AltVehicle = player.AltPlayer.Vehicle;
             if (AltVehicle == null) return CmdReturn.NotInVehicle;
@@ -266,13 +267,16 @@ namespace Lambda.Commands
 
             if (player.AltPlayer != null)
             {
-
+                Alt.Log("MESSAGE 1");
                 if (player.AltPlayer.IsInVehicle)
                 {
-
+                    Alt.Log("MESSAGE 2");
+                    if (player.AltPlayer.Vehicle == null) return CmdReturn.NotInVehicle;
                     player.AltPlayer.Vehicle.GetData("vehicle", out Vehicle vehicle);
+                    Alt.Log("MESSAGE 2b");
                     if (vehicle != null)
                     {
+                        Alt.Log("MESSAGE 3");
                         player.Game.RemoveVehicle(vehicle);
                         return new CmdReturn("Vous avez supprimé un véhicule", CmdReturn.CmdReturnType.SUCCESS);
                     }
@@ -329,8 +333,10 @@ namespace Lambda.Commands
         [Command(Command.CommandType.ADMIN, "id")]
         public static CmdReturn Dimension(Player player, string[] argv)
         {
-            player.Dimension = short.Parse(argv[1]);
-            return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
+            if (!short.TryParse(argv[1], out short val)) return new CmdReturn("Veuillez entré un nombre valide", CmdReturn.CmdReturnType.WARNING);
+            player.Dimension = val;
+            return new CmdReturn("Vous avez changé de  dim", CmdReturn.CmdReturnType.SUCCESS);
         }
+
     }
 }

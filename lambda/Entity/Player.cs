@@ -9,6 +9,7 @@ using Lambda.Administration;
 using Lambda.Commands;
 using Lambda.Database;
 using Lambda.Items;
+using Lambda.Organizations;
 using Lambda.Utils;
 
 namespace Lambda.Entity
@@ -52,7 +53,7 @@ namespace Lambda.Entity
 
         public IPlayer AltPlayer { get; }
         public ushort ServerId => AltPlayer.Id;
-        public Game Game { get; }
+        public Game Game { get; set; }
 
 
 
@@ -60,20 +61,33 @@ namespace Lambda.Entity
         {
             get => AltPlayer.Dimension;
             set {
-                AltPlayer.Dimension = value;
-                //Game.VoiceChannel.RemovePlayer(AltPlayer);
-                //Game.VoiceChannel.AddPlayer(AltPlayer);
+                if (AltPlayer != null)
+                {
+                    AltPlayer.Dimension = value;
+                }
             }
         }
         public ushort Hp
         {
             get => AltPlayer.Health;
-            set => AltPlayer.Health = value;
+            set {
+                if (AltPlayer != null)
+                {
+                    AltPlayer.Health = value;
+                }
+            }
+
         }
         public Position Position
         {
             get => AltPlayer.Position;
-            set => AltPlayer.Position = value;
+            set {
+                if (AltPlayer != null)
+                {
+                    AltPlayer.Position = value;
+                }
+            }
+
         }
         public Position FeetPosition => new Position(AltPlayer.Position.X, AltPlayer.Position.Y, AltPlayer.Position.Z - 1);
 
@@ -240,6 +254,17 @@ namespace Lambda.Entity
         public long GetBankMoney()
         {
             return bankMoney;
+        }
+
+        public Organization[] GetOrganizations()
+        {
+            List<Organization> organizations = new List<Organization>();
+            foreach (Organization organization in Game.GetOrganizations())
+            {
+                if (organization.GetMember(Id) != null) organizations.Add(organization);
+            }
+
+            return organizations.ToArray();
         }
 
 

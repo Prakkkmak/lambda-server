@@ -18,13 +18,14 @@ namespace Lambda.Database
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
             data["org_name"] = organization.Name;
+            data["org_members"] = organization.GetMembersMetadata();
             return data;
         }
 
         public override void SetData(Organization organization, Dictionary<string, string> data)
         {
             organization.Name = data["org_name"];
-
+            organization.SetMembers(data["org_members"]);
         }
     }
 }
