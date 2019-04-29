@@ -20,7 +20,7 @@ namespace Lambda.Entity
         private uint deathCount;
         private uint id; // The id in the database
         private Skin skin;
-        private List<Request> Requests;
+        private Request request;
         private long bankMoney;
 
 
@@ -101,7 +101,7 @@ namespace Lambda.Entity
         public Player()
         {
             Permissions = new List<string>();
-            Requests = new List<Request>();
+
             deathCount = 0;
             id = 0;
             Food = 0;
@@ -172,14 +172,22 @@ namespace Lambda.Entity
             this.GotoLocation(new Location(interior.Position, interior, (short)interior.Id));
         }
 
-        public void AddRequest(Request r)
+        public void SendRequest(Request r)
         {
-            Requests.Add(r);
+            if (r.Answers.Count < 2) throw new Exception("Not enough answer");
+            SendMessage(r.Text);
+            SendMessage("Vous pouvez accepté ou refuser.");
+            SetRequest(r);
         }
 
-        public Request[] GetRequests()
+        public void SetRequest(Request r)
         {
-            return Requests.ToArray();
+            request = r;
+        }
+
+        public Request GetRequest()
+        {
+            return request;
         }
 
         public void AddPermission(string permission)

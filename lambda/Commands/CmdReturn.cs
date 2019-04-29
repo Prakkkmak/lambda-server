@@ -45,6 +45,7 @@ namespace Lambda.Commands
         public static CmdReturn NotInVehicle = new CmdReturn("Vous n etes pas dans un véhicule", CmdReturnType.LOCATION);
         public static CmdReturn NotInOrg = new CmdReturn("Vous n etes pas dans une organisation", CmdReturnType.WARNING);
         public static CmdReturn NotImplemented = new CmdReturn("Non implémenté", CmdReturnType.ERROR);
-
+        public static CmdReturn InvalidParameters = new CmdReturn("Parametres incorects", CmdReturnType.WARNING);
+        public static CmdReturn RequestBusy = new CmdReturn("Le joueur a déjà une requete en cours", CmdReturnType.WARNING);
     }
 }

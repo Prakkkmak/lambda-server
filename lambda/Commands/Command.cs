@@ -29,6 +29,7 @@ namespace Lambda.Commands
         public PermissionAttribute(string permission)
         {
             Permission = permission;
+
         }
     }
 

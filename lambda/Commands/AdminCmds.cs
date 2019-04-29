@@ -42,7 +42,7 @@ namespace Lambda.Commands
                 return new CmdReturn("Veuillez entrer un id valide", CmdReturn.CmdReturnType.SYNTAX);
             }
 
-            if (!uint.TryParse(argv[1], out uint amount))
+            if (!uint.TryParse(argv[2], out uint amount))
             {
                 return new CmdReturn("Veuillez entrer un nombre valide", CmdReturn.CmdReturnType.SYNTAX);
             }

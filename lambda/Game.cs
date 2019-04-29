@@ -403,7 +403,7 @@ namespace Lambda
             organizations = DbOrganization.GetAll().ToList();
             foreach (Organization organization in organizations)
             {
-                Rank[] ranks = DbRank.GetAll(organization.Id);
+                Rank[] ranks = DbRank.GetAll(organization);
                 foreach (Rank rank in ranks)
                 {
                     organization.AddRank(rank);

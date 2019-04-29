@@ -27,5 +27,15 @@ namespace Lambda.Database
             organization.Name = data["org_name"];
             organization.SetMembers(data["org_members"]);
         }
+
+        public void Save(Organization org)
+        {
+            base.Save(org);
+            foreach (Rank rank in org.GetRanks())
+            {
+                Game.DbRank.Save(rank);
+
+            }
+        }
     }
 }

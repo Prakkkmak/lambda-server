@@ -12,8 +12,9 @@ namespace Lambda.Organizations
     {
         public uint Id { get; set; }
         public string Name;
+        public Rank DefaultRank { get; set; }
         private List<Rank> ranks; // ranks in this organization
-        private Rank defaultRank;
+
         private List<Member> members;
 
         public Organization()
@@ -23,7 +24,7 @@ namespace Lambda.Organizations
             ranks = new List<Rank>();
             members = new List<Member>();
             Rank r = new Rank(this);
-            defaultRank = r;
+            DefaultRank = r;
             ranks.Add(r);
         }
 
@@ -36,7 +37,7 @@ namespace Lambda.Organizations
         public void AddMember(Player player)
         {
             if (members.Any(member => member.Id == player.Id)) return;
-            members.Add(new Member(player.Id, defaultRank));
+            members.Add(new Member(player.Id, DefaultRank));
         }
         public void AddMember(uint id, uint rankid)
         {
@@ -63,6 +64,13 @@ namespace Lambda.Organizations
         public void AddRank(Rank rank)
         {
             ranks.Add(rank);
+            rank.Organization = this;
+        }
+        public Rank AddRank(string name)
+        {
+            Rank r = new Rank(this, name);
+            ranks.Add(r);
+            return r;
         }
 
         public Rank GetRank(uint id)
@@ -73,6 +81,14 @@ namespace Lambda.Organizations
             }
 
             return null;
+        }
+        public Rank GetRankByIndex(int id)
+        {
+            return ranks.Count < id ? null : ranks[id];
+        }
+        public void RemoveRank(Rank rank)
+        {
+            ranks.Remove(rank);
         }
 
         public Rank[] GetRanks()

@@ -23,6 +23,16 @@ namespace Lambda.Organizations
             Organization = org;
         }
 
+        public Rank(Organization org, string name) : this(org)
+        {
+            Name = name;
+        }
+
+        public bool IsDefault()
+        {
+            return Organization.DefaultRank == this;
+        }
+
 
     }
 }

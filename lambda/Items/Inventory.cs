@@ -57,7 +57,6 @@ namespace Lambda.Items
                 amount -= nbrToAdd;
                 itemWithLessStack.Amount += nbrToAdd;
             }
-            Alt.Log(id + ") Création d'un item avec " + amount + " de quantité ");
             Item item = new Item(Entity.Game.GetBaseItem(id), amount);
             //if (item.GetBaseItem().MaxStack < 1) item.Amount = amount;
             while (item.Amount > item.GetBaseItem().MaxStack && item.GetBaseItem().MaxStack > 0)
@@ -71,12 +70,54 @@ namespace Lambda.Items
             return true;
         }
 
+        public Item GetItem(uint id)
+        {
+            Item item = null;
+            foreach (Item it in Items)
+            {
+                if (it.GetBaseItem().Id == id)
+                {
+                    if (item == null) item = new Item(it.GetBaseItem(), it.Amount);
+                    else item.Amount += it.Amount;
+                }
+            }
+
+            return item;
+        }
+
+        public void RemoveItem(uint id, uint amount)
+        {
+
+            while (amount > 0)
+            {
+                Item itemWithLessStack = GetItemWithLessStack(id);
+                if (itemWithLessStack != null)
+                {
+                    if (amount >= itemWithLessStack.Amount)
+                    {
+                        amount -= itemWithLessStack.Amount;
+                        Items.Remove(itemWithLessStack);
+                    }
+                    else
+                    {
+                        itemWithLessStack.Amount -= amount;
+                    }
+                }
+                else
+                {
+                    return;
+                }
+
+            }
+
+        }
+
         public Item GetItemWithLessStack(uint id)
         {
             Item currentItem = null;
             foreach (Item item in Items)
             {
-                if (item.Id == id)
+                if (item.GetBaseItem().Id == id)
                 {
 
                     if (currentItem == null || item.Amount < currentItem.Amount)

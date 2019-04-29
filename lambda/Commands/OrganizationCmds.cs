@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AltV.Net;
 using Lambda.Entity;
 using Lambda.Organizations;
 
@@ -47,7 +48,7 @@ namespace Lambda.Commands
             Player[] players = player.Game.GetPlayers(charName);
             CmdReturn cmdReturn = CmdReturn.OnlyOnePlayer(players);
             if (cmdReturn.Type != CmdReturn.CmdReturnType.SUCCESS) return cmdReturn;
-            org.AddMember(player);
+            org.AddMember(players[0]);
             player.Game.DbOrganization.Save(org);
             return new CmdReturn($"Vous avez ajouté {player.Name} à une organisation", CmdReturn.CmdReturnType.SUCCESS);
         }
@@ -61,9 +62,10 @@ namespace Lambda.Commands
             foreach (Organization organization in organizations)
             {
                 str = $"=> {organization.Name} : <br>";
+                int i = 0;
                 foreach (Rank rank in organization.GetRanks())
                 {
-                    str += $"{rank.Name} <br>";
+                    str += $"{i++} - {rank.Name} <br>";
                 }
             }
             return new CmdReturn(str);
@@ -96,30 +98,65 @@ namespace Lambda.Commands
             return new CmdReturn(str);
         }
 
-        [Command(Command.CommandType.DEFAULT)]
+        [Command(Command.CommandType.DEFAULT, "Nom du rang")]
         public static CmdReturn Organisation_Rang_Creer(Player player, string[] argv)
         {
-            return CmdReturn.NotImplemented;
+            Organization[] organizations = player.GetOrganizations();
+            if (organizations.Length < 1) return CmdReturn.NotInOrg;
+            if (organizations.Length > 1) return CmdReturn.NotImplemented;
+            Organization organization = organizations[0];
+            player.Game.DbRank.Save(organization.AddRank(argv[3]));
+            return new CmdReturn("Vous avez rajouté un rang", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Command(Command.CommandType.DEFAULT)]
+        [Command(Command.CommandType.DEFAULT, "Id du rang", "Nom")]
         public static CmdReturn Organisation_Rang_Renommer(Player player, string[] argv)
         {
-            return CmdReturn.NotImplemented;
+            Organization[] organizations = player.GetOrganizations();
+            if (organizations.Length < 1) return CmdReturn.NotInOrg;
+            if (organizations.Length > 1) return CmdReturn.NotImplemented;
+            if (!int.TryParse(argv[3], out int id)) return CmdReturn.InvalidParameters;
+            Organization organization = organizations[0];
+            Rank rank = organization.GetRankByIndex(id);
+            if (rank == null) return new CmdReturn("Ce rang n existe pas", CmdReturn.CmdReturnType.WARNING);
+            rank.Name = argv[4];
+            player.Game.DbRank.Save(rank);
+            return new CmdReturn("Vous avez renommé un rang !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Command(Command.CommandType.DEFAULT)]
+        [Command(Command.CommandType.DEFAULT, "Id du rang")]
         public static CmdReturn Organisation_Rang_Default(Player player, string[] argv)
         {
-            return CmdReturn.NotImplemented;
+            Organization[] organizations = player.GetOrganizations();
+            if (organizations.Length < 1) return CmdReturn.NotInOrg;
+            if (organizations.Length > 1) return CmdReturn.NotImplemented;
+            if (!int.TryParse(argv[3], out int id)) return CmdReturn.InvalidParameters;
+            Organization organization = organizations[0];
+            Rank rank = organization.GetRankByIndex(id);
+            if (rank == null) return new CmdReturn("Ce rang n existe pas", CmdReturn.CmdReturnType.WARNING);
+            organization.DefaultRank = rank;
+            player.Game.DbOrganization.Save(organization);
+            return new CmdReturn("Vous avez changé le rang par défaut!", CmdReturn.CmdReturnType.SUCCESS);
+
         }
-        [Command(Command.CommandType.DEFAULT)]
+        [Command(Command.CommandType.DEFAULT, "Id du rang")]
         public static CmdReturn Organisation_Rang_Supprimer(Player player, string[] argv)
         {
-            return CmdReturn.NotImplemented;
+            Organization[] organizations = player.GetOrganizations();
+            if (organizations.Length < 1) return CmdReturn.NotInOrg;
+            if (organizations.Length > 1) return CmdReturn.NotImplemented;
+            if (!int.TryParse(argv[3], out int id)) return CmdReturn.InvalidParameters;
+            Organization organization = organizations[0];
+            Rank rank = organization.GetRankByIndex(id);
+            if (rank == null) return new CmdReturn("Ce rang n existe pas", CmdReturn.CmdReturnType.WARNING);
+            organization.RemoveRank(rank);
+            player.Game.DbRank.Delete(rank);
+            return new CmdReturn("Vous avez supprimé un rang !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Command(Command.CommandType.DEFAULT)]
+        [Command(Command.CommandType.DEFAULT, "Id du joueur")]
         public static CmdReturn Organisation_Inviter(Player player, string[] argv)
         {
-            return CmdReturn.NotImplemented;
+
+
+            return new CmdReturn("Vous avez invité un joueur !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Organisation_Proumevoir(Player player, string[] argv)
@@ -136,4 +173,4 @@ namespace Lambda.Commands
 
 
 }
-}
+
