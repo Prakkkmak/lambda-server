@@ -22,7 +22,7 @@ namespace Lambda.Items
         public uint Id { get; }
         public InventoryType Type { get; }
         public List<Item> Items { get; set; }
-        public long Money { get; private set; }
+        public long Money { get; set; }
 
 
         public Inventory(IEntity entity, InventoryType type = InventoryType.DEFAULT, uint id = 0)

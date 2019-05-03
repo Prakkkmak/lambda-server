@@ -99,6 +99,7 @@ namespace Lambda
                 game.DbSkin.Save(player.GetSkin());
 
             }
+            Alt.Log($"[{player.ServerId}]{player.Name} c'est connécté.");
             game.AddPlayer(player);
         }
 

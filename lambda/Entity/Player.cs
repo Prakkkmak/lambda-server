@@ -77,6 +77,7 @@ namespace Lambda.Entity
                 }
             }
 
+
         }
         public Position Position
         {
@@ -89,6 +90,17 @@ namespace Lambda.Entity
             }
 
         }
+
+        public Vehicle Vehicle
+        {
+            get {
+                if (!AltPlayer.IsInVehicle || AltPlayer.Vehicle == null) return null;
+                AltPlayer.Vehicle.GetData("vehicle", out Vehicle vehicle);
+                return vehicle;
+            }
+        }
+
+
         public Position FeetPosition => new Position(AltPlayer.Position.X, AltPlayer.Position.Y, AltPlayer.Position.Z - 1);
 
         public Rotation Rotation
@@ -154,9 +166,15 @@ namespace Lambda.Entity
             Game.Chat.Send(this, msg);
         }
 
+        public void SendMessage(CmdReturn cmdReturn)
+        {
+            SendMessage(Game.Chat.SendCmdReturn(cmdReturn));
+        }
+
         public void Freeze(bool choice)
         {
-            AltPlayer.Emit(choice ? "freeze" : "unfreeze");
+
+            AltPlayer.Emit("setfreeze", choice);
         }
 
         public void Goto(Position pos)
@@ -213,7 +231,7 @@ namespace Lambda.Entity
         {
             foreach (string ipl in interior.GetIPLs())
             {
-                this.AltPlayer.Emit("loadipl", ipl);
+                this.AltPlayer.Emit("loadIpl", ipl);
             }
 
         }
@@ -221,7 +239,7 @@ namespace Lambda.Entity
         {
             foreach (string ipl in interior.GetIPLs())
             {
-                this.AltPlayer.Emit("unloadipl", ipl);
+                this.AltPlayer.Emit("unloadIpl", ipl);
             }
         }
 

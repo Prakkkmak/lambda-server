@@ -45,7 +45,7 @@ namespace Lambda.Utils
             string commandstring = "";
             foreach (Command command in cmd)
             {
-                commandstring += command.Syntax().Text + "<br>";
+                commandstring += command.Syntax() + "<br>";
             }
             if (cmd.Length > 1) cmdReturn = new CmdReturn("Plusieurs commandes ont le même nom. <br> " + commandstring, CmdReturn.CmdReturnType.SYNTAX);
             if (cmd.Length < 1) cmdReturn = new CmdReturn("Commande introuvable.", CmdReturn.CmdReturnType.SYNTAX);

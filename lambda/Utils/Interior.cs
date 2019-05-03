@@ -12,6 +12,7 @@ namespace Lambda.Utils
 
     {
         public uint Id { get; set; }
+        public string Name { get; set; }
         private string[] IPLs { get; set; }
         public Position Position { get; set; }
         public Area Area { get; set; }

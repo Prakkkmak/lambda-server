@@ -42,10 +42,12 @@ namespace Lambda.Entity
         public uint Id { get; set; }
         public AreaType Type { get; set; }
         public ICheckpoint AltCheckpoint { get; set; }
+        public IBlip AltBlip { get; set; }
 
         public float Radius { get; set; }
         public float Height { get; set; }
         public byte CheckpointTypeId { get; set; }
+        public ushort BlipTypeId { get; set; }
 
         public Location InteriorLocation;
         public Location ExteriorLocation;
@@ -74,13 +76,19 @@ namespace Lambda.Entity
             Radius = radius;
             Height = height;
             Type = type;
+            if (type == AreaType.BANK)
+            {
+                BlipTypeId = 0;
 
+            }
 
         }
 
         public void Spawn(Position position)
         {
             AltCheckpoint = Alt.CreateCheckpoint((byte)this.CheckpointTypeId, position, Radius, 2, new Rgba(0, 0, 0, 255));
+            //AltBlip = Alt.CreateBlip(4, position);
+            //AltBlip.Sprite = BlipTypeId;
         }
 
         public virtual string GetMetaData()

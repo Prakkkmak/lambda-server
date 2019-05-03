@@ -105,7 +105,7 @@ namespace Items
             }
 
             player.Game.DbSkin.Save(this);
-            player.AltPlayer.Emit("setSkin", clothes.ToArray());
+            player.AltPlayer.Emit("setComponent", clothes.ToArray());
         }
 
         public Link[] ExtractLinks()

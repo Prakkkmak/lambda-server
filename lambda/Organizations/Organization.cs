@@ -86,6 +86,16 @@ namespace Lambda.Organizations
         {
             return ranks.Count < id ? null : ranks[id];
         }
+        public Rank[] GetRanks(string name)
+        {
+            List<Rank> ranks = new List<Rank>();
+            foreach (Rank rank in ranks)
+            {
+                if (ranks.IndexOf(rank).ToString().Equals(name) || rank.Name.Replace(" ", "_").Equals(name)) ranks.Add(rank);
+            }
+            return ranks.ToArray();
+
+        }
         public void RemoveRank(Rank rank)
         {
             ranks.Remove(rank);

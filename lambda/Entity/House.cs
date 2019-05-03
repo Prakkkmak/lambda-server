@@ -14,6 +14,7 @@ namespace Lambda.Entity
         public House() : base(2, 1, AreaType.HOUSE)
         {
             CheckpointTypeId = 0;
+            BlipTypeId = 40;
         }
 
 

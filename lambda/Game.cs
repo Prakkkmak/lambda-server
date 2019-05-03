@@ -14,6 +14,7 @@ using Lambda.Entity;
 using Lambda.Items;
 using Lambda.Organizations;
 using Lambda.Utils;
+using MoreLinq;
 using Player = Lambda.Entity.Player;
 using Vehicle = Lambda.Entity.Vehicle;
 
@@ -25,7 +26,7 @@ namespace Lambda
         private List<Vehicle> vehicles;
         private List<Area> areas;
         private List<Spawn> spawns;
-        private List<Command> commands;
+        private Command[] commands;
         //private List<ComponentLink> componentLinks;
         private List<Organization> organizations;
         public List<Link> links;
@@ -61,7 +62,7 @@ namespace Lambda
             vehicles = new List<Vehicle>();
             areas = new List<Area>();
             spawns = new List<Spawn>();
-            commands = new List<Command>();
+            commands = new Command[0];
             //componentLinks = new List<ComponentLink>();
             organizations = new List<Organization>();
             links = new List<Link>();
@@ -136,7 +137,7 @@ namespace Lambda
             foreach (Player player in this.players)
             {
                 if (player.ServerId.ToString().Equals(nameOrId)) players.Add(player);
-                else if (player.Name.StartsWith(nameOrId)) players.Add(player);
+                else if (player.Name.ToLower().StartsWith(nameOrId.ToLower())) players.Add(player);
             }
             return players.ToArray();
         }
@@ -225,6 +226,10 @@ namespace Lambda
 
             return null;
         }
+        public Area GetArea(Player player, Area.AreaType type)
+        {
+            return GetArea(player.FeetPosition, type);
+        }
 
         public void AddArea(Area area)
         {
@@ -270,50 +275,79 @@ namespace Lambda
             spawns.Remove(spawn);
         }
 
-        public void AddCommand(Command command)
+
+
+
+        public void AddAllCommands()
         {
-            commands.Add(command);
-            Alt.Log($"[COMMAND]{command.Name} registered");
+            commands = Command.GetAllCommands();
         }
 
-        public void AddAllCommands(string namespaceName = "", Assembly assembly = null)
-        {
-
-            if (namespaceName.Length == 0) namespaceName = typeof(Command).Namespace; //If no namespace is specified
-            if (assembly == null) assembly = Assembly.GetExecutingAssembly();
-            Type[] types = GetTypesInNamespace(assembly, namespaceName); // Get all classes in this namespace
-            Alt.Log($"Nombre de types dans le namespace {namespaceName}: " + types.Length);
-            foreach (Type type in types)
-            {
-                foreach (MethodInfo method in type.GetMethods())
-                {
-                    if (method.GetCustomAttributes(typeof(CommandAttribute), false).Length <= 0) continue;
-                    if (method.GetParameters()[0].ParameterType == typeof(Player) && method.GetParameters()[1].ParameterType == typeof(string[]))
-                    {
-                        Command.CommandFunc function = (Command.CommandFunc)Delegate.CreateDelegate(typeof(Command.CommandFunc), method, false); // Create the delegate of my méthod
-                        if (function == null) Alt.Log("FUNCTION NULL" + method.Name);
-                        CommandAttribute attribute = (CommandAttribute)method.GetCustomAttributes(typeof(CommandAttribute), false)[0];
-                        PermissionAttribute[] permissionAttributes = (PermissionAttribute[])method.GetCustomAttributes(typeof(PermissionAttribute), false);
-                        string permission = "";
-                        if (permissionAttributes.Length > 0) permission = permissionAttributes[0].Permission;
-                        Command command = new Command(method.Name.ToLower(), function, attribute.Type, attribute.Syntax, permission);
-                        AddCommand(command); // Register the command
-                    }
-                }
-            }
-        }
-
-        public static Type[] GetTypesInNamespace(Assembly assembly, string nameSpace)
-        {
-            return assembly.GetTypes().Where(t => string.Equals(t.Namespace, nameSpace, StringComparison.Ordinal)).ToArray();
-        }
 
         public Command[] GetCommands()
         {
             return commands.ToArray();
         }
 
+        public Command[] GetCommands(Command.CommandType commandType)
+        {
+            return commands.Where(cmd => cmd.Type == commandType).ToArray();
+        }
+
         public Command[] GetCommands(string[] parameters)
+        {
+            List<Command> cmdsValid = new List<Command>();
+            foreach (Command command in commands)
+            {
+                bool isValid = CommandFitToParameter(command, parameters);
+                if (isValid)
+                {
+                    if (parameters.Length >= command.Name.Split("_").Length)
+                    {
+                        for (int i = 0; i < cmdsValid.Count; i++)
+                        {
+                            Command command1 = cmdsValid[i];
+                            string[] command1Text = command1.Name.Split("_");
+                            string[] commandText = command.Name.Split("_");
+                            if (command1Text.Length < commandText.Length)
+                            {
+                                cmdsValid.Remove(command1);
+                                i--;
+                            }
+                        }
+                    }
+
+                    cmdsValid.Add(command);
+                }
+            }
+
+            foreach (Command command in cmdsValid)
+            {
+                string[] commandText = command.Name.Split("_");
+                if (parameters.Length >= commandText.Length)
+                {
+                    if (commandText[commandText.Length - 1].Equals(parameters[commandText.Length - 1]))
+                    {
+                        return new[] { command };
+                    }
+                }
+            }
+
+            return cmdsValid.ToArray();
+        }
+
+        public bool CommandFitToParameter(Command command, string[] parameters)
+        {
+            string[] commandText = command.Name.Split("_");
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                if (commandText.Length <= i) return true;
+                if (!commandText[i].StartsWith(parameters[i])) return false;
+            }
+            return true;
+        }
+
+        public Command[] GetCommands3(string[] parameters)
         {
             List<Command> cmds = new List<Command>(commands);
             int i = 0;
@@ -350,7 +384,11 @@ namespace Lambda
                     }
                 }
 
-                if (sameLength && i >= cmds[0].Name.Split("_").Length) break;
+                if (sameLength && i >= cmds[0].Name.Split("_").Length)
+                {
+
+                    break;
+                }
                 for (int j = 0; j < cmds.Count; j++)
                 {
                     Command command = cmds[j];
@@ -388,6 +426,16 @@ namespace Lambda
             }
             return null;
         }
+        public Interior[] GetInteriors(string name)
+        {
+            List<Interior> inters = new List<Interior>();
+            foreach (Interior interior in interiors)
+            {
+                if (interior.Id.ToString().Equals(name)) inters.Add(interior);
+                if (interior.Name.Replace(" ", "_").StartsWith(name)) inters.Add(interior);
+            }
+            return inters.ToArray();
+        }
         public Interior[] GetInteriors()
         {
             return interiors;
@@ -418,6 +466,15 @@ namespace Lambda
             }
 
             return null;
+        }
+        public Organization[] GetOrganizations(string name)
+        {
+            List<Organization> orgs = new List<Organization>();
+            foreach (Organization organization in this.organizations)
+            {
+                if (organization.Id.ToString().Equals(name) || organization.Name.Replace(" ", "_").Equals(name)) orgs.Add(organization);
+            }
+            return orgs.ToArray();
         }
         public Organization[] GetOrganizations()
         {

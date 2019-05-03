@@ -44,7 +44,7 @@ namespace Lambda.Database
             player.Id = uint.Parse(data["cha_id"]);
             player.FirstName = data["cha_firstname"];
             player.LastName = data["cha_lastname"];
-            player.Inventory.Deposit(long.Parse(data["cha_money"]));
+            player.Inventory.Money = long.Parse(data["cha_money"]);
             player.Food = short.Parse(data["cha_food"]);
             if (player.AltPlayer == null) return;
             Position position = new Position();

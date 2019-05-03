@@ -17,6 +17,7 @@ namespace Lambda.Entity
         {
             Sells = new List<Sell>();
             CheckpointTypeId = 1;
+            BlipTypeId = 52;
         }
 
         public void AddSell(uint id, int price)
