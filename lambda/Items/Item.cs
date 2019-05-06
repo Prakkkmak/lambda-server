@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Lambda.Database;
 
 namespace Lambda.Items
 {
-    public class Item
+    public class Item : IDBElement
     {
         private Inventory inventory;
         private BaseItem baseItem;
@@ -13,22 +14,41 @@ namespace Lambda.Items
 
         public uint Id { get; set; }
         public uint Amount { get; set; }
-        public string[] MetaData { get; set; }
+        public string MetaData { get; set; }
 
 
+        public Item()
+        {
+            MetaData = "";
+        }
 
-
-        public Item(BaseItem baseItem, uint amount)
+        public Item(Inventory inventory, BaseItem baseItem, uint amount) : this()
         {
             this.baseItem = baseItem;
-            int sizeMetaDate = baseItem.MetaDataDescription.Length;
-            MetaData = new string[sizeMetaDate];
+            this.inventory = inventory;
             Amount = amount;
         }
+
+
 
         public BaseItem GetBaseItem()
         {
             return baseItem;
+        }
+
+        public void SetBaseItem(BaseItem baseItem)
+        {
+            this.baseItem = baseItem;
+        }
+
+        public Inventory GetInventory()
+        {
+            return inventory;
+        }
+
+        public void SetInventory(Inventory inv)
+        {
+            inventory = inv;
         }
 
 

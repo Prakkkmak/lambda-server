@@ -41,6 +41,8 @@ namespace Lambda.Entity
         public Position SpawnPosition { get; set; }
         public Rotation SpawnRotation { get; set; }
 
+        public Lock Lock { get; set; }
+
         public Position Position
         {
             get => AltVehicle?.Position ?? SpawnPosition;
@@ -92,6 +94,7 @@ namespace Lambda.Entity
             this.hp = 100;
             this.Inventory = new Inventory(this);
             this.VoiceChannel = Alt.CreateVoiceChannel(true, 10);
+            this.Lock = new Lock(10, Lock.Complexity.NUMERICAL, Lock.Complexity.ALPHAMAJ);
         }
 
         public Vehicle(Position position) : this()
@@ -134,5 +137,68 @@ namespace Lambda.Entity
             SpawnPosition = Position;
             SpawnRotation = rot;
         }
+
+        public void SetEngine(bool status)
+        {
+            AltVehicle.EngineOn = status;
+            if (status) AltVehicle.PetrolTankHealth = 100;
+            else AltVehicle.PetrolTankHealth = 0;
+        }
+        public bool GetEngine()
+        {
+            return AltVehicle.EngineOn;
+        }
+
+        public void SetPlate(string text)
+        {
+            AltVehicle.NumberplateText = text;
+        }
+
+        public string GetPlate()
+        {
+            return AltVehicle.NumberplateText;
+
+        }
+
+        public void SetLock(VehicleLockState state)
+        {
+            AltVehicle.LockState = state;
+        }
+
+        public VehicleLockState GetLock()
+        {
+            return AltVehicle.LockState;
+        }
+
+        public uint GetOwnerId()
+        {
+            return ownerId;
+        }
+
+        public void SetOwnerId(uint id)
+        {
+            ownerId = id;
+        }
+
+        public OwnerType GetOwnerType()
+        {
+            return ownerType;
+        }
+
+        public void SetOwnerType(OwnerType owner)
+        {
+            ownerType = owner;
+        }
+
+        public void SetOwner(uint id, OwnerType owner = OwnerType.CHARACTER)
+        {
+            SetOwnerId(id);
+            SetOwnerType(owner);
+        }
+        public void SetOwner(Player player)
+        {
+            SetOwner(player.Id);
+        }
+
     }
 }

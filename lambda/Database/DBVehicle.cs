@@ -30,6 +30,19 @@ namespace Lambda.Database
             data["veh_color2_r"] = vehicle.SecondaryColor.R.ToString();
             data["veh_color2_g"] = vehicle.SecondaryColor.G.ToString();
             data["veh_color2_b"] = vehicle.SecondaryColor.B.ToString();
+            data["veh_lock"] = vehicle.Lock.Code;
+            if (vehicle.GetOwnerId() != 0)
+            {
+                if (vehicle.GetOwnerType() == Vehicle.OwnerType.CHARACTER)
+                {
+                    data["cha_id"] = vehicle.GetOwnerId().ToString();
+                }
+                else if (vehicle.GetOwnerType() == Vehicle.OwnerType.ORGANIZATION)
+                {
+                    data["org_id"] = vehicle.GetOwnerId().ToString();
+                }
+            }
+
             return data;
         }
 
@@ -41,7 +54,7 @@ namespace Lambda.Database
             position.Y = float.Parse(data["veh_position_y"]);
             position.Z = float.Parse(data["veh_position_z"]);
             vehicle.SpawnPosition = position;
-
+            vehicle.Lock.Code = data["veh_lock"];
             vehicle.Spawn();
             Rotation rotation = new Rotation();
             rotation.Roll = float.Parse(data["veh_rotation_r"]);
@@ -58,6 +71,17 @@ namespace Lambda.Database
             secondaryColor.B = byte.Parse(data["veh_color2_b"]);
             vehicle.Color = color;
             vehicle.SecondaryColor = secondaryColor;
+            if (data.ContainsKey("cha_id"))
+            {
+                vehicle.SetOwnerType(Vehicle.OwnerType.CHARACTER);
+                vehicle.SetOwnerId(uint.Parse(data["cha_id"]));
+            }
+            if (data.ContainsKey("org_id"))
+            {
+                vehicle.SetOwnerType(Vehicle.OwnerType.ORGANIZATION);
+                vehicle.SetOwnerId(uint.Parse(data["org_id"]));
+            }
+
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Lambda.Items
         public string Description { get; set; }
         public int Weight { get; set; }
         public uint MaxStack { get; set; }
-        public string[] MetaDataDescription { get; set; }
+        //public string[] MetaDataDescription { get; set; }
 
         public BaseItem()
         {

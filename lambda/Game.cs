@@ -53,6 +53,8 @@ namespace Lambda
         public DbLink DbLink { get; }
         //public DbLink DbComponentLink { get; }
         public DbInterior DbInterior { get; }
+        public DbInventory DbInventory { get; }
+        public DbItem DbItem { get; }
 
 
 
@@ -86,7 +88,8 @@ namespace Lambda
             DbOrganization = new DbOrganization(this, dbConnect, "t_organization_org", "org");
             DbRank = new DbRank(this, dbConnect, "t_rank_ran", "ran");
             DbLink = new DbLink(this, dbConnect, "t_link_lin", "lin");
-
+            DbInventory = new DbInventory(this, dbConnect, "t_inventory_inv", "inv");
+            DbItem = new DbItem(this, dbConnect, "t_item_ite", "ite");
         }
 
         public void Init()
@@ -99,7 +102,7 @@ namespace Lambda
             Alt.Log(">Chat registered");
             Alt.Log("=== Events are registered ===");
             Alt.Log("=== Register Spawns... ===");
-            AddSpawn(new Spawn(new Position(-167.8418f, 921.5604f, 235.6395f)));
+            AddSpawn(new Spawn(new Position(-263.2484f, 2195.248f, 130.3956f)));
             Alt.Log("=== Spawns added... ===");
             Alt.Log("=== Register Commands... ===");
             AddAllCommands();
@@ -124,6 +127,16 @@ namespace Lambda
             players.Add(player);
             VoiceChannel.AddPlayer(player.AltPlayer);
             Alt.EmitAllClients("chatmessage", null, $"{player.AltPlayer.Name} c'est connecté!");
+        }
+
+        public Player GetPlayerByDbId(uint id)
+        {
+            foreach (Player player in players)
+            {
+                if (player.Id == id) return player;
+            }
+
+            return null;
         }
 
         public Player[] GetPlayers()
@@ -160,6 +173,11 @@ namespace Lambda
         {
             vehicles = DbVehicle.GetAll().ToList();
             vehicles.ForEach((veh) => { veh.Game = this; });
+        }
+
+        public Vehicle[] GetVehicles()
+        {
+            return vehicles.ToArray();
         }
 
         public void RemoveVehicle(Vehicle vehicle)

@@ -32,7 +32,7 @@ namespace Lambda.Database
             data["acc_id"] = player.Account.Id.ToString();
             data["ski_id"] = player.GetSkin().Id.ToString();
             data["cha_permissions"] = string.Join(",", player.Permissions);
-            //data["inv_id"] = Inventory.Id.ToString();
+            data["inv_id"] = player.Inventory.Id.ToString();
             //data["baa_id"] = bankAccount.Id.ToString();
             //data["lic_id"] = license.Id.ToString();
             return data;
@@ -56,16 +56,10 @@ namespace Lambda.Database
             player.Hp = ushort.Parse(data["cha_hp"]);
             player.GetSkin().Id = uint.Parse(data["ski_id"]);
             player.Permissions = data["cha_permissions"].Split(',').ToList();
-            Skin skin = player.Game.DbSkin.Get(uint.Parse(data["ski_id"]));
-            if (skin == null)
-            {
-                player.SetSkin(new Skin(player.Game));
-                player.Game.DbSkin.Save(player.GetSkin());
-            }
-            else
-            {
-                player.SetSkin(skin);
-            }
+            if (data["inv_id"] != null) player.Game.DbInventory.Get(uint.Parse(data["inv_id"]), player.Inventory);
+            Game.DbSkin.Get(player.GetSkin().Id, player.GetSkin());
+            player.GetSkin().SendModel(player);
+            player.GetSkin().SendSkin(player);
 
         }
         public Player Get(Account account, Player player)
@@ -78,7 +72,13 @@ namespace Lambda.Database
             SetData(player, result);
             return player;
         }
-
+        public override void Save(Player player)
+        {
+            Game.DbAccount.Save(player.Account);
+            Game.DbSkin.Save(player.GetSkin());
+            Game.DbInventory.Save(player.Inventory);
+            base.Save(player);
+        }
 
 
     }

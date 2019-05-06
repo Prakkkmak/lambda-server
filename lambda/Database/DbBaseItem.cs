@@ -26,7 +26,6 @@ namespace Lambda.Database
             baseItem.Description = data["itd_description"];
             baseItem.Weight = int.Parse(data["itd_weight"]);
             baseItem.MaxStack = uint.Parse(data["itd_maxstack"]);
-            baseItem.MetaDataDescription = new string[0]; //TODO
         }
     }
 }

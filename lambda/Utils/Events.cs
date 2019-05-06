@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using AltV.Net;
 using AltV.Net.Elements.Entities;
+using AltV.Net.Enums;
+using Items;
 using Lambda.Administration;
 using Player = Lambda.Entity.Player;
 using Vehicle = Lambda.Entity.Vehicle;
@@ -88,17 +90,15 @@ namespace Lambda
             {
                 game.DbPlayer.Get(account, player);
                 player.Account = account;
-                game.DbSkin.Get(player.GetSkin().Id, player.GetSkin());
-                player.GetSkin().SendSkin(player);
             }
             else
             {
                 player.Account = new Account(player.license);
-                game.DbAccount.Save(player.Account);
                 game.DbPlayer.Save(player);
-                game.DbSkin.Save(player.GetSkin());
 
             }
+            Alt.Log("Skin chargement");
+
             Alt.Log($"[{player.ServerId}]{player.Name} c'est connécté.");
             game.AddPlayer(player);
         }

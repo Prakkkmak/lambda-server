@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using AltV.Net;
+using Lambda.Database;
 using Lambda.Entity;
 
 namespace Lambda.Items
 {
-    public class Inventory
+    public class Inventory : IDBElement
+
     {
         public IEntity Entity;
 
@@ -19,20 +21,24 @@ namespace Lambda.Items
             AREA
         }
 
-        public uint Id { get; }
+        public uint Id { get; set; }
         public InventoryType Type { get; }
         public List<Item> Items { get; set; }
         public long Money { get; set; }
 
-
-        public Inventory(IEntity entity, InventoryType type = InventoryType.DEFAULT, uint id = 0)
+        public Inventory()
+        {
+            Items = new List<Item>();
+            Money = 10000;
+        }
+        public Inventory(IEntity entity, InventoryType type = InventoryType.DEFAULT, uint id = 0) : this()
         {
             Id = id;
             Type = type;
-            Items = new List<Item>();
-            Money = 10000;
             Entity = entity;
         }
+
+
 
         public bool Withdraw(long amount)
         {
@@ -48,7 +54,7 @@ namespace Lambda.Items
         }
 
 
-        public bool AddItem(uint id, uint amount)
+        public bool AddItem(uint id, uint amount, string metadata = "")
         {
             Item itemWithLessStack = GetItemWithLessStack(id);
             if (itemWithLessStack != null)
@@ -57,15 +63,18 @@ namespace Lambda.Items
                 amount -= nbrToAdd;
                 itemWithLessStack.Amount += nbrToAdd;
             }
-            Item item = new Item(Entity.Game.GetBaseItem(id), amount);
+
+            Item item = new Item(this, Entity.Game.GetBaseItem(id), amount);
             //if (item.GetBaseItem().MaxStack < 1) item.Amount = amount;
             while (item.Amount > item.GetBaseItem().MaxStack && item.GetBaseItem().MaxStack > 0)
             {
                 item.Amount = item.GetBaseItem().MaxStack;
                 amount -= item.GetBaseItem().MaxStack;
                 Items.Add(item);
-                item = new Item(Entity.Game.GetBaseItem(id), amount);
+                item = new Item(this, Entity.Game.GetBaseItem(id), amount);
             }
+
+            item.MetaData = metadata;
             Items.Add(item);
             return true;
         }
@@ -77,7 +86,7 @@ namespace Lambda.Items
             {
                 if (it.GetBaseItem().Id == id)
                 {
-                    if (item == null) item = new Item(it.GetBaseItem(), it.Amount);
+                    if (item == null) item = new Item(this, it.GetBaseItem(), it.Amount);
                     else item.Amount += it.Amount;
                 }
             }
@@ -112,6 +121,13 @@ namespace Lambda.Items
 
         }
 
+        public void TransferItem(Item item, Inventory inventory)
+        {
+            this.Items.Remove(item);
+            inventory.Items.Add(item);
+            item.SetInventory(inventory);
+        }
+
         public Item GetItemWithLessStack(uint id)
         {
             Item currentItem = null;
@@ -127,8 +143,17 @@ namespace Lambda.Items
 
                 }
             }
-
             return currentItem;
+        }
+
+        public Item GetItemWithBaseItemIdAndMetaData(uint id, string metadata)
+        {
+            foreach (Item item in Items)
+            {
+                if (item.GetBaseItem().Id == id && item.MetaData == metadata) return item;
+            }
+
+            return null;
         }
     }
 }

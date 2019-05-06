@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using AltV.Net;
 using AltV.Net.Data;
@@ -293,6 +294,51 @@ namespace Lambda.Entity
             return organizations.ToArray();
         }
 
+        public Vehicle[] GetVehiclesInRange(int range)
+        {
+            List<Vehicle> vehicles = new List<Vehicle>();
+            foreach (Vehicle vehicle in Game.GetVehicles())
+            {
+                if (Position.Distance(vehicle.Position) < range) vehicles.Add(vehicle);
+            }
+
+            return vehicles.ToArray();
+        }
+
+        public Vehicle GetNearestVehicle()
+        {
+            Vehicle nearestVehicle = null;
+            foreach (Vehicle vehicle in Game.GetVehicles())
+            {
+                if (nearestVehicle == null ||
+                    Position.Distance(vehicle.Position) < Position.Distance(nearestVehicle.Position))
+                {
+                    nearestVehicle = vehicle;
+                }
+            }
+
+            return nearestVehicle;
+        }
+
+        public Vehicle GetNearestVehicle(int range)
+        {
+            Vehicle nearestVehicle = null;
+            foreach (Vehicle vehicle in GetVehiclesInRange(range))
+            {
+                if (nearestVehicle == null ||
+                    Position.Distance(vehicle.Position) < Position.Distance(nearestVehicle.Position))
+                {
+                    nearestVehicle = vehicle;
+                }
+            }
+
+            return nearestVehicle;
+        }
+
+        public bool HaveKeyOf(string code)
+        {
+            return Inventory.GetItemWithBaseItemIdAndMetaData(1000, code) != null;
+        }
 
     }
 }

@@ -27,7 +27,7 @@ namespace Lambda.Database
         abstract public Dictionary<string, string> GetData(T entity);
         abstract public void SetData(T entity, Dictionary<string, string> data);
 
-        public void Save(T entity)
+        public virtual void Save(T entity)
         {
             Dictionary<string, string> datas = GetData(entity);
             if (entity.Id == 0)
@@ -38,7 +38,12 @@ namespace Lambda.Database
             {
                 Dictionary<string, string> where = new Dictionary<string, string>();
                 where[Prefix + "_id"] = entity.Id.ToString();
-                DbConnect.Update(TableName, datas, where);
+                int rows = DbConnect.Update(TableName, datas, where);
+                if (rows == 0)
+                {
+                    entity.Id = 0;
+                    Save(entity);
+                }
             }
         }
 
@@ -52,6 +57,7 @@ namespace Lambda.Database
             if (result.Count == 0) return default(T);
             T entity = new T();
             SetData(entity, result);
+            entity.Id = uint.Parse(result[index]);
             return entity;
         }
         public T Get(uint id, T entity)

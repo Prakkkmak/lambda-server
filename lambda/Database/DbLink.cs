@@ -13,7 +13,6 @@ namespace Lambda.Database
         public override Dictionary<string, string> GetData(Link link)
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-            int i = 0;
             data["lin_valid"] = link.Type.ToString();
             data["lin_from"] = link.Component1.Item1.ToString();
             data["lin_to"] = link.Component2.Item1.ToString();

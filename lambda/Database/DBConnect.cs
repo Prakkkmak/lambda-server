@@ -168,9 +168,8 @@ namespace Lambda.Database
             List<Dictionary<string, string>> results = new List<Dictionary<string, string>>();
 
             MySqlCommand cmd = new MySqlCommand(query, connection);
-            Alt.Log("Execute reader");
             MySqlDataReader dataReader = cmd.ExecuteReader();
-            Alt.Log("Lecture des données");
+
             while (dataReader.Read())
             {
                 Dictionary<string, string> result = new Dictionary<string, string>();

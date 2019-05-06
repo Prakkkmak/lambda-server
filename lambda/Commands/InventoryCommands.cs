@@ -91,7 +91,25 @@ namespace Lambda.Commands
             target.Inventory.AddItem(baseItem.Id, amount);
             return new CmdReturn("Vous avez donné des objets", CmdReturn.CmdReturnType.SUCCESS);
         }
-
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.INVENTORY, 1)]
+        [Syntax("Objet")]
+        [SyntaxType(typeof(Item))]
+        public static CmdReturn Objet_Info(Player player, object[] argv)
+        {
+            Item item = (Item)argv[0];
+            return new CmdReturn($"{item.GetBaseItem().Id} {item.GetBaseItem().Name} ({item.Amount}) : {item.MetaData}");
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.INVENTORY, 2)]
+        [Syntax("Objet", "Valeur")]
+        [SyntaxType(typeof(Item), typeof(string))]
+        public static CmdReturn Objet_Data_Changer(Player player, object[] argv)
+        {
+            Item item = (Item)argv[0];
+            item.MetaData = argv[1] + "";
+            return new CmdReturn("Vous avez changé le metadata de l'objet.");
+        }
 
     }
 }

@@ -88,12 +88,12 @@ namespace Lambda.Organizations
         }
         public Rank[] GetRanks(string name)
         {
-            List<Rank> ranks = new List<Rank>();
-            foreach (Rank rank in ranks)
+            List<Rank> rs = new List<Rank>();
+            foreach (Rank rank in this.ranks)
             {
-                if (ranks.IndexOf(rank).ToString().Equals(name) || rank.Name.Replace(" ", "_").Equals(name)) ranks.Add(rank);
+                if (ranks.IndexOf(rank).ToString().Equals(name) || rank.Name.Replace(" ", "_").Equals(name)) rs.Add(rank);
             }
-            return ranks.ToArray();
+            return rs.ToArray();
 
         }
         public void RemoveRank(Rank rank)

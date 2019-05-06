@@ -10,7 +10,6 @@ namespace Lambda.Commands
 {
     class ShopCommands
     {
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.SHOP)]
         public static CmdReturn Magasin_Creer(Player player, object[] argv)
         {
@@ -20,7 +19,6 @@ namespace Lambda.Commands
             player.Game.DbArea.Save(shop);
             return new CmdReturn("Vous avez créé un magasin !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.SHOP)]
         public static CmdReturn Magasin_Supprimer(Player player, object[] argv)
         {
@@ -29,7 +27,6 @@ namespace Lambda.Commands
             player.Game.RemoveArea(shop);
             return new CmdReturn("Vous avez supprimé un magasin !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.SHOP, 2)]
         [Syntax("Objet", "Prix")]
         [SyntaxType(typeof(BaseItem), typeof(int))]
@@ -44,7 +41,6 @@ namespace Lambda.Commands
             player.Game.DbArea.Save(shop);
             return new CmdReturn("Vous avez ajouté une vente !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.SHOP, 1)]
         [Syntax("Objet")]
         [SyntaxType(typeof(BaseItem))]
@@ -58,7 +54,6 @@ namespace Lambda.Commands
             player.Game.DbArea.Save(shop);
             return new CmdReturn("Vous avez supprimé une vente !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.SHOP)]
         public static CmdReturn Magasin_Inspecter(Player player, object[] argv)
         {
@@ -73,7 +68,6 @@ namespace Lambda.Commands
             if (sellsString.Length < 1) sellsString = "Le magasin est vide";
             return new CmdReturn(sellsString);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.SHOP, 2)]
         [Syntax("Objet", "Montant")]
         [SyntaxType(typeof(BaseItem), typeof(uint))]

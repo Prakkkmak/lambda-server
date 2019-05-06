@@ -7,8 +7,10 @@ using System.Net.Sockets;
 using System.Text;
 using AltV.Net;
 using AltV.Net.Data;
+using AltV.Net.Enums;
 using Lambda;
 using Lambda.Administration;
+using Lambda.Commands;
 using Lambda.Database;
 using Lambda.Entity;
 using Lambda.Items;
@@ -103,6 +105,7 @@ namespace Items
             {
                 clothes.Add(GetComponent(i).Drawable);
             }
+
 
             player.Game.DbSkin.Save(this);
             player.AltPlayer.Emit("setComponent", clothes.ToArray());
@@ -204,6 +207,13 @@ namespace Items
                     }
                 }
             }
+        }
+
+        public void SendModel(Player player)
+        {
+            if (!Enum.TryParse(player.GetSkin().Model, true, out PedModel model)) model = PedModel.FreemodeMale01;
+            if (!Enum.IsDefined(typeof(PedModel), model)) model = PedModel.FreemodeMale01;
+            player.AltPlayer.Model = player.AltPlayer.Model = (uint)model;
         }
 
         /*

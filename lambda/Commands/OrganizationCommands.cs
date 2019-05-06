@@ -8,7 +8,6 @@ namespace Lambda.Commands
 {
     class OrganizationCommands
     {
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ORGANIZATION, 1)]
         [Syntax("Nom")]
         [SyntaxType(typeof(string))]
@@ -19,7 +18,6 @@ namespace Lambda.Commands
             player.Game.DbOrganization.Save(org);
             return new CmdReturn("Vous avez créé une organisation !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ORGANIZATION, 1)]
         [Syntax("Organisation")]
         [SyntaxType(typeof(Organization))]
@@ -29,7 +27,6 @@ namespace Lambda.Commands
 
             return new CmdReturn("Vous avez supprimé une organisation !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ORGANIZATION)]
         public static CmdReturn Organisation_Liste(Player player, object[] argv)
         {
@@ -41,7 +38,6 @@ namespace Lambda.Commands
 
             return new CmdReturn(txt);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Joueur")]
         [SyntaxType(typeof(Organization), typeof(Player))]
@@ -51,10 +47,9 @@ namespace Lambda.Commands
             Player target = (Player)argv[1];
             org.AddMember(target);
             player.Game.DbOrganization.Save(org);
-            target.SendMessage("Vous avez été ajouté a une organisation");
+            target.SendMessage($"Vous avez été ajouté a l'organisation {org.Name}.");
             return new CmdReturn($"Vous avez ajouté {target.Name} à une organisation", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ORGANIZATION)]
         public static CmdReturn Organisation_Rangs(Player player, object[] argv)
         {
@@ -74,7 +69,6 @@ namespace Lambda.Commands
             return new CmdReturn(str);
 
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ORGANIZATION)]
         public static CmdReturn Organisation_Membres(Player player, object[] argv)
         {
@@ -101,7 +95,6 @@ namespace Lambda.Commands
             }
             return new CmdReturn(str);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Nom")]
         [SyntaxType(typeof(Organization), typeof(string))]
@@ -112,7 +105,6 @@ namespace Lambda.Commands
             player.Game.DbRank.Save(org.AddRank((string)argv[1]));
             return new CmdReturn("Vous avez rajouté un rang", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ORGANIZATION, 3)]
         [Syntax("Organisation", "Rang", "Nom")]
         [SyntaxType(typeof(Organization), typeof(Rank), typeof(string))]
@@ -126,7 +118,6 @@ namespace Lambda.Commands
             player.Game.DbRank.Save(rank);
             return new CmdReturn("Vous avez renommé un rang !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Rang")]
         [SyntaxType(typeof(Organization), typeof(Rank))]
@@ -139,7 +130,6 @@ namespace Lambda.Commands
             return new CmdReturn("Vous avez changé le rang par défaut!", CmdReturn.CmdReturnType.SUCCESS);
 
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Rang")]
         [SyntaxType(typeof(Organization), typeof(Rank))]
@@ -152,19 +142,16 @@ namespace Lambda.Commands
             return new CmdReturn("Vous avez changé le rang par défaut!", CmdReturn.CmdReturnType.SUCCESS);
 
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ORGANIZATION)]
         public static CmdReturn Organisation_Inviter(Player player, object[] argv)
         {
             return CmdReturn.NotImplemented;
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ORGANIZATION)]
         public static CmdReturn Organisation_Promouvoir(Player player, object[] argv)
         {
             return CmdReturn.NotImplemented;
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ORGANIZATION)]
         public static CmdReturn Organisation_Virer(Player player, object[] argv)
         {

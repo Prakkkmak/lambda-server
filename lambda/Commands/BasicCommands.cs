@@ -37,7 +37,7 @@ namespace Lambda.Commands
             {
                 pagename = pages[(int)argv[0]];
             }
-            string text = $"Voici la liste des commandes <{pagename}> {(int)argv[0]}/{maxpage}:<br>";
+            string text = $"Voici la liste des commandes ({pagename}) {(int)argv[0]}/{maxpage}:<br>";
             foreach (Command command in commands)
             {
                 if (command.Status == Command.CommandStatus.NEW) text += "{2980b9}";
