@@ -55,7 +55,7 @@ namespace Lambda
         public DbInterior DbInterior { get; }
         public DbInventory DbInventory { get; }
         public DbItem DbItem { get; }
-
+        public DbSkill DbSkill { get; }
 
 
         public Game()
@@ -90,6 +90,7 @@ namespace Lambda
             DbLink = new DbLink(this, dbConnect, "t_link_lin", "lin");
             DbInventory = new DbInventory(this, dbConnect, "t_inventory_inv", "inv");
             DbItem = new DbItem(this, dbConnect, "t_item_ite", "ite");
+            DbSkill = new DbSkill(this, dbConnect, "t_skill_skl", "skl");
         }
 
         public void Init()

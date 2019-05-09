@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AltV.Net;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
@@ -122,7 +123,7 @@ namespace Lambda.Commands
             if (vehicle == null) return CmdReturn.NotInVehicle;
             string text = argv.Aggregate("", (current, t) => current + ((string)t + " "));
             vehicle.SetPlate(text);
-            return new CmdReturn("Vous avez etteint le moteur");
+            return new CmdReturn("Vous avez changé la plaque du véhicule");
         }
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.VEHICLE)]
@@ -144,15 +145,17 @@ namespace Lambda.Commands
             vehicle.SetOwner(player);
             return new CmdReturn("Vous avez changé le propriétaire du véhicule");
         }
-        [Command(Command.CommandType.TEST)]
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.VEHICLE)]
         public static CmdReturn Vehicule_Info(Player player, object[] argv)
         {
             Vehicle vehicle = player.Vehicle;
             if (vehicle == null) return CmdReturn.NotInVehicle;
             Player pla = player.Game.GetPlayerByDbId(vehicle.GetOwnerId());
+            Alt.Log(vehicle.Rotation + "");
             if (pla == null) return new CmdReturn("Le proprio n'est pas co @" + vehicle.GetOwnerId());
             else return new CmdReturn($"[{vehicle.GetOwnerId()}]{pla.Name} est le proprietaire du véhicule. Serrure : {vehicle.Lock.Code}");
-
         }
+
     }
 }

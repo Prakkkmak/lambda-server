@@ -39,14 +39,14 @@ namespace Items
 
         private Component[] components;
         public string Type;
-        public string Model;
+        public PedModel Model;
         public Game Game;
 
         public Skin()
         {
             components = new Component[MAX_COMPONENT_NUMBER];
             Type = "DEFAULT";
-            Model = "mp_m_freemode_01";
+            Model = PedModel.FreemodeMale01;
         }
         public Skin(Game game) : this()
         {
@@ -107,7 +107,7 @@ namespace Items
             }
 
 
-            player.Game.DbSkin.Save(this);
+            //player.Game.DbSkin.Save(this);
             player.AltPlayer.Emit("setComponent", clothes.ToArray());
         }
 
@@ -211,9 +211,9 @@ namespace Items
 
         public void SendModel(Player player)
         {
-            if (!Enum.TryParse(player.GetSkin().Model, true, out PedModel model)) model = PedModel.FreemodeMale01;
-            if (!Enum.IsDefined(typeof(PedModel), model)) model = PedModel.FreemodeMale01;
-            player.AltPlayer.Model = player.AltPlayer.Model = (uint)model;
+            //if (!Enum.TryParse(player.GetSkin().Model, true, out PedModel model)) model = PedModel.FreemodeMale01;
+            //if (!Enum.IsDefined(typeof(PedModel), model)) model = PedModel.FreemodeMale01;
+            player.AltPlayer.Model = (uint)Model;
         }
 
         /*

@@ -11,6 +11,7 @@ using Lambda.Commands;
 using Lambda.Database;
 using Lambda.Items;
 using Lambda.Organizations;
+using Lambda.Skills;
 using Lambda.Utils;
 
 namespace Lambda.Entity
@@ -18,15 +19,7 @@ namespace Lambda.Entity
     public class Player : IDBElement, IEntity
     {
 
-        private uint deathCount;
-        private uint id; // The id in the database
-        private Skin skin;
-        private Request request;
-        private long bankMoney;
-
-
-        public uint Id { get; set; }
-
+        public List<Skill> Skills;
         public List<string> Permissions;
 
         public string license
@@ -42,22 +35,20 @@ namespace Lambda.Entity
             }
 
         }
-
-        public Account Account { get; set; }
-
-        public short Food { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Name => $"{FirstName}_{LastName}";
-        public Inventory Inventory { get; set; }
-        public Interior Interior { get; set; }
 
-        public IPlayer AltPlayer { get; }
-        public ushort ServerId => AltPlayer.Id;
-        public Game Game { get; set; }
+        public ulong TimeOnline = 0;
+        public ulong TotalTimeOnline = 0;
 
+        public uint Id
+        {
+            get;
+            set;
+        }
 
-
+        public short Food { get; set; }
         public short Dimension
         {
             get => AltPlayer.Dimension;
@@ -68,6 +59,7 @@ namespace Lambda.Entity
                 }
             }
         }
+
         public ushort Hp
         {
             get => AltPlayer.Health;
@@ -80,6 +72,27 @@ namespace Lambda.Entity
 
 
         }
+        public ushort ServerId => AltPlayer.Id;
+
+        public Account Account { get; set; }
+
+        public Inventory Inventory { get; set; }
+
+        public Interior Interior { get; set; }
+
+        public Game Game { get; set; }
+
+        public Vehicle Vehicle
+        {
+            get {
+                if (!AltPlayer.IsInVehicle || AltPlayer.Vehicle == null) return null;
+                AltPlayer.Vehicle.GetData("vehicle", out Vehicle vehicle);
+                return vehicle;
+            }
+        }
+
+        public IPlayer AltPlayer { get; }
+
         public Position Position
         {
             get => AltPlayer.Position;
@@ -91,17 +104,6 @@ namespace Lambda.Entity
             }
 
         }
-
-        public Vehicle Vehicle
-        {
-            get {
-                if (!AltPlayer.IsInVehicle || AltPlayer.Vehicle == null) return null;
-                AltPlayer.Vehicle.GetData("vehicle", out Vehicle vehicle);
-                return vehicle;
-            }
-        }
-
-
         public Position FeetPosition => new Position(AltPlayer.Position.X, AltPlayer.Position.Y, AltPlayer.Position.Z - 1);
 
         public Rotation Rotation
@@ -110,11 +112,19 @@ namespace Lambda.Entity
             set => AltPlayer.Rotation = value;
         }
 
+        private uint deathCount;
+        private uint id; // The id in the database
+
+        private long bankMoney;
+
+        private Skin skin;
+
+        private Request request;
 
         public Player()
         {
+            Skills = new List<Skill>();
             Permissions = new List<string>();
-
             deathCount = 0;
             id = 0;
             Food = 0;
@@ -124,8 +134,6 @@ namespace Lambda.Entity
             skin = new Skin();
             Inventory = new Inventory(this);
             Inventory.Deposit(100000);
-
-
         }
 
         public Player(IPlayer altPlayer, Game game) : this()
@@ -134,6 +142,8 @@ namespace Lambda.Entity
             AltPlayer = altPlayer;
             altPlayer.SetData("player", this);
             skin.Game = game;
+            skin.SendModel(this);
+            skin.SendSkin(this);
         }
 
 
@@ -223,6 +233,7 @@ namespace Lambda.Entity
         {
             foreach (string perm in Permissions)
             {
+
                 if (permission.StartsWith(perm)) return true;
             }
             return false;
@@ -282,6 +293,10 @@ namespace Lambda.Entity
         {
             return bankMoney;
         }
+        public void SetBankMoney(long money)
+        {
+            bankMoney = money;
+        }
 
         public Organization[] GetOrganizations()
         {
@@ -338,6 +353,41 @@ namespace Lambda.Entity
         public bool HaveKeyOf(string code)
         {
             return Inventory.GetItemWithBaseItemIdAndMetaData(1000, code) != null;
+        }
+
+        public Skill GetSkill(Skill.SkillType type)
+        {
+            foreach (Skill skill in Skills)
+            {
+                if (type == skill.Type) return skill;
+            }
+
+            return null;
+        }
+        public void AddExperience(Skill.SkillType type, long xp)
+        {
+            Skill skill = GetSkill(type);
+            if (skill == null)
+            {
+                skill = new Skill(this, type);
+                Skills.Add(skill);
+            }
+            skill.AddExperience(xp);
+        }
+
+        public void RemoveExperience(Skill.SkillType type, long xp)
+        {
+            Skill skill = GetSkill(type);
+            if (skill == null)
+            {
+                skill = new Skill(this, type);
+                Skills.Add(skill);
+            }
+            skill.RemoveExperience(xp);
+            if (skill.GetExperience() < 0)
+            {
+                Skills.Remove(skill);
+            }
         }
 
     }

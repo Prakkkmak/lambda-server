@@ -31,6 +31,8 @@ namespace Lambda.Database
             data["veh_color2_g"] = vehicle.SecondaryColor.G.ToString();
             data["veh_color2_b"] = vehicle.SecondaryColor.B.ToString();
             data["veh_lock"] = vehicle.Lock.Code;
+            data["veh_plate"] = vehicle.GetPlate();
+
             if (vehicle.GetOwnerId() != 0)
             {
                 if (vehicle.GetOwnerType() == Vehicle.OwnerType.CHARACTER)
@@ -46,7 +48,7 @@ namespace Lambda.Database
             return data;
         }
 
-        public override void SetData(Vehicle vehicle, Dictionary<string, string> data)
+        public override void SetData(Lambda.Entity.Vehicle vehicle, Dictionary<string, string> data)
         {
             vehicle.Model = (VehicleModel)Enum.Parse(typeof(VehicleModel), data["veh_model"]);
             Position position = new Position();
@@ -81,6 +83,7 @@ namespace Lambda.Database
                 vehicle.SetOwnerType(Vehicle.OwnerType.ORGANIZATION);
                 vehicle.SetOwnerId(uint.Parse(data["org_id"]));
             }
+            vehicle.SetPlate(data["veh_plate"]);
 
         }
     }

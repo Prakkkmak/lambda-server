@@ -16,8 +16,16 @@ namespace Lambda.Commands
         {
             player.Goto((Player)argv[0]);
             return new CmdReturn("Vous vous êtes téléporté.", CmdReturn.CmdReturnType.SUCCESS);
+        }
 
-
+        [Command(Command.CommandType.ADMIN, 1)]
+        [Syntax("Joueur")]
+        [SyntaxType(typeof(Player))]
+        public static CmdReturn Gethere_Joueur(Player player, object[] argv)
+        {
+            ((Player)argv[0]).Goto(player);
+            ((Player)argv[0]).SendMessage("Vous vous êtes fait téléporté.");
+            return new CmdReturn("Vous vous avez téléporté quelqu'un à vous.", CmdReturn.CmdReturnType.SUCCESS);
         }
 
         [Command(Command.CommandType.ADMIN, 1)]
@@ -26,6 +34,7 @@ namespace Lambda.Commands
         public static CmdReturn Freeze(Player player, object[] argv)
         {
             ((Player)argv[0]).Freeze(true);
+            ((Player)argv[0]).SendMessage("Vous avez été freeze.");
             return new CmdReturn("Vous vous avez freeze quelqu'un.", CmdReturn.CmdReturnType.SUCCESS);
 
         }
@@ -36,6 +45,7 @@ namespace Lambda.Commands
         public static CmdReturn Unfreeze(Player player, object[] argv)
         {
             ((Player)argv[0]).Freeze(false);
+            ((Player)argv[0]).SendMessage("Vous avez été défreeze.");
             return new CmdReturn("Vous vous avez unfreeze quelqu'un.", CmdReturn.CmdReturnType.SUCCESS);
 
         }
@@ -66,6 +76,24 @@ namespace Lambda.Commands
         {
             player.Spawn(player.Game.GetSpawn(0).Position);
             return new CmdReturn("Vous vous avez respawn!", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.ADMIN, 1)]
+        [Syntax("Permission")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Permission_Ajouter(Player player, object[] argv)
+        {
+            player.AddPermission((string)argv[0]);
+            return new CmdReturn("Vous avez ajouté une permission", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.ADMIN, 1)]
+        [Syntax("Permission")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Permission_Retirer(Player player, object[] argv)
+        {
+            player.RemovePermission((string)argv[0]);
+            return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
         }
     }
 }

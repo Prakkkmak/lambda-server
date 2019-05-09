@@ -25,10 +25,6 @@ namespace Lambda.Database
             inventory.Id = uint.Parse(data["inv_id"]);
             inventory.Money = long.Parse(data["inv_money"]);
             inventory.Items = Game.DbItem.GetAll(inventory).ToList();
-            foreach (Item inventoryItem in inventory.Items)
-            {
-                inventoryItem.SetInventory(inventory);
-            }
         }
         public override void Save(Inventory inventory)
         {

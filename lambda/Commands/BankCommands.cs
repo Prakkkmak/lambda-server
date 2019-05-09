@@ -7,7 +7,6 @@ namespace Lambda.Commands
 {
     class BankCommands
     {
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.BANK)]
         public static CmdReturn Banque_Creer(Player player, object[] argv)
         {
@@ -17,7 +16,6 @@ namespace Lambda.Commands
             player.Game.DbArea.Save(bank);
             return new CmdReturn("Vous avez créé une banque !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.BANK, 1)]
         [Syntax("Montant")]
         [SyntaxType(typeof(int))]
@@ -26,10 +24,11 @@ namespace Lambda.Commands
             int amount = (int)argv[0];
             Area bank = player.Game.GetArea(player.Position, Area.AreaType.BANK);
             if (bank == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
+            if (amount > player.GetBankMoney()) return new CmdReturn("Vous n'avez pas assez d'argent dans votre comptre en banque", CmdReturn.CmdReturnType.WARNING);
+
             player.Withdraw(amount);
             return new CmdReturn("Vous avez retiré de l'argent !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.BANK, 1)]
         [Syntax("Montant")]
         [SyntaxType(typeof(int))]
@@ -38,10 +37,10 @@ namespace Lambda.Commands
             int amount = (int)argv[0];
             Area bank = player.Game.GetArea(player.Position, Area.AreaType.BANK);
             if (bank == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
+            if (amount > player.Inventory.Money) return new CmdReturn("Vous n'avez pas assez d'argent", CmdReturn.CmdReturnType.WARNING);
             player.Deposit(amount);
             return new CmdReturn("Vous avez déposé de l'argent !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.BANK)]
         public static CmdReturn Balance(Player player, object[] argv)
         {

@@ -32,7 +32,7 @@ namespace Lambda.Database
             port = "3306";
             password = "";
             connectionString = $"server={server}; database={database}; uid={uid}; pwd='{password}'; port={port}";
-            connectionString = $"server=149.91.90.131; database=lambda; uid=server; pwd=MaZmPcs7nt; port=3306";
+            connectionString = $"server=149.91.90.131; database=lambda; uid=server; pwd=MaZmPcs7nt; port=3306;Convert Zero Datetime=True";
         }
         /// <summary>
         /// Open the connection

@@ -27,21 +27,31 @@ namespace Lambda
         }
 
 
-
+        private long minutes = 0;
+        private long startTicks = DateTime.Now.Ticks;
+        private DateTime lastTime = DateTime.Now;
         public override void OnTick()
         {
             base.OnTick();
-
-            //Alt.Log("Test");
+            long delta = DateTime.Now.Ticks - lastTime.Ticks;
+            if ((DateTime.Now.Ticks - startTicks) / TimeSpan.TicksPerMinute > minutes)
+            {
+                minutes++;
+                Alt.Log(minutes + "");
+                foreach (Player player in Game.GetPlayers())
+                {
+                    player.TimeOnline++;
+                    player.TotalTimeOnline++;
+                }
+            }
+            lastTime = DateTime.Now;
         }
         public override void OnStart()
         {
             Game = new Game();
             Game.Init();
             //Game.BaseGame = Game;
-
         }
-
         public override void OnStop()
         {
             Alt.Log("Stopping ...");

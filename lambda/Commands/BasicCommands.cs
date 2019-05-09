@@ -106,7 +106,6 @@ namespace Lambda.Commands
             CmdReturn cmdReturn = new CmdReturn($"Votre position ( X:{pos.X} | Y:{pos.Y} | Z:{pos.Z} ) Dim : {player.Dimension}");
             return cmdReturn;
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Accepter(Player player, object[] argv)
         {
@@ -121,7 +120,6 @@ namespace Lambda.Commands
             player.SetRequest(null);
             return new CmdReturn("Vous avez accepté la demande !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Refuser(Player player, object[] argv)
         {
@@ -136,7 +134,6 @@ namespace Lambda.Commands
             player.SetRequest(null);
             return new CmdReturn("Vous avez refusé la demande !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn TP(Player player, object[] argv)
         {

@@ -8,7 +8,6 @@ namespace Lambda.Commands
 {
     class AreaCommands
     {
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.AREA)]
         public static CmdReturn Interieur_Liste(Player player, object[] argv)
         {
@@ -20,14 +19,12 @@ namespace Lambda.Commands
             }
             return new CmdReturn(txt);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.AREA)]
         public static CmdReturn Interieur_Recharger(Player player, object[] argv)
         {
             player.Game.AddAllInteriors();
             return new CmdReturn("Vous avez rechargé les interieurs", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.AREA, 1)]
         [Syntax("Interieur")]
         [SyntaxType(typeof(Interior))]

@@ -97,10 +97,13 @@ namespace Lambda
                 game.DbPlayer.Save(player);
 
             }
-            Alt.Log("Skin chargement");
+
 
             Alt.Log($"[{player.ServerId}]{player.Name} c'est connécté.");
             game.AddPlayer(player);
+            Alt.Log("Skin chargement");
+            player.GetSkin().SendModel(player);
+            player.GetSkin().SendSkin(player);
         }
 
 

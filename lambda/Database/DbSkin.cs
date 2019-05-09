@@ -3,6 +3,7 @@ using Lambda.Items;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using AltV.Net.Enums;
 
 namespace Lambda.Database
 {
@@ -17,7 +18,7 @@ namespace Lambda.Database
             Dictionary<string, string> data = new Dictionary<string, string>();
             //data["ski_valid"] = (skin.Valid ? 1 : 0).ToString();
             data["ski_type"] = skin.Type;
-            data["ski_model"] = skin.Model;
+            data["ski_model"] = skin.Model.ToString();
             data["ski_mask_drawable"] = skin.GetComponent(0).Drawable.ToString();
             data["ski_mask_texture"] = skin.GetComponent(0).Texture.ToString();
             data["ski_mask_palette"] = skin.GetComponent(0).Palette.ToString();
@@ -56,7 +57,7 @@ namespace Lambda.Database
 
         public override void SetData(Skin skin, Dictionary<string, string> data)
         {
-            skin.Model = data["ski_model"];
+            skin.Model = (PedModel)Enum.Parse(typeof(PedModel), data["ski_model"]);
             skin.SetComponent(0, new Component(data, "ski_hair"));
             skin.SetComponent(1, new Component(data, "ski_mask"));
             skin.SetComponent(2, new Component(data, "ski_torso"));

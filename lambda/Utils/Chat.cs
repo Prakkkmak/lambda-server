@@ -27,6 +27,11 @@ namespace Lambda.Utils
                     Alt.Log($"[chat:cmd] {player.Name}:{msg}");
                     InvokeCmd(player, msg);
                 }
+                else if (msg[0] == '!')
+                {
+                    Alt.Log($"[chat:cmd] {player.Name}:{msg}");
+                    InvokeCmd(player, msg, false);
+                }
                 else
                 {
 
@@ -36,7 +41,7 @@ namespace Lambda.Utils
             }
         }
 
-        public CmdReturn InvokeCmd(Player player, string msg)
+        public CmdReturn InvokeCmd(Player player, string msg, bool returnable = true)
         {
             if (string.IsNullOrWhiteSpace(msg)) return default;
             string[] parameters = TextToArgs(msg);
@@ -51,7 +56,7 @@ namespace Lambda.Utils
             if (cmd.Length < 1) cmdReturn = new CmdReturn("Commande introuvable.", CmdReturn.CmdReturnType.SYNTAX);
             if (cmd.Length == 1) cmdReturn = cmd[0].Execute(player, parameters);
             string cmdReturnText = string.Copy(SendCmdReturn(cmdReturn));
-            player.SendMessage(cmdReturnText);
+            if (returnable) player.SendMessage(cmdReturnText);
             return cmdReturn;
         }
 

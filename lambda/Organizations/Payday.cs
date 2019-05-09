@@ -6,16 +6,18 @@ namespace Lambda.Organizations
 {
     class Payday
     {
-        private uint id;
-        private DateTime date;
-        private int amount;
-        private uint characterId;
+        public Dictionary<string, long> sources;
+
         public Payday()
         {
-            this.id = 0;
-            this.date = new DateTime();
-            this.amount = 0;
-            this.characterId = 0;
+            sources = new Dictionary<string, long>();
         }
+
+        public void AddSource(string label, long amount)
+        {
+            sources.Add(label, amount);
+        }
+
+
     }
 }

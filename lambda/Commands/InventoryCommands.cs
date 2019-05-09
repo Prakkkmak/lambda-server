@@ -31,11 +31,9 @@ namespace Lambda.Commands
         }
         [Command(Command.CommandType.INVENTORY, 3)]
         [Syntax("Joueur", "Item", "Nombre")]
-        [SyntaxType(typeof(Player), typeof(Item), typeof(int))]
+        [SyntaxType(typeof(Player), typeof(Item), typeof(uint))]
         public static CmdReturn Donner(Player player, object[] argv)
         {
-
-
             Player p = (Player)argv[0];
             Item item = (Item)argv[1];
             uint amount = (uint)argv[2];
@@ -89,6 +87,7 @@ namespace Lambda.Commands
             BaseItem baseItem = (BaseItem)argv[1];
             uint amount = (uint)argv[2];
             target.Inventory.AddItem(baseItem.Id, amount);
+            if (amount > 10) return new CmdReturn("Ne te donne pas trop d'objets stp");
             return new CmdReturn("Vous avez donné des objets", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Status(Command.CommandStatus.NEW)]
@@ -111,5 +110,22 @@ namespace Lambda.Commands
             return new CmdReturn("Vous avez changé le metadata de l'objet.");
         }
 
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.INVENTORY)]
+        public static CmdReturn Inventaire_Vider(Player player, object[] argv)
+        {
+            player.Inventory.Clear();
+            return new CmdReturn("Vous avez vidé votre inventaire.");
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.INVENTORY, 1)]
+        [Syntax("Objet")]
+        [SyntaxType(typeof(Item))]
+        public static CmdReturn Objet_Jeter(Player player, object[] argv)
+        {
+            Item item = (Item)argv[0];
+            player.Inventory.RemoveItem(item.Id, item.Amount);
+            return new CmdReturn($"Vous avez jeté un objet");
+        }
     }
 }

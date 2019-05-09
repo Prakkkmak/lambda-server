@@ -155,5 +155,10 @@ namespace Lambda.Items
 
             return null;
         }
+
+        public void Clear()
+        {
+            Items = new List<Item>();
+        }
     }
 }

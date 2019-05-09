@@ -85,8 +85,6 @@ namespace Lambda.Entity
             this.SpawnRotation = new Rotation(0, 0, 0);
             this.Model = VehicleModel.Adder;
             this.Id = 0;
-            this.Color = new Rgba(0, 0, 0, 255);
-            this.SecondaryColor = new Rgba(0, 0, 0, 0);
             this.fuel = 100;
             this.ownerType = OwnerType.CHARACTER;
             this.ownerId = 0;
@@ -108,11 +106,21 @@ namespace Lambda.Entity
             this.Model = model;
         }
 
-
+        public void Respawn()
+        {
+            Rgba col1 = this.Color;
+            Rgba col2 = this.SecondaryColor;
+            AltVehicle.Remove();
+            this.Spawn();
+            this.Color = col1;
+            this.SecondaryColor = col2;
+        }
         public void Spawn()
         {
-            this.AltVehicle = Alt.CreateVehicle(Model, SpawnPosition, SpawnRotation.Pitch);
+            this.AltVehicle = Alt.CreateVehicle(Model, SpawnPosition, SpawnRotation);
             this.AltVehicle.SetData("vehicle", this);
+            this.Color = new Rgba(0, 0, 0, 255);
+            this.SecondaryColor = new Rgba(0, 0, 0, 0);
         }
 
         public void Repair()

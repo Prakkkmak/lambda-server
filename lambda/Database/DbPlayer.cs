@@ -7,6 +7,7 @@ using Items;
 using Lambda.Administration;
 using Lambda.Entity;
 using Lambda.Items;
+using Lambda.Skills;
 
 namespace Lambda.Database
 {
@@ -33,6 +34,9 @@ namespace Lambda.Database
             data["ski_id"] = player.GetSkin().Id.ToString();
             data["cha_permissions"] = string.Join(",", player.Permissions);
             data["inv_id"] = player.Inventory.Id.ToString();
+            data["cha_bankaccount"] = player.GetBankMoney().ToString();
+            data["cha_timeonline"] = player.TimeOnline.ToString();
+            data["cha_totaltimeonline"] = player.TotalTimeOnline.ToString();
             //data["baa_id"] = bankAccount.Id.ToString();
             //data["lic_id"] = license.Id.ToString();
             return data;
@@ -45,6 +49,7 @@ namespace Lambda.Database
             player.FirstName = data["cha_firstname"];
             player.LastName = data["cha_lastname"];
             player.Inventory.Money = long.Parse(data["cha_money"]);
+            player.SetBankMoney(long.Parse(data["cha_bankaccount"]));
             player.Food = short.Parse(data["cha_food"]);
             if (player.AltPlayer == null) return;
             Position position = new Position();
@@ -55,11 +60,13 @@ namespace Lambda.Database
             player.Dimension = short.Parse(data["cha_world"]);
             player.Hp = ushort.Parse(data["cha_hp"]);
             player.GetSkin().Id = uint.Parse(data["ski_id"]);
-            player.Permissions = data["cha_permissions"].Split(',').ToList();
+            if (!string.IsNullOrWhiteSpace(data["cha_permissions"]))
+                player.Permissions = data["cha_permissions"].Split(',').ToList();
             if (data["inv_id"] != null) player.Game.DbInventory.Get(uint.Parse(data["inv_id"]), player.Inventory);
+            else player.Game.DbInventory.Save(player.Inventory);
             Game.DbSkin.Get(player.GetSkin().Id, player.GetSkin());
-            player.GetSkin().SendModel(player);
-            player.GetSkin().SendSkin(player);
+            player.TimeOnline = ulong.Parse(data["cha_timeonline"]);
+            player.TotalTimeOnline = ulong.Parse(data["cha_totaltimeonline"]);
 
         }
         public Player Get(Account account, Player player)
@@ -70,6 +77,7 @@ namespace Lambda.Database
             Dictionary<string, string> result = DbConnect.SelectOne(TableName, where);
             if (result.Count == 0) return default(Player);
             SetData(player, result);
+            player.Skills = Game.DbSkill.GetAll(player).ToList();
             return player;
         }
         public override void Save(Player player)
@@ -77,6 +85,10 @@ namespace Lambda.Database
             Game.DbAccount.Save(player.Account);
             Game.DbSkin.Save(player.GetSkin());
             Game.DbInventory.Save(player.Inventory);
+            foreach (Skill playerSkill in player.Skills)
+            {
+                Game.DbSkill.Save(playerSkill);
+            }
             base.Save(player);
         }
 

@@ -83,6 +83,8 @@ namespace Lambda.Commands
             parametersString = RemoveCommandName(parametersString);
             CmdReturn result = ConvertParamameters(player, parametersString, out object[] parameters);
             if (result.Type != CmdReturn.CmdReturnType.SUCCESS) return result;
+            player.SendMessage("PERM : " + permission + " ? " + player.PermissionExist(permission));
+            if (!string.IsNullOrWhiteSpace(permission) && !player.PermissionExist(permission)) return new CmdReturn("Pas permission");
             CmdReturn cmdReturn = action(player, parameters); // Launch the command
             player.Game.DbPlayer.Save(player);
             return cmdReturn;
@@ -223,6 +225,8 @@ namespace Lambda.Commands
                     Command command = new Command(name, action, commandType, syntax, syntaxTypes);
                     StatusAttribute[] statusAttributes = (StatusAttribute[])method.GetCustomAttributes(typeof(StatusAttribute), false);
                     if (statusAttributes.Length > 0) command.Status = statusAttributes[0].Status;
+                    PermissionAttribute[] permissionsAttributes = (PermissionAttribute[])method.GetCustomAttributes(typeof(PermissionAttribute), false);
+                    if (permissionsAttributes.Length > 0) command.permission = permissionsAttributes[0].Permission;
                     Alt.Log($"-{command.Name} registered");
                     commands.Add(command);
 

@@ -8,7 +8,6 @@ namespace Lambda.Commands
 {
     class HouseCommands
     {
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.HOUSE)]
         public static CmdReturn Maison_Creer(Player player, object[] argv)
         {
@@ -18,7 +17,6 @@ namespace Lambda.Commands
             player.Game.DbArea.Save(house);
             return new CmdReturn("Vous avez créé une maison !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.HOUSE, 1)]
         [Syntax("Interieur")]
         [SyntaxType(typeof(Interior))]
