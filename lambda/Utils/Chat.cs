@@ -9,14 +9,14 @@ using Player = Lambda.Entity.Player;
 
 namespace Lambda.Utils
 {
-    public class Chat
+    public static class Chat
     {
-        public void RegisterEvents()
+        public static void RegisterEvents()
         {
             Alt.OnClient("chatmessage", OnClientChatMessage);
         }
 
-        public void OnClientChatMessage(IPlayer altPlayer, object[] args)
+        public static void OnClientChatMessage(IPlayer altPlayer, object[] args)
         {
             string msg = (string)args[0];
             if (string.IsNullOrWhiteSpace(msg)) return;
@@ -41,11 +41,11 @@ namespace Lambda.Utils
             }
         }
 
-        public CmdReturn InvokeCmd(Player player, string msg, bool returnable = true)
+        public static CmdReturn InvokeCmd(Player player, string msg, bool returnable = true)
         {
             if (string.IsNullOrWhiteSpace(msg)) return default;
             string[] parameters = TextToArgs(msg);
-            Command[] cmd = player.Game.GetCommands(parameters);
+            Command[] cmd = Command.GetCommands(parameters);
             CmdReturn cmdReturn = new CmdReturn();
             string commandstring = "";
             foreach (Command command in cmd)
@@ -60,7 +60,7 @@ namespace Lambda.Utils
             return cmdReturn;
         }
 
-        public string SendCmdReturn(CmdReturn cmdReturn)
+        public static string SendCmdReturn(CmdReturn cmdReturn)
         {
             switch (cmdReturn.Type)
             {
@@ -85,15 +85,15 @@ namespace Lambda.Utils
         }
 
 
-        public void Send(Player player, string msg)
+        public static void Send(Player player, string msg)
         {
             if (string.IsNullOrWhiteSpace(msg)) return;
             player.AltPlayer.Emit("chatmessage", null, msg);
         }
 
-        public void SendInRange(Player player, int range, string msg, bool named = true)
+        public static void SendInRange(Player player, int range, string msg, bool named = true)
         {
-            foreach (Player player2 in player.Game.GetPlayers())
+            foreach (Player player2 in Player.Players)
             {
                 if (player.Position.Distance(player2.Position) < range)
                 {
@@ -103,7 +103,7 @@ namespace Lambda.Utils
 
         }
 
-        public string[] TextToArgs(string msg)
+        public static string[] TextToArgs(string msg)
         {
             msg = msg.Replace("/", "");
             return msg.Split(" ");

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
+using System.Threading.Tasks;
 using AltV.Net;
 using Lambda.Database;
 using Lambda.Entity;
@@ -22,23 +24,18 @@ namespace Lambda.Items
         }
 
         public uint Id { get; set; }
-        public InventoryType Type { get; }
-        public List<Item> Items { get; set; }
-        public long Money { get; set; }
 
-        public Inventory()
-        {
-            Items = new List<Item>();
-            Money = 10000;
-        }
-        public Inventory(IEntity entity, InventoryType type = InventoryType.DEFAULT, uint id = 0) : this()
+
+        public InventoryType Type { get; }
+        public List<Item> Items = new List<Item>();
+        public long Money = 1000;
+
+        public Inventory(IEntity entity, InventoryType type = InventoryType.DEFAULT, uint id = 0)
         {
             Id = id;
             Type = type;
             Entity = entity;
         }
-
-
 
         public bool Withdraw(long amount)
         {
@@ -53,7 +50,6 @@ namespace Lambda.Items
             return true;
         }
 
-
         public bool AddItem(uint id, uint amount, string metadata = "")
         {
             Item itemWithLessStack = GetItemWithLessStack(id);
@@ -64,14 +60,14 @@ namespace Lambda.Items
                 itemWithLessStack.Amount += nbrToAdd;
             }
 
-            Item item = new Item(this, Entity.Game.GetBaseItem(id), amount);
+            Item item = new Item(this, BaseItem.GetBaseItem(id), amount);
             //if (item.GetBaseItem().MaxStack < 1) item.Amount = amount;
             while (item.Amount > item.GetBaseItem().MaxStack && item.GetBaseItem().MaxStack > 0)
             {
                 item.Amount = item.GetBaseItem().MaxStack;
                 amount -= item.GetBaseItem().MaxStack;
                 Items.Add(item);
-                item = new Item(this, Entity.Game.GetBaseItem(id), amount);
+                item = new Item(this, BaseItem.GetBaseItem(id), amount);
             }
 
             item.MetaData = metadata;
@@ -160,5 +156,47 @@ namespace Lambda.Items
         {
             Items = new List<Item>();
         }
+
+        public Dictionary<string, string> GetData()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data["inv_type"] = Type.ToString();
+            data["inv_money"] = Money.ToString();
+            return data;
+        }
+
+        public void SetData(Dictionary<string, string> data)
+        {
+            Id = uint.Parse(data["inv_id"]);
+            Money = long.Parse(data["inv_money"]);
+            Items = DatabaseElement.GetAllItems(this).ToList();
+        }
+
+        public void Delete()
+        {
+            DatabaseElement.Delete(this);
+        }
+
+        public async Task SaveAsync()
+        {
+            long t = DateTime.Now.Ticks;
+            await DatabaseElement.SaveAsync(this);
+            Alt.Log("Inventory Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
+        }
+
+        public Task DeleteAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Save()
+        {
+            long t = DateTime.Now.Ticks;
+            DatabaseElement.Save(this);
+            Alt.Log("Inventory Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
+        }
+
+
+
     }
 }

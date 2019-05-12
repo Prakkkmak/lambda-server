@@ -74,7 +74,7 @@ namespace Lambda.Commands
         public static CmdReturn Objets(Player player, object[] argv)
         {
             string str = "Voici la liste des objets:";
-            str += player.Game.GetBaseItems().Aggregate("", (current, item) => current + $"[{item.Id}]{item.Name} ");
+            str += BaseItem.BaseItems.Aggregate("", (current, item) => current + $"[{item.Id}]{item.Name} ");
             return new CmdReturn(str);
         }
         [Command(Command.CommandType.INVENTORY, 3)]

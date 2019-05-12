@@ -2,9 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using AltV.Net;
 using AltV.Net.Data;
@@ -40,6 +43,7 @@ namespace Lambda.Entity
         //public Interior Interior { get; set; }
 
         public uint Id { get; set; }
+
         public AreaType Type { get; set; }
         public ICheckpoint AltCheckpoint { get; set; }
         public IBlip AltBlip { get; set; }
@@ -62,7 +66,6 @@ namespace Lambda.Entity
             }
         }
         public Rotation Rotation { get; set; }
-        public Game Game { get; set; }
         public short Dimension { get; set; }
 
         public Area()
@@ -121,6 +124,128 @@ namespace Lambda.Entity
         }
 
 
+        public Dictionary<string, string> GetData()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data["are_type"] = Type.ToString();
+            data["are_position_x"] = Position.X.ToString();
+            data["are_position_y"] = Position.Y.ToString();
+            data["are_position_z"] = Position.Z.ToString();
+            data["are_radius"] = Radius.ToString();
+            data["are_metadata"] = GetMetaData();
+            if (InteriorLocation.Equals(default(Location))) data["are_interior"] = "0";
+            else data["are_interior"] = InteriorLocation.Interior.Id.ToString();
+            return data;
+        }
 
+        public void SetData(Dictionary<string, string> data)
+        {
+            Enum.TryParse(data["are_type"], out Area.AreaType type);
+            Type = type;
+            Position position = new Position();
+            position.X = float.Parse(data["are_position_x"]);
+            position.Y = float.Parse(data["are_position_y"]);
+            position.Z = float.Parse(data["are_position_z"]);
+            Radius = float.Parse(data["are_radius"]);
+            Spawn(position);
+            SetMetaData(data["are_metadata"]);
+            Interior interior = Interior.GetInterior(uint.Parse(data["are_interior"]));
+            if (interior != null) SetLocations(interior, short.Parse(data["are_id"]));
+        }
+
+        public void Remove()
+        {
+            Areas.Remove(this);
+        }
+
+        public void Save()
+        {
+            long t = DateTime.Now.Ticks;
+            DatabaseElement.Save(this);
+            Alt.Log("Area Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
+        }
+
+        public void Delete()
+        {
+            DatabaseElement.Delete(this);
+        }
+
+        public async Task SaveAsync()
+        {
+            long t = DateTime.Now.Ticks;
+            await DatabaseElement.SaveAsync(this);
+            Alt.Log("Area Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
+        }
+
+        public Task DeleteAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public static void AddArea(Area area)
+        {
+            Areas.Add(area);
+        }
+        public static Area GetArea(Position position)
+        {
+            foreach (Area area in Areas)
+            {
+                if (area.Position.Distance(position) < area.Radius)
+                {
+                    return area;
+                }
+            }
+
+            return null;
+        }
+
+        public static Area GetArea(Position position, Area.AreaType type)
+        {
+            foreach (Area area in Areas)
+            {
+                if (area.Type != type) continue;
+                if (area.Position.Distance(position) < area.Radius)
+                {
+                    return area;
+                }
+            }
+
+            return null;
+        }
+
+        public static Area GetArea(Player player, Area.AreaType type)
+        {
+            return GetArea(player.FeetPosition, type);
+        }
+
+
+        public static Location GetDestination(Position position, short dimension)
+        {
+            foreach (Area area in Areas)
+            {
+                if (area.InteriorLocation.Position.Distance(position) < area.Radius && area.Id == dimension)
+                {
+                    return area.ExteriorLocation;
+                }
+                if (area.ExteriorLocation.Position.Distance(position) < area.Radius && area.Dimension == dimension)
+                {
+                    return area.InteriorLocation;
+                }
+            }
+
+            return default;
+        }
+        public void RemoveArea(Area area)
+        {
+            Areas.Remove(area);
+            area.AltCheckpoint.Remove();
+        }
+        public static void LoadAreas()
+        {
+            Areas.AddRange(DatabaseElement.GetAllAreas());
+        }
+
+        public static List<Area> Areas = new List<Area>();
     }
 }

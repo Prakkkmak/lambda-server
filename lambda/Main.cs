@@ -10,6 +10,7 @@ using Lambda.Commands;
 using Lambda.Database;
 using Lambda.Entity;
 using Lambda.Items;
+using Lambda.Organizations;
 using Lambda.Utils;
 using IEntity = AltV.Net.Elements.Entities.IEntity;
 using Player = Lambda.Entity.Player;
@@ -19,7 +20,6 @@ namespace Lambda
 {
     public class Main : Resource
     {
-        public Game Game;
 
         public Main()
         {
@@ -38,7 +38,7 @@ namespace Lambda
             {
                 minutes++;
                 Alt.Log(minutes + "");
-                foreach (Player player in Game.GetPlayers())
+                foreach (Player player in Player.Players)
                 {
                     player.TimeOnline++;
                     player.TotalTimeOnline++;
@@ -48,8 +48,34 @@ namespace Lambda
         }
         public override void OnStart()
         {
-            Game = new Game();
-            Game.Init();
+            //DatabaseElement.DbConnect = new DBConnect();
+            Alt.Log("=== Register events... ===");
+            Events.RegisterEvents();
+            Alt.Log(">Server events registered");
+            Chat.RegisterEvents();
+            Alt.Log(">Chat registered");
+            Alt.Log("=== Events are registered ===");
+            Alt.Log("=== Register Spawns... ===");
+            //AddSpawn(new Spawn(new Position(-263.2484f, 2195.248f, 130.3956f)));
+            Alt.Log("=== Spawns added... ===");
+            Alt.Log("=== Register Commands... ===");
+            Command.GetAllCommands();
+            Alt.Log("=== Commands are registered ===");
+            Alt.Log("=== Load in database... ===");
+            Interior.LoadInteriors();
+            Alt.Log(">All interiors loaded");
+            BaseItem.LoadBaseItems();
+            Alt.Log(">Base items created");
+            Vehicle.LoadVehicles();
+            Alt.Log(">Vehicles spawned");
+            Area.LoadAreas();
+            Alt.Log(">All areas loaded");
+            Organization.LoadOrganizations();
+            Alt.Log(">All organizations loaded");
+            Anim.RegisterAnims();
+            //AddAllLinks();
+            //Game = new Game();
+            //Game.Init();
             //Game.BaseGame = Game;
         }
         public override void OnStop()

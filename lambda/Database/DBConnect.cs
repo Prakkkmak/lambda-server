@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using AltV.Net;
 using MySql.Data.MySqlClient;
 
@@ -94,10 +95,22 @@ namespace Lambda.Database
             MySqlConnection connection = OpenConnection();
             string query = DataToInsertQuery(table, data);
             MySqlCommand cmd = new MySqlCommand(query, connection);
-            int rowsAffected = cmd.ExecuteNonQuery();
+            cmd.ExecuteNonQuery();
             long last = cmd.LastInsertedId;
             CloseConnection(connection);
             return last;
+        }
+        public async Task<long> InsertAsync(string table, Dictionary<string, string> data)
+        {
+
+            MySqlConnection connection = OpenConnection();
+            string query = DataToInsertQuery(table, data);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            await cmd.ExecuteNonQueryAsync();
+            long last = cmd.LastInsertedId;
+            CloseConnection(connection);
+            return last;
+
         }
 
 
@@ -116,6 +129,17 @@ namespace Lambda.Database
             CloseConnection(connection);
             return rowsAffected;
         }
+        public async Task<long> UpdateAsync(string table, Dictionary<string, string> datas, Dictionary<string, string> wheres)
+        {
+            MySqlConnection connection = OpenConnection();
+            string query = DataToUpdateQuery(table, datas, wheres);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            int rowsAffected = await cmd.ExecuteNonQueryAsync();
+            CloseConnection(connection);
+            return rowsAffected;
+        }
+
+
         /// <summary>
         /// Delete in the database
         /// </summary>

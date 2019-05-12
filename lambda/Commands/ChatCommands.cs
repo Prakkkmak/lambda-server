@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using AltV.Net;
 using Lambda.Entity;
+using Lambda.Utils;
 
 namespace Lambda.Commands
 {
@@ -14,7 +15,7 @@ namespace Lambda.Commands
         public static CmdReturn OOC(Player player, object[] argv)
         {
             string str = string.Join(' ', argv);
-            Alt.EmitAllClients("chatmessage", player.Name, str);
+            Alt.EmitAllClients("chatmessage", player.Name, "((" + str + "))");
             return new CmdReturn("", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.CHAT, 1)]
@@ -25,7 +26,7 @@ namespace Lambda.Commands
             string str = "{9b59b6}";
             str += string.Join(' ', argv);
             str += " ((" + player.Name + "))";
-            player.Game.Chat.SendInRange(player, 20, str, false);
+            Chat.SendInRange(player, 20, str, false);
             return new CmdReturn("", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.CHAT, 1)]
@@ -36,7 +37,7 @@ namespace Lambda.Commands
             string str = "{9b59b6}";
             str += player.Name + " ";
             str += string.Join(' ', argv);
-            player.Game.Chat.SendInRange(player, 20, str, false);
+            Chat.SendInRange(player, 20, str, false);
             return new CmdReturn("", CmdReturn.CmdReturnType.SUCCESS);
         }
     }

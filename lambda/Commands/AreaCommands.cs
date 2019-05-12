@@ -11,7 +11,7 @@ namespace Lambda.Commands
         [Command(Command.CommandType.AREA)]
         public static CmdReturn Interieur_Liste(Player player, object[] argv)
         {
-            Interior[] interiors = player.Game.GetInteriors();
+            Interior[] interiors = Interior.Interiors.ToArray();
             string txt = "Voici la liste des interieurs : <br>";
             foreach (Interior interior in interiors)
             {
@@ -22,7 +22,7 @@ namespace Lambda.Commands
         [Command(Command.CommandType.AREA)]
         public static CmdReturn Interieur_Recharger(Player player, object[] argv)
         {
-            player.Game.AddAllInteriors();
+            Interior.LoadInteriors();
             return new CmdReturn("Vous avez rechargé les interieurs", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.AREA, 1)]

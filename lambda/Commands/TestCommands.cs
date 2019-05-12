@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using AltV.Net.Enums;
+using Lambda.Administration;
 using Lambda.Entity;
 using Lambda.Items;
+using Lambda.Organizations;
 using Lambda.Skills;
+using Lambda.Utils;
 
 namespace Lambda.Commands
 {
@@ -85,11 +88,10 @@ namespace Lambda.Commands
         {
             return new CmdReturn("C 2 sECR3t 0+0+4+23");
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Vehicules_Respawn(Player player, object[] argv)
         {
-            foreach (Vehicle veh in player.Game.GetVehicles())
+            foreach (Vehicle veh in Vehicle.Vehicles)
             {
 
                 veh.Respawn();
@@ -97,7 +99,6 @@ namespace Lambda.Commands
             return new CmdReturn("Les veh devraient avoir respawn");
         }
 
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 2)]
         [Syntax("slot", "xp")]
         [SyntaxType(typeof(int), typeof(int))]
@@ -108,7 +109,6 @@ namespace Lambda.Commands
             return new CmdReturn("Vous avez xp");
         }
 
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 1)]
         [Syntax("slot")]
         [SyntaxType(typeof(int))]
@@ -118,7 +118,6 @@ namespace Lambda.Commands
             Skill skill = player.GetSkill(type);
             return new CmdReturn("Vous etes level " + skill.GetLevel());
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Levels(Player player, object[] argv)
         {
@@ -128,6 +127,106 @@ namespace Lambda.Commands
                 txt += "" + playerSkill.GetLevel() + "<br>";
             }
             return new CmdReturn(txt);
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 2)]
+        [Syntax("dict", "anim")]
+        [SyntaxType(typeof(string), typeof(string))]
+        public static CmdReturn specificanim(Player player, object[] argv)
+        {
+            player.AltPlayer.Emit("playAnim", argv);
+            return new CmdReturn("anim?");
+        }
+
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("numero")]
+        [SyntaxType(typeof(uint))]
+        public static CmdReturn anim(Player player, object[] argv)
+        {
+            uint index = (uint)argv[0];
+            if (Anim.Anims.Length <= index) return CmdReturn.InvalidParameters;
+            Anim anim = Anim.Anims[index];
+            player.AltPlayer.Emit("playAnim", anim.Dictionary, anim.Animation);
+            return new CmdReturn(anim.Dictionary + " " + anim.Animation);
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 2)]
+        [Syntax("Organization", "Permission")]
+        [SyntaxType(typeof(Organization), typeof(Permissions))]
+        public static CmdReturn Organisation_Permission_Ajouter(Player player, object[] argv)
+        {
+            Organization org = (Organization)argv[0];
+            string perm = (string)argv[1];
+            org.Permissions.Add(perm);
+            _ = org.SaveAsync();
+            return new CmdReturn("Vous avez ajouté une permission", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 2)]
+        [Syntax("Organization", "Permission")]
+        [SyntaxType(typeof(Organization), typeof(Permissions))]
+        public static CmdReturn Organisation_Permission_Supprimer(Player player, object[] argv)
+        {
+            Organization org = (Organization)argv[0];
+            string perm = (string)argv[1];
+            org.Permissions.Remove(perm);
+            _ = org.SaveAsync();
+            return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("Organization")]
+        [SyntaxType(typeof(Organization))]
+        public static CmdReturn Organisation_Permission_Voir(Player player, object[] argv)
+        {
+            Organization org = (Organization)argv[0];
+            string str = "";
+            foreach (string s in org.Permissions.Get())
+            {
+                str += s + " - ";
+            }
+            return new CmdReturn(str);
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 2)]
+        [Syntax("Organization", "Joueur")]
+        [SyntaxType(typeof(Organization), typeof(Player))]
+        public static CmdReturn Organisation_Leader_Creer(Player player, object[] argv)
+        {
+            Organization org = (Organization)argv[0];
+            Player player2 = (Player)argv[1];
+            Rank rank = org.AddRank("Leader");
+            rank.Permissions.Add("LEADER");
+            org.AddMember(player2, rank);
+            _ = org.SaveAsync();
+            return new CmdReturn("Vous avez créé un leader");
+        }
+        [Permission("LEADER")]
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 2)]
+        [Syntax("Organization", "Joueur")]
+        [SyntaxType(typeof(Organization), typeof(Player))]
+        public static CmdReturn Inviter(Player player, object[] argv)
+        {
+            Organization org = (Organization)argv[0];
+            Player player2 = (Player)argv[1];
+            Request request = new Request(player2, "Don", $"{player.Name} veux vous inviter dans son organisation", player);
+            request.AddAnswer("Accepter", (sender, receiver) =>
+            {
+                org.AddMember(receiver);
+                sender.SendMessage("Machin a accepter la demande");
+            });
+            request.AddAnswer("Refuser", (sender, receiver) =>
+            {
+                sender.SendMessage($"{receiver.Name} a refusé votre demande");
+            });
+            request.Condition = (sender, receiver) =>
+            {
+                return true;
+            };
+            player2.SendRequest(request);
+            return new CmdReturn("Vous avez fait une leader");
         }
     }
 }

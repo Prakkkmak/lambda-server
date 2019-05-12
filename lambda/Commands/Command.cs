@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml.XPath;
 using AltV.Net;
+using Lambda.Administration;
 using Lambda.Entity;
 using Lambda.Items;
 using Lambda.Organizations;
@@ -39,11 +40,6 @@ namespace Lambda.Commands
             TEST,
         }
 
-        public enum ParameterError
-        {
-            ARGUMENTS_LENGTH,
-            INTEGER
-        }
 
         private Func<Player, object[], CmdReturn> action;
         private string[] syntax;
@@ -83,10 +79,10 @@ namespace Lambda.Commands
             parametersString = RemoveCommandName(parametersString);
             CmdReturn result = ConvertParamameters(player, parametersString, out object[] parameters);
             if (result.Type != CmdReturn.CmdReturnType.SUCCESS) return result;
-            player.SendMessage("PERM : " + permission + " ? " + player.PermissionExist(permission));
-            if (!string.IsNullOrWhiteSpace(permission) && !player.PermissionExist(permission)) return new CmdReturn("Pas permission");
+            player.SendMessage("PERM : " + permission + " ? " + player.Permissions.Contains(permission));
+            if (!string.IsNullOrWhiteSpace(permission) && !player.Permissions.Contains(permission)) return new CmdReturn("Pas permission");
+            _ = player.SaveAsync();
             CmdReturn cmdReturn = action(player, parameters); // Launch the command
-            player.Game.DbPlayer.Save(player);
             return cmdReturn;
         }
 
@@ -125,7 +121,7 @@ namespace Lambda.Commands
                 else if (syntaxTypes[i] == typeof(Player))
                 {
                     string charName = parameters[i];
-                    Player[] players = player.Game.GetPlayers(charName);
+                    Player[] players = Player.GetPlayers(charName);
                     CmdReturn cmdReturn = CmdReturn.OnlyOnePlayer(players);
                     if (cmdReturn.Type != CmdReturn.CmdReturnType.SUCCESS) return cmdReturn;
                     result[i] = players[0];
@@ -141,13 +137,13 @@ namespace Lambda.Commands
                 else if (syntaxTypes[i] == typeof(BaseItem))
                 {
                     if (!uint.TryParse(parameters[i], out uint itemid)) return new CmdReturn($"{syntax[i]} doit être un identifier d objet", CmdReturn.CmdReturnType.WARNING);
-                    BaseItem baseItem = player.Game.GetBaseItem(itemid);
+                    BaseItem baseItem = BaseItem.GetBaseItem(itemid);
                     if (baseItem == null) return new CmdReturn("L objet n existe pas", CmdReturn.CmdReturnType.WARNING);
                     result[i] = baseItem;
                 }
                 else if (syntaxTypes[i] == typeof(Organization))
                 {
-                    Organization[] orgs = player.Game.GetOrganizations(parameters[i]);
+                    Organization[] orgs = Organization.GetOrganizations(parameters[i]);
                     CmdReturn cmdReturn = CmdReturn.OnlyOneOrganization(orgs);
                     if (cmdReturn.Type != CmdReturn.CmdReturnType.SUCCESS) return cmdReturn;
                     result[i] = orgs[0];
@@ -164,10 +160,15 @@ namespace Lambda.Commands
                 }
                 else if (syntaxTypes[i] == typeof(Interior))
                 {
-                    Interior[] interiors = player.Game.GetInteriors(parameters[i]);
+                    Interior[] interiors = Interior.GetInteriors(parameters[i]);
                     CmdReturn cmdReturn = CmdReturn.OnlyOneInterior(interiors);
                     if (cmdReturn.Type != CmdReturn.CmdReturnType.SUCCESS) return cmdReturn;
                     result[i] = interiors[0];
+                }
+                else if (syntaxTypes[i] == typeof(Permissions))
+                {
+                    if (!Permissions.PermissionExist(parameters[i])) return new CmdReturn("Permissions n'existe pas", CmdReturn.CmdReturnType.WARNING);
+                    result[i] = parameters[0];
                 }
                 else
                 {
@@ -226,28 +227,81 @@ namespace Lambda.Commands
                     StatusAttribute[] statusAttributes = (StatusAttribute[])method.GetCustomAttributes(typeof(StatusAttribute), false);
                     if (statusAttributes.Length > 0) command.Status = statusAttributes[0].Status;
                     PermissionAttribute[] permissionsAttributes = (PermissionAttribute[])method.GetCustomAttributes(typeof(PermissionAttribute), false);
-                    if (permissionsAttributes.Length > 0) command.permission = permissionsAttributes[0].Permission;
+                    if (permissionsAttributes.Length > 0)
+                    {
+                        command.permission = permissionsAttributes[0].Permission;
+                        Permissions.CommandsPermissions.Add(permissionsAttributes[0].Permission);
+                    }
                     Alt.Log($"-{command.Name} registered");
                     commands.Add(command);
-
-                    /*Command.CommandFunc function = (Command.CommandFunc)Delegate.CreateDelegate(typeof(Command.CommandFunc), method, false); // Create the delegate of my méthod
-                    //if (function == null) Alt.Log("FUNCTION NULL" + method.Name);
-                    CommandAttribute attribute = (CommandAttribute)method.GetCustomAttributes(typeof(CommandAttribute), false)[0];
-                    PermissionAttribute[] permissionAttributes = (PermissionAttribute[])method.GetCustomAttributes(typeof(PermissionAttribute), false);
-                    string permission = "";
-                    if (permissionAttributes.Length > 0) permission = permissionAttributes[0].Permission;
-                    Command command = new Command(method.Name.ToLower(), function, attribute.Type, attribute.Syntax, permission);
-                    AddCommand(command); // Register the command*/
                 }
             }
 
+            Commands = commands;
             return commands.ToArray();
         }
         public static Type[] GetTypesInNamespace(Assembly assembly, string nameSpace)
         {
             return assembly.GetTypes().Where(t => string.Equals(t.Namespace, nameSpace, StringComparison.Ordinal)).ToArray();
         }
+        public static Command[] GetCommands(Command.CommandType commandType)
+        {
+            return Commands.Where(cmd => cmd.Type == commandType).ToArray();
+        }
+        public static Command[] GetCommands(string[] parameters)
+        {
+            List<Command> cmdsValid = new List<Command>();
+            foreach (Command command in Commands)
+            {
+                bool isValid = CommandFitToParameter(command, parameters);
+                if (isValid)
+                {
+                    if (parameters.Length >= command.Name.Split("_").Length)
+                    {
+                        for (int i = 0; i < cmdsValid.Count; i++)
+                        {
+                            Command command1 = cmdsValid[i];
+                            string[] command1Text = command1.Name.Split("_");
+                            string[] commandText = command.Name.Split("_");
+                            if (command1Text.Length < commandText.Length)
+                            {
+                                cmdsValid.Remove(command1);
+                                i--;
+                            }
+                        }
+                    }
+
+                    cmdsValid.Add(command);
+                }
+            }
+
+            foreach (Command command in cmdsValid)
+            {
+                string[] commandText = command.Name.Split("_");
+                if (parameters.Length >= commandText.Length)
+                {
+                    if (commandText[commandText.Length - 1].Equals(parameters[commandText.Length - 1]))
+                    {
+                        return new[] { command };
+                    }
+                }
+            }
+
+            return cmdsValid.ToArray();
+        }
+        public static bool CommandFitToParameter(Command command, string[] parameters)
+        {
+            string[] commandText = command.Name.Split("_");
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                if (commandText.Length <= i) return true;
+                if (!commandText[i].StartsWith(parameters[i])) return false;
+            }
+            return true;
+        }
 
 
+
+        public static List<Command> Commands = new List<Command>();
     }
 }

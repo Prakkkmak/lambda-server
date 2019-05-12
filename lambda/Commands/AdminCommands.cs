@@ -74,7 +74,7 @@ namespace Lambda.Commands
         [Command(Command.CommandType.ADMIN)]
         public static CmdReturn Respawn(Player player, object[] argv)
         {
-            player.Spawn(player.Game.GetSpawn(0).Position);
+            player.Spawn(Spawn.NewSpawn.Position);
             return new CmdReturn("Vous vous avez respawn!", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Status(Command.CommandStatus.NEW)]
@@ -83,7 +83,7 @@ namespace Lambda.Commands
         [SyntaxType(typeof(string))]
         public static CmdReturn Permission_Ajouter(Player player, object[] argv)
         {
-            player.AddPermission((string)argv[0]);
+            player.Permissions.Add((string)argv[0]);
             return new CmdReturn("Vous avez ajouté une permission", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Status(Command.CommandStatus.NEW)]
@@ -92,7 +92,7 @@ namespace Lambda.Commands
         [SyntaxType(typeof(string))]
         public static CmdReturn Permission_Retirer(Player player, object[] argv)
         {
-            player.RemovePermission((string)argv[0]);
+            player.Permissions.Add((string)argv[0]);
             return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
         }
     }

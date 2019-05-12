@@ -12,9 +12,9 @@ namespace Lambda.Commands
         public static CmdReturn Maison_Creer(Player player, object[] argv)
         {
             House house = new House();
-            player.Game.AddArea(house);
+            Area.AddArea(house);
             house.Spawn(player.FeetPosition);
-            player.Game.DbArea.Save(house);
+            _ = house.SaveAsync();
             return new CmdReturn("Vous avez créé une maison !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.HOUSE, 1)]
@@ -23,11 +23,10 @@ namespace Lambda.Commands
         public static CmdReturn Maison_Interieur(Player player, object[] argv)
         {
             Interior interior = (Interior)argv[0];
-            House house = (House)player.Game.GetArea(player.FeetPosition, Area.AreaType.HOUSE);
+            House house = (House)Area.GetArea(player.FeetPosition, Area.AreaType.HOUSE);
             if (house == null) return new CmdReturn("Aucune maison n a ete trouvée", CmdReturn.CmdReturnType.LOCATION);
-            player.Game.DbArea.Save(house);
             house.SetLocations(interior, (short)house.Id);
-
+            house.SaveAsync();
             return new CmdReturn("Vous avez changé l'interieur!", CmdReturn.CmdReturnType.SUCCESS);
         }
     }

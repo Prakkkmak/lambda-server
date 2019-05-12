@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using Lambda.Database;
 
 namespace Lambda.Items
@@ -15,6 +16,13 @@ namespace Lambda.Items
             UNVALID
         }
         public uint Id { get; set; }
+        public Dictionary<string, string> GetData()
+        {
+            throw new NotImplementedException();
+        }
+
+
+
         public Tuple<byte, ushort> Component1;
         public Tuple<byte, ushort> Component2;
         public LinkType Type;
@@ -89,5 +97,30 @@ namespace Lambda.Items
             new Tuple<byte, byte>(4, 11),
             new Tuple<byte, byte>(8, 11),
         };
+
+        public void SetData(Dictionary<string, string> data)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Save()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Delete()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SaveAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace Lambda.Commands
         public static CmdReturn Aide(Player player, object[] argv)
         {
             Command.CommandType type = (Command.CommandType)argv[0];
-            Command[] commands = player.Game.GetCommands(type);
+            Command[] commands = Command.GetCommands(type);
             int maxpage = Enum.GetValues(typeof(Command.CommandType)).Cast<int>().Max();
             string[] pages = new[]
             {
@@ -93,9 +93,8 @@ namespace Lambda.Commands
         public static CmdReturn Liste(Player player, object[] argv)
         {
             string str = "";
-            Player[] players = player.Game.GetPlayers();
-            str += "Il y a " + players.Length + " joueurs sur le serveur. <br>";
-            str = players.Aggregate(str, (current, p) => current + $"[{p.ServerId}]{p.FirstName} {p.LastName} <br>");
+            str += "Il y a " + Player.Players.Count + " joueurs sur le serveur. <br>";
+            str = Player.Players.Aggregate(str, (current, p) => current + $"[{p.ServerId}]{p.FirstName} {p.LastName} <br>");
             return new CmdReturn(str);
         }
 
@@ -137,7 +136,7 @@ namespace Lambda.Commands
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn TP(Player player, object[] argv)
         {
-            Location location = player.Game.GetDestination(player.Position, player.Dimension);
+            Location location = Area.GetDestination(player.Position, player.Dimension);
             //if (area == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
             if (player.AltPlayer.Vehicle != null) return new CmdReturn("");
             if (location.Equals(default(Location))) return new CmdReturn("");

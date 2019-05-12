@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using AltV.Net;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
@@ -20,7 +22,7 @@ namespace Lambda.Entity
     {
 
         public List<Skill> Skills;
-        public List<string> Permissions;
+        public Permissions Permissions = new Permissions();
 
         public string license
         {
@@ -80,12 +82,10 @@ namespace Lambda.Entity
 
         public Interior Interior { get; set; }
 
-        public Game Game { get; set; }
-
         public Vehicle Vehicle
         {
             get {
-                if (!AltPlayer.IsInVehicle || AltPlayer.Vehicle == null) return null;
+                if (!AltPlayer.IsInVehicle) return null;
                 AltPlayer.Vehicle.GetData("vehicle", out Vehicle vehicle);
                 return vehicle;
             }
@@ -124,7 +124,6 @@ namespace Lambda.Entity
         public Player()
         {
             Skills = new List<Skill>();
-            Permissions = new List<string>();
             deathCount = 0;
             id = 0;
             Food = 0;
@@ -136,12 +135,10 @@ namespace Lambda.Entity
             Inventory.Deposit(100000);
         }
 
-        public Player(IPlayer altPlayer, Game game) : this()
+        public Player(IPlayer altPlayer) : this()
         {
-            Game = game;
             AltPlayer = altPlayer;
             altPlayer.SetData("player", this);
-            skin.Game = game;
             skin.SendModel(this);
             skin.SendSkin(this);
         }
@@ -174,12 +171,12 @@ namespace Lambda.Entity
 
         public void SendMessage(string msg)
         {
-            Game.Chat.Send(this, msg);
+            Chat.Send(this, msg);
         }
 
         public void SendMessage(CmdReturn cmdReturn)
         {
-            SendMessage(Game.Chat.SendCmdReturn(cmdReturn));
+            SendMessage(Chat.SendCmdReturn(cmdReturn));
         }
 
         public void Freeze(bool choice)
@@ -219,24 +216,20 @@ namespace Lambda.Entity
             return request;
         }
 
-        public void AddPermission(string permission)
-        {
-            RemovePermission(permission);
-            Permissions.Add(permission.ToUpper());
-        }
-        public void RemovePermission(string permission)
-        {
-            permission = permission.ToUpper();
-            Permissions.RemoveAll(perm => perm.StartsWith(permission));
-        }
-        public bool PermissionExist(string permission)
-        {
-            foreach (string perm in Permissions)
-            {
 
-                if (permission.StartsWith(perm)) return true;
+        public bool AllowedTo(string perm)
+        {
+            if (Permissions.Contains(perm)) return true;
+            foreach (Rank rank in GetRanks())
+            {
+                if (rank.Permissions.Contains(perm)) return true;
             }
             return false;
+        }
+        public bool AllowedTo(Organization organization, string perm)
+        {
+            Member member = organization.GetMember(Id);
+            return member != null && member.Rank.Permissions.Contains(perm);
         }
 
         public void LoadInterior(Interior interior)
@@ -301,7 +294,7 @@ namespace Lambda.Entity
         public Organization[] GetOrganizations()
         {
             List<Organization> organizations = new List<Organization>();
-            foreach (Organization organization in Game.GetOrganizations())
+            foreach (Organization organization in Organization.Organizations)
             {
                 if (organization.GetMember(Id) != null) organizations.Add(organization);
             }
@@ -309,10 +302,21 @@ namespace Lambda.Entity
             return organizations.ToArray();
         }
 
+        public Rank[] GetRanks()
+        {
+            List<Rank> ranks = new List<Rank>();
+            foreach (Organization organization in Organization.Organizations)
+            {
+                if (organization.GetMember(Id) != null) ranks.Add(organization.GetMember(Id).Rank);
+            }
+
+            return ranks.ToArray();
+        }
+
         public Vehicle[] GetVehiclesInRange(int range)
         {
             List<Vehicle> vehicles = new List<Vehicle>();
-            foreach (Vehicle vehicle in Game.GetVehicles())
+            foreach (Vehicle vehicle in Vehicle.Vehicles)
             {
                 if (Position.Distance(vehicle.Position) < range) vehicles.Add(vehicle);
             }
@@ -320,20 +324,7 @@ namespace Lambda.Entity
             return vehicles.ToArray();
         }
 
-        public Vehicle GetNearestVehicle()
-        {
-            Vehicle nearestVehicle = null;
-            foreach (Vehicle vehicle in Game.GetVehicles())
-            {
-                if (nearestVehicle == null ||
-                    Position.Distance(vehicle.Position) < Position.Distance(nearestVehicle.Position))
-                {
-                    nearestVehicle = vehicle;
-                }
-            }
 
-            return nearestVehicle;
-        }
 
         public Vehicle GetNearestVehicle(int range)
         {
@@ -390,5 +381,129 @@ namespace Lambda.Entity
             }
         }
 
+        public Dictionary<string, string> GetData()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data["cha_firstname"] = FirstName;
+            data["cha_lastname"] = LastName;
+            data["cha_position_x"] = Position.X.ToString();
+            data["cha_position_Y"] = Position.Y.ToString();
+            data["cha_position_z"] = Position.Z.ToString();
+            data["cha_world"] = Dimension.ToString();
+            data["cha_money"] = Inventory.Money.ToString();
+            data["cha_hp"] = Hp.ToString();
+            data["cha_food"] = Food.ToString();
+            data["cha_deathcount"] = "0";
+            data["acc_id"] = Account.Id.ToString();
+            data["ski_id"] = GetSkin().Id.ToString();
+            data["cha_permissions"] = Permissions.ToString();
+            data["inv_id"] = Inventory.Id.ToString();
+            data["cha_bankaccount"] = GetBankMoney().ToString();
+            data["cha_timeonline"] = TimeOnline.ToString();
+            data["cha_totaltimeonline"] = TotalTimeOnline.ToString();
+            return data;
+
+        }
+
+        public void SetData(Dictionary<string, string> data)
+        {
+            Id = uint.Parse(data["cha_id"]);
+            FirstName = data["cha_firstname"];
+            LastName = data["cha_lastname"];
+            Inventory.Money = long.Parse(data["cha_money"]);
+            SetBankMoney(long.Parse(data["cha_bankaccount"]));
+            Food = short.Parse(data["cha_food"]);
+            if (AltPlayer == null) return;
+            Position position = new Position();
+            position.X = float.Parse(data["cha_position_x"]);
+            position.Y = float.Parse(data["cha_position_y"]);
+            position.Z = float.Parse(data["cha_position_z"]);
+            Position = position;
+            Dimension = short.Parse(data["cha_world"]);
+            Hp = ushort.Parse(data["cha_hp"]);
+            GetSkin().Id = uint.Parse(data["ski_id"]);
+            if (!string.IsNullOrWhiteSpace(data["cha_permissions"]))
+                Permissions.Set(data["cha_permissions"].Split(',').ToList());
+            if (data["inv_id"] != null) DatabaseElement.Get<Inventory>(Inventory, uint.Parse(data["inv_id"]));
+            else Inventory.Save();
+            DatabaseElement.Get<Skin>(GetSkin(), GetSkin().Id);
+            TimeOnline = ulong.Parse(data["cha_timeonline"]);
+            TotalTimeOnline = ulong.Parse(data["cha_totaltimeonline"]);
+        }
+
+        public void Save()
+        {
+            long t = DateTime.Now.Ticks;
+            Account.Save();
+            GetSkin().Save();
+            Inventory.Save();
+            foreach (Skill playerSkill in Skills)
+            {
+                playerSkill.Save();
+            }
+            DatabaseElement.Save(this);
+            Alt.Log("Player Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
+        }
+
+        public void Delete()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Remove()
+        {
+            Players.Remove(this);
+            VoiceChannel.RemovePlayer(AltPlayer);
+            Alt.EmitAllClients("chatmessage", $"{AltPlayer.Name} c'est déconnecté!");
+        }
+
+        public async Task SaveAsync()
+        {
+            long t = DateTime.Now.Ticks;
+            await Account.SaveAsync();
+            await GetSkin().SaveAsync();
+            await Inventory.SaveAsync();
+            foreach (Skill playerSkill in Skills)
+            {
+                await playerSkill.SaveAsync();
+            }
+            DatabaseElement.Save(this);
+            Alt.Log("Player Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
+        }
+
+        public Task DeleteAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void AddPlayer(Player player)
+        {
+            Players.Add(player);
+            VoiceChannel.AddPlayer(player.AltPlayer);
+            Alt.EmitAllClients("chatmessage", null, $"{player.AltPlayer.Name} c'est connecté!");
+        }
+        public static Player GetPlayerByDbId(uint id)
+        {
+            foreach (Player player in Players)
+            {
+                if (player.Id == id) return player;
+            }
+
+            return null;
+        }
+
+        public static Player[] GetPlayers(string nameOrId)
+        {
+            List<Player> players = new List<Player>();
+            foreach (Player player in Players)
+            {
+                if (player.ServerId.ToString().Equals(nameOrId)) players.Add(player);
+                else if (player.Name.ToLower().StartsWith(nameOrId.ToLower())) players.Add(player);
+            }
+            return players.ToArray();
+        }
+
+        public static IVoiceChannel VoiceChannel = Alt.CreateVoiceChannel(true, 15);
+        public static List<Player> Players = new List<Player>();
     }
 }

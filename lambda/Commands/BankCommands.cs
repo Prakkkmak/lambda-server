@@ -11,9 +11,9 @@ namespace Lambda.Commands
         public static CmdReturn Banque_Creer(Player player, object[] argv)
         {
             Area bank = new Area(2, 2, Area.AreaType.BANK);
-            player.Game.AddArea(bank);
+            Area.AddArea(bank);
             bank.Spawn(player.FeetPosition);
-            player.Game.DbArea.Save(bank);
+            _ = bank.SaveAsync();
             return new CmdReturn("Vous avez créé une banque !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.BANK, 1)]
@@ -22,7 +22,7 @@ namespace Lambda.Commands
         public static CmdReturn Retirer(Player player, object[] argv)
         {
             int amount = (int)argv[0];
-            Area bank = player.Game.GetArea(player.Position, Area.AreaType.BANK);
+            Area bank = Area.GetArea(player.Position, Area.AreaType.BANK);
             if (bank == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
             if (amount > player.GetBankMoney()) return new CmdReturn("Vous n'avez pas assez d'argent dans votre comptre en banque", CmdReturn.CmdReturnType.WARNING);
 
@@ -35,7 +35,7 @@ namespace Lambda.Commands
         public static CmdReturn Deposer(Player player, object[] argv)
         {
             int amount = (int)argv[0];
-            Area bank = player.Game.GetArea(player.Position, Area.AreaType.BANK);
+            Area bank = Area.GetArea(player.Position, Area.AreaType.BANK);
             if (bank == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
             if (amount > player.Inventory.Money) return new CmdReturn("Vous n'avez pas assez d'argent", CmdReturn.CmdReturnType.WARNING);
             player.Deposit(amount);

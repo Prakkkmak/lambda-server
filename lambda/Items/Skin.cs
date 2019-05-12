@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using AltV.Net;
 using AltV.Net.Data;
 using AltV.Net.Enums;
@@ -22,8 +23,10 @@ namespace Items
     {
         public uint Id { get; set; }
 
+
         public enum ClothNumber
         {
+            HEAD,
             MASK,
             HAIR,
             TORSO,
@@ -40,17 +43,12 @@ namespace Items
         private Component[] components;
         public string Type;
         public PedModel Model;
-        public Game Game;
 
         public Skin()
         {
             components = new Component[MAX_COMPONENT_NUMBER];
             Type = "DEFAULT";
             Model = PedModel.FreemodeMale01;
-        }
-        public Skin(Game game) : this()
-        {
-            Game = game;
         }
 
         public bool Equals(Skin skin)
@@ -110,7 +108,7 @@ namespace Items
             //player.Game.DbSkin.Save(this);
             player.AltPlayer.Emit("setComponent", clothes.ToArray());
         }
-
+        /*
         public Link[] ExtractLinks()
         {
             List<Link> links = new List<Link>();
@@ -208,12 +206,95 @@ namespace Items
                 }
             }
         }
-
+        */
         public void SendModel(Player player)
         {
             //if (!Enum.TryParse(player.GetSkin().Model, true, out PedModel model)) model = PedModel.FreemodeMale01;
             //if (!Enum.IsDefined(typeof(PedModel), model)) model = PedModel.FreemodeMale01;
             player.AltPlayer.Model = (uint)Model;
+            Alt.Log("Model set en " + (uint)Model);
+        }
+
+        public Dictionary<string, string> GetData()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            //data["ski_valid"] = (skin.Valid ? 1 : 0).ToString();
+            data["ski_type"] = Type;
+            data["ski_model"] = Model.ToString();
+            data["ski_mask_drawable"] = GetComponent((int)Skin.ClothNumber.MASK).Drawable.ToString();
+            data["ski_mask_texture"] = GetComponent((int)Skin.ClothNumber.MASK).Texture.ToString();
+            data["ski_mask_palette"] = GetComponent((int)Skin.ClothNumber.MASK).Palette.ToString();
+            data["ski_hair_drawable"] = GetComponent((int)Skin.ClothNumber.HAIR).Drawable.ToString();
+            data["ski_hair_texture"] = GetComponent((int)Skin.ClothNumber.HAIR).Texture.ToString();
+            data["ski_hair_palette"] = GetComponent((int)Skin.ClothNumber.HAIR).Palette.ToString();
+            data["ski_torso_drawable"] = GetComponent((int)Skin.ClothNumber.TORSO).Drawable.ToString();
+            data["ski_torso_texture"] = GetComponent((int)Skin.ClothNumber.TORSO).Texture.ToString();
+            data["ski_torso_palette"] = GetComponent((int)Skin.ClothNumber.TORSO).Palette.ToString();
+            data["ski_leg_drawable"] = GetComponent((int)Skin.ClothNumber.LEG).Drawable.ToString();
+            data["ski_leg_texture"] = GetComponent((int)Skin.ClothNumber.LEG).Texture.ToString();
+            data["ski_leg_palette"] = GetComponent((int)Skin.ClothNumber.LEG).Palette.ToString();
+            data["ski_bag_drawable"] = GetComponent((int)Skin.ClothNumber.BAG).Drawable.ToString();
+            data["ski_bag_texture"] = GetComponent((int)Skin.ClothNumber.BAG).Texture.ToString();
+            data["ski_bag_palette"] = GetComponent((int)Skin.ClothNumber.BAG).Palette.ToString();
+            data["ski_feet_drawable"] = GetComponent((int)Skin.ClothNumber.FEET).Drawable.ToString();
+            data["ski_feet_texture"] = GetComponent((int)Skin.ClothNumber.FEET).Texture.ToString();
+            data["ski_feet_palette"] = GetComponent((int)Skin.ClothNumber.FEET).Palette.ToString();
+            data["ski_accessoiries_drawable"] = GetComponent((int)Skin.ClothNumber.ACCESSOIRIES).Drawable.ToString();
+            data["ski_accessoiries_texture"] = GetComponent((int)Skin.ClothNumber.ACCESSOIRIES).Texture.ToString();
+            data["ski_accessoiries_palette"] = GetComponent((int)Skin.ClothNumber.ACCESSOIRIES).Palette.ToString();
+            data["ski_undershirt_drawable"] = GetComponent((int)Skin.ClothNumber.UNDERSHIRT).Drawable.ToString();
+            data["ski_undershirt_texture"] = GetComponent((int)Skin.ClothNumber.UNDERSHIRT).Texture.ToString();
+            data["ski_undershirt_palette"] = GetComponent((int)Skin.ClothNumber.UNDERSHIRT).Palette.ToString();
+            data["ski_bodyarmor_drawable"] = GetComponent((int)Skin.ClothNumber.BODYARMOR).Drawable.ToString();
+            data["ski_bodyarmor_texture"] = GetComponent((int)Skin.ClothNumber.BODYARMOR).Texture.ToString();
+            data["ski_bodyarmor_palette"] = GetComponent((int)Skin.ClothNumber.BODYARMOR).Palette.ToString();
+            data["ski_decal_drawable"] = GetComponent((int)Skin.ClothNumber.DECAL).Drawable.ToString();
+            data["ski_decal_texture"] = GetComponent((int)Skin.ClothNumber.DECAL).Texture.ToString();
+            data["ski_decal_palette"] = GetComponent((int)Skin.ClothNumber.DECAL).Palette.ToString();
+            data["ski_top_drawable"] = GetComponent((int)Skin.ClothNumber.TOP).Drawable.ToString();
+            data["ski_top_texture"] = GetComponent((int)Skin.ClothNumber.TOP).Drawable.ToString();
+            data["ski_top_palette"] = GetComponent((int)Skin.ClothNumber.TOP).Drawable.ToString();
+            return data;
+        }
+
+        public void SetData(Dictionary<string, string> data)
+        {
+            Model = (PedModel)Enum.Parse(typeof(PedModel), data["ski_model"]);
+            SetComponent((int)Skin.ClothNumber.MASK, new Component(data, "ski_mask"));
+            SetComponent((int)Skin.ClothNumber.HAIR, new Component(data, "ski_hair"));
+            SetComponent((int)Skin.ClothNumber.TORSO, new Component(data, "ski_torso"));
+            SetComponent((int)Skin.ClothNumber.LEG, new Component(data, "ski_leg"));
+            SetComponent((int)Skin.ClothNumber.BAG, new Component(data, "ski_bag"));
+            SetComponent((int)Skin.ClothNumber.FEET, new Component(data, "ski_feet"));
+            SetComponent((int)Skin.ClothNumber.ACCESSOIRIES, new Component(data, "ski_accessoiries"));
+            SetComponent((int)Skin.ClothNumber.UNDERSHIRT, new Component(data, "ski_undershirt"));
+            SetComponent((int)Skin.ClothNumber.BODYARMOR, new Component(data, "ski_bodyarmor"));
+            SetComponent((int)Skin.ClothNumber.DECAL, new Component(data, "ski_decal"));
+            SetComponent((int)Skin.ClothNumber.TOP, new Component(data, "ski_top"));
+        }
+
+        public void Save()
+        {
+            long t = DateTime.Now.Ticks;
+            DatabaseElement.Save(this);
+            Alt.Log("Skin Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
+        }
+
+        public void Delete()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task SaveAsync()
+        {
+            long t = DateTime.Now.Ticks;
+            await DatabaseElement.SaveAsync(this);
+            Alt.Log("Skin Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
+        }
+
+        public Task DeleteAsync()
+        {
+            throw new NotImplementedException();
         }
 
         /*

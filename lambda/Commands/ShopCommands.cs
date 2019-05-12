@@ -14,17 +14,17 @@ namespace Lambda.Commands
         public static CmdReturn Magasin_Creer(Player player, object[] argv)
         {
             Shop shop = new Shop();
-            player.Game.AddArea(shop);
+            Area.AddArea(shop);
             shop.Spawn(player.FeetPosition);
-            player.Game.DbArea.Save(shop);
+            shop.Save();
             return new CmdReturn("Vous avez créé un magasin !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.SHOP)]
         public static CmdReturn Magasin_Supprimer(Player player, object[] argv)
         {
-            Shop shop = (Shop)player.Game.GetArea(player.FeetPosition, Area.AreaType.SHOP);
+            Shop shop = (Shop)Area.GetArea(player.FeetPosition, Area.AreaType.SHOP);
             if (shop == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
-            player.Game.RemoveArea(shop);
+            shop.Remove();
             return new CmdReturn("Vous avez supprimé un magasin !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.SHOP, 2)]
@@ -34,11 +34,11 @@ namespace Lambda.Commands
         {
             BaseItem baseItem = (BaseItem)argv[0];
             int price = (int)argv[1];
-            Shop shop = (Shop)player.Game.GetArea(player.FeetPosition, Area.AreaType.SHOP);
+            Shop shop = (Shop)Area.GetArea(player.FeetPosition, Area.AreaType.SHOP);
             if (shop == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
             if (price < 0) return new CmdReturn("Veuillez entrer un prix valide", CmdReturn.CmdReturnType.SYNTAX);
             shop.AddSell(baseItem.Id, price);
-            player.Game.DbArea.Save(shop);
+            _ = shop.SaveAsync();
             return new CmdReturn("Vous avez ajouté une vente !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.SHOP, 1)]
@@ -47,17 +47,17 @@ namespace Lambda.Commands
         public static CmdReturn Magasin_Enlever_Vente(Player player, object[] argv)
         {
             BaseItem baseItem = (BaseItem)argv[0];
-            Shop shop = (Shop)player.Game.GetArea(player.FeetPosition, Area.AreaType.SHOP);
+            Shop shop = (Shop)Area.GetArea(player.FeetPosition, Area.AreaType.SHOP);
             if (shop == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
             if (shop.GetSell(baseItem.Id).Equals(default(Sell))) return new CmdReturn("Cet objet n'est pas en vente !", CmdReturn.CmdReturnType.WARNING);
             shop.RemoveSell(baseItem.Id);
-            player.Game.DbArea.Save(shop);
+            _ = shop.SaveAsync();
             return new CmdReturn("Vous avez supprimé une vente !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.SHOP)]
         public static CmdReturn Magasin_Inspecter(Player player, object[] argv)
         {
-            Shop shop = (Shop)player.Game.GetArea(player.FeetPosition, Area.AreaType.SHOP);
+            Shop shop = (Shop)Area.GetArea(player.FeetPosition, Area.AreaType.SHOP);
             if (shop == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
             string sellsString = "";
             foreach (Sell sell in shop.Sells)
@@ -75,7 +75,7 @@ namespace Lambda.Commands
         {
             BaseItem baseItem = (BaseItem)argv[0];
             uint amount = (uint)argv[1];
-            Shop shop = (Shop)player.Game.GetArea(player.FeetPosition, Area.AreaType.SHOP);
+            Shop shop = (Shop)Area.GetArea(player.FeetPosition, Area.AreaType.SHOP);
             if (shop == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
             CmdReturn returnType = shop.Sell(baseItem.Id, amount, player.Inventory);
             if (returnType.Type != CmdReturn.CmdReturnType.SUCCESS) return returnType;

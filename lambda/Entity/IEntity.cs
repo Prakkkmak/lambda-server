@@ -8,10 +8,8 @@ namespace Lambda.Entity
 {
     public interface IEntity
     {
-        Game Game { get; set; }
         short Dimension { get; set; }
         Position Position { get; set; }
         Rotation Rotation { get; set; }
-
     }
 }

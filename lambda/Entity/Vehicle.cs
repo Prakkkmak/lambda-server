@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Threading.Tasks;
 using AltV.Net;
 using AltV.Net.Data;
 using AltV.Net.Elements;
@@ -32,9 +33,9 @@ namespace Lambda.Entity
 
         public IVoiceChannel VoiceChannel { get; set; }
 
-        public Game Game { get; set; }
-
         public uint Id { get; set; }
+
+
         public Inventory Inventory;
         public IVehicle AltVehicle { get; set; }
         public VehicleModel Model { get; set; }
@@ -137,7 +138,7 @@ namespace Lambda.Entity
         public void Park()
         {
             SpawnPosition = Position;
-
+            Save();
         }
 
         public void Park(Rotation rot)
@@ -208,5 +209,108 @@ namespace Lambda.Entity
             SetOwner(player.Id);
         }
 
+        public Dictionary<string, string> GetData()
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data["veh_model"] = Model.ToString();
+            data["veh_position_x"] = SpawnPosition.X.ToString();
+            data["veh_position_y"] = SpawnPosition.Y.ToString();
+            data["veh_position_z"] = SpawnPosition.Z.ToString();
+            data["veh_rotation_r"] = SpawnRotation.Roll.ToString();
+            data["veh_rotation_p"] = SpawnRotation.Pitch.ToString();
+            data["veh_rotation_y"] = SpawnRotation.Yaw.ToString();
+            data["veh_color_r"] = Color.R.ToString();
+            data["veh_color_g"] = Color.G.ToString();
+            data["veh_color_b"] = Color.B.ToString();
+            data["veh_color2_r"] = SecondaryColor.R.ToString();
+            data["veh_color2_g"] = SecondaryColor.G.ToString();
+            data["veh_color2_b"] = SecondaryColor.B.ToString();
+            data["veh_lock"] = Lock.Code;
+            data["veh_plate"] = GetPlate();
+            if (GetOwnerId() == 0) return data;
+            if (GetOwnerType() == Vehicle.OwnerType.CHARACTER) data["cha_id"] = GetOwnerId().ToString();
+            else if (GetOwnerType() == Vehicle.OwnerType.ORGANIZATION) data["org_id"] = GetOwnerId().ToString();
+            return data;
+        }
+
+        public void SetData(Dictionary<string, string> data)
+        {
+            Model = (VehicleModel)Enum.Parse(typeof(VehicleModel), data["veh_model"]);
+            Position position = new Position();
+            position.X = float.Parse(data["veh_position_x"]);
+            position.Y = float.Parse(data["veh_position_y"]);
+            position.Z = float.Parse(data["veh_position_z"]);
+            SpawnPosition = position;
+            Lock.Code = data["veh_lock"];
+            Spawn();
+            Rotation rotation = new Rotation();
+            rotation.Roll = float.Parse(data["veh_rotation_r"]);
+            rotation.Pitch = float.Parse(data["veh_rotation_p"]);
+            rotation.Yaw = float.Parse(data["veh_rotation_y"]);
+            Rotation = rotation;
+            Rgba color = new Color();
+            color.R = byte.Parse(data["veh_color_r"]);
+            color.G = byte.Parse(data["veh_color_g"]);
+            color.B = byte.Parse(data["veh_color_b"]);
+            Rgba secondaryColor = new Color();
+            secondaryColor.R = byte.Parse(data["veh_color2_r"]);
+            secondaryColor.G = byte.Parse(data["veh_color2_g"]);
+            secondaryColor.B = byte.Parse(data["veh_color2_b"]);
+            SetPlate(data["veh_plate"]);
+            Color = color;
+            SecondaryColor = secondaryColor;
+            if (data.ContainsKey("cha_id"))
+            {
+                SetOwnerType(Vehicle.OwnerType.CHARACTER);
+                SetOwnerId(uint.Parse(data["cha_id"]));
+            }
+            if (data.ContainsKey("org_id"))
+            {
+                SetOwnerType(Vehicle.OwnerType.ORGANIZATION);
+                SetOwnerId(uint.Parse(data["org_id"]));
+            }
+        }
+
+        public void Save()
+        {
+            long t = DateTime.Now.Ticks;
+            DatabaseElement.Save(this);
+            Alt.Log("Vehicle Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
+        }
+
+        public void Delete()
+        {
+            DatabaseElement.Delete(this);
+        }
+
+        public async Task SaveAsync()
+        {
+            long t = DateTime.Now.Ticks;
+            await DatabaseElement.SaveAsync(this);
+            Alt.Log("Vehicle Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
+        }
+
+        public Task DeleteAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Remove()
+        {
+            Vehicles.Remove(this);
+            this.AltVehicle.Remove();
+        }
+
+        public static void AddVehicle(Vehicle vehicle)
+        {
+            Vehicles.Add(vehicle);
+        }
+
+        public static void LoadVehicles()
+        {
+            Vehicles.AddRange(DatabaseElement.GetAllVehicles());
+        }
+
+        public static List<Vehicle> Vehicles = new List<Vehicle>();
     }
 }

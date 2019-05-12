@@ -26,7 +26,7 @@ namespace Lambda.Commands
             if (!Enum.IsDefined(typeof(VehicleModel), model)) return new CmdReturn("Modele incorrect", CmdReturn.CmdReturnType.WARNING);
 
             Vehicle vehicle = new Vehicle(Vector3.Near(player.Position), model);
-            player.Game.AddVehicle(vehicle);
+            Vehicle.AddVehicle(vehicle);
             vehicle.Spawn();
             player.Inventory.AddItem(1000, 1, vehicle.Lock.Code);
             return new CmdReturn("Vous avez fait apparaitre un véhicule", CmdReturn.CmdReturnType.SUCCESS);
@@ -38,7 +38,6 @@ namespace Lambda.Commands
             Vehicle veh = player.Vehicle;
             if (veh == null) return CmdReturn.NotInVehicle;
             veh.Park();
-            player.Game.DbVehicle.Save(veh);
             return new CmdReturn("Vous avez sauvegardé un véhicule", CmdReturn.CmdReturnType.SUCCESS);
         }
 
@@ -69,7 +68,8 @@ namespace Lambda.Commands
         {
             Vehicle veh = player.Vehicle;
             if (veh == null) return CmdReturn.NotInVehicle;
-            player.Game.RemoveVehicle(veh);
+            veh.Remove();
+            if (veh.Id != 0) veh.Delete();
             return new CmdReturn("Vous avez supprimé un véhicule", CmdReturn.CmdReturnType.SUCCESS);
         }
 
@@ -78,6 +78,7 @@ namespace Lambda.Commands
         public static CmdReturn Vehicule_Clef(Player player, object[] argv)
         {
             Vehicle vehicle = player.Vehicle;
+            Alt.Log("");
             if (vehicle == null) return CmdReturn.NotInVehicle;
             if (!player.HaveKeyOf(vehicle.Lock.Code)) return new CmdReturn("Vous n'avez pas les clés", CmdReturn.CmdReturnType.WARNING);
             if (vehicle.GetEngine())
@@ -151,7 +152,7 @@ namespace Lambda.Commands
         {
             Vehicle vehicle = player.Vehicle;
             if (vehicle == null) return CmdReturn.NotInVehicle;
-            Player pla = player.Game.GetPlayerByDbId(vehicle.GetOwnerId());
+            Player pla = Player.GetPlayerByDbId(vehicle.GetOwnerId());
             Alt.Log(vehicle.Rotation + "");
             if (pla == null) return new CmdReturn("Le proprio n'est pas co @" + vehicle.GetOwnerId());
             else return new CmdReturn($"[{vehicle.GetOwnerId()}]{pla.Name} est le proprietaire du véhicule. Serrure : {vehicle.Lock.Code}");

@@ -6,23 +6,17 @@ using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Items;
 using Lambda.Administration;
+using Lambda.Database;
 using Player = Lambda.Entity.Player;
 using Vehicle = Lambda.Entity.Vehicle;
 
 namespace Lambda
 {
-    class Events
+    static class Events
     {
 
-        private Game game;
 
-        public Events(Game g)
-        {
-            game = g;
-            RegisterEvents();
-        }
-
-        public void RegisterEvents()
+        public static void RegisterEvents()
         {
             Alt.OnPlayerConnect += OnPlayerConnect;
             Alt.Log("[EVENT] OnPlayerConnect registered");
@@ -38,69 +32,69 @@ namespace Lambda
             Alt.OnPlayerLeaveVehicle += OnVehicleLeave;
         }
 
-        public void OnPlayerConnect(IPlayer altPlayer, string reason)
+        public static void OnPlayerConnect(IPlayer altPlayer, string reason)
         {
 
         }
 
-        private void OnPlayerDisconnect(IPlayer altPlayer, string reason)
-        {
-            altPlayer.GetData("player", out Player player);
-
-            //game.DbPlayer.Save(player);
-            game.RemovePlayer(player);
-        }
-
-        private void OnPlayerDead(IPlayer altPlayer, AltV.Net.Elements.Entities.IEntity killer, uint nbr)
+        private static void OnPlayerDisconnect(IPlayer altPlayer, string reason)
         {
             altPlayer.GetData("player", out Player player);
-            player?.Spawn(game.GetSpawn(0).Position);
+            player.Remove();
         }
 
-        public void OnVehicleRemove(IVehicle vehicle)
+        private static void OnPlayerDead(IPlayer altPlayer, AltV.Net.Elements.Entities.IEntity killer, uint nbr)
+        {
+            altPlayer.GetData("player", out Player player);
+            player?.Spawn(Spawn.NewSpawn.Position);
+        }
+
+        public static void OnVehicleRemove(IVehicle vehicle)
         {
             //vehicle.GetData("AltVehicle", out Vehicle veh);
             //veh?.Spawn();
         }
 
-        public void OnVehicleEnter(IVehicle altVehicle, IPlayer altPlayer, byte seat)
+        public static void OnVehicleEnter(IVehicle altVehicle, IPlayer altPlayer, byte seat)
         {
             altVehicle.GetData("vehicle", out Vehicle vehicle);
-            game.VoiceChannel.RemovePlayer(altPlayer);
+            Player.VoiceChannel.RemovePlayer(altPlayer);
             vehicle.VoiceChannel.AddPlayer(altPlayer);
         }
 
-        public void OnVehicleLeave(IVehicle altVehicle, IPlayer altPlayer, byte seat)
+        public static void OnVehicleLeave(IVehicle altVehicle, IPlayer altPlayer, byte seat)
         {
             altVehicle.GetData("vehicle", out Vehicle vehicle);
             if (vehicle == null) return;
-            game.VoiceChannel.AddPlayer(altPlayer);
+            Player.VoiceChannel.AddPlayer(altPlayer);
             vehicle.VoiceChannel.RemovePlayer(altPlayer);
         }
 
-        public void OnPlayerSetLicenseHash(IPlayer altPlayer, object[] args)
+        public static void OnPlayerSetLicenseHash(IPlayer altPlayer, object[] args)
         {
-            Alt.Log("License set to " + (string)args[0]);
-            altPlayer.SetData("license", (string)args[0]);
-            Player player = new Player(altPlayer, game);
-            player.Spawn(game.GetSpawn(0).Position);
+            string license = (string)args[0];
+            Alt.Log("License set to " + license);
+            altPlayer.SetData("license", license);
+            Player player = new Player(altPlayer);
+            player.Spawn(Spawn.NewSpawn.Position);
             player.Freeze(false);
-            Account account = game.DbAccount.Get(player.license);
+            Account account = new Account(license);
+            account = DatabaseElement.Get<Account>(account, "acc_license", license);
             if (account != null)
             {
-                game.DbPlayer.Get(account, player);
+                DatabaseElement.Get<Player>(player, "acc_id", account.Id.ToString());
                 player.Account = account;
             }
             else
             {
                 player.Account = new Account(player.license);
-                game.DbPlayer.Save(player);
+                _ = player.SaveAsync();
 
             }
 
 
             Alt.Log($"[{player.ServerId}]{player.Name} c'est connécté.");
-            game.AddPlayer(player);
+            Player.AddPlayer(player);
             Alt.Log("Skin chargement");
             player.GetSkin().SendModel(player);
             player.GetSkin().SendSkin(player);

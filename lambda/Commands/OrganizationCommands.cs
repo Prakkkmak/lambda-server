@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Lambda.Database;
 using Lambda.Entity;
 using Lambda.Organizations;
 
@@ -14,8 +15,8 @@ namespace Lambda.Commands
         public static CmdReturn Organisation_Creer(Player player, object[] argv)
         {
             Organization org = new Organization((string)argv[0]);
-            player.Game.AddOrganization(org);
-            player.Game.DbOrganization.Save(org);
+            Organization.AddOrganization(org);
+            org.Save();
             return new CmdReturn("Vous avez créé une organisation !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.ORGANIZATION, 1)]
@@ -23,15 +24,15 @@ namespace Lambda.Commands
         [SyntaxType(typeof(Organization))]
         public static CmdReturn Organisation_Supprimer(Player player, object[] argv)
         {
-            player.Game.RemoveOrganization((Organization)argv[0]);
-
+            Organization org = (Organization)argv[0];
+            org.Remove();
             return new CmdReturn("Vous avez supprimé une organisation !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.ORGANIZATION)]
         public static CmdReturn Organisation_Liste(Player player, object[] argv)
         {
             string txt = "Voici la liste des organisations: ";
-            foreach (Organization organization in player.Game.GetOrganizations())
+            foreach (Organization organization in Organization.Organizations)
             {
                 txt += $"{organization.Id}: {organization.Name} <br>";
             }
@@ -46,7 +47,7 @@ namespace Lambda.Commands
             Organization org = (Organization)argv[0];
             Player target = (Player)argv[1];
             org.AddMember(target);
-            player.Game.DbOrganization.Save(org);
+            org.Save();
             target.SendMessage($"Vous avez été ajouté a l'organisation {org.Name}.");
             return new CmdReturn($"Vous avez ajouté {target.Name} à une organisation", CmdReturn.CmdReturnType.SUCCESS);
         }
@@ -81,15 +82,15 @@ namespace Lambda.Commands
                 str = $"=> {organization.Name} : <br>";
                 foreach (Member member in organization.GetMembers())
                 {
-                    Player[] players = player.Game.GetPlayers(member.Id.ToString());
+                    Player[] players = Player.GetPlayers(member.Id.ToString());
                     if (players.Length > 0)
                     {
                         str += $"{member.Id} {players[0].Name} (Online)<br>";
                     }
                     else
                     {
-                        string name = player.Game.DbPlayer.Get(member.Id).Name;
-                        str += $"{member.Id} {name} <br>";
+                        //string name = DatabaseElement.Get<Player>(member.Id)["cha_name"];
+                        //str += $"{member.Id} {name} <br>";
                     }
                 }
             }
@@ -102,7 +103,8 @@ namespace Lambda.Commands
         {
             Organization org = (Organization)argv[0];
             if (org.GetMember(player.Id) == null) return CmdReturn.NotInOrg;
-            player.Game.DbRank.Save(org.AddRank((string)argv[1]));
+            Rank rank = org.AddRank((string)argv[1]);
+            _ = rank.SaveAsync();
             return new CmdReturn("Vous avez rajouté un rang", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.ORGANIZATION, 3)]
@@ -115,7 +117,7 @@ namespace Lambda.Commands
             string name = (string)argv[2];
             if (rank == null) return new CmdReturn("Ce rang n existe pas", CmdReturn.CmdReturnType.WARNING);
             rank.Name = name;
-            player.Game.DbRank.Save(rank);
+            _ = rank.SaveAsync();
             return new CmdReturn("Vous avez renommé un rang !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.ORGANIZATION, 2)]
@@ -126,7 +128,7 @@ namespace Lambda.Commands
             Organization org = (Organization)argv[0];
             Rank rank = (Rank)argv[1];
             org.DefaultRank = rank;
-            player.Game.DbOrganization.Save(org);
+            _ = org.SaveAsync();
             return new CmdReturn("Vous avez changé le rang par défaut!", CmdReturn.CmdReturnType.SUCCESS);
 
         }
@@ -138,9 +140,8 @@ namespace Lambda.Commands
             Organization org = (Organization)argv[0];
             Rank rank = (Rank)argv[1];
             org.RemoveRank(rank);
-            player.Game.DbOrganization.Save(org);
-            return new CmdReturn("Vous avez changé le rang par défaut!", CmdReturn.CmdReturnType.SUCCESS);
-
+            _ = org.SaveAsync();
+            return new CmdReturn("Vous avez changé supprimé un rang!", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.ORGANIZATION)]
         public static CmdReturn Organisation_Inviter(Player player, object[] argv)
