@@ -15,53 +15,42 @@ namespace Lambda.Organizations
     {
         public uint Id { get; set; }
 
-
-        public string Name;
-        public Rank DefaultRank { get; set; }
-        private List<Rank> ranks; // ranks in this organization
-
-        private List<Member> members;
+        public string Name = "";
 
         public Permissions Permissions = new Permissions();
 
-        public Organization()
-        {
-            Id = 0;
-            Name = "";
-            ranks = new List<Rank>();
-            members = new List<Member>();
-            Rank r = new Rank(this);
-            Permissions.Add("LEADER");
-            DefaultRank = r;
-            ranks.Add(r);
-        }
+        private List<Rank> ranks = new List<Rank>();
+        private List<Member> members = new List<Member>();
 
-        public Organization(string name) : this()
+
+
+        public Organization(string name)
         {
             this.Name = name;
-
         }
 
-        public Member AddMember(Player player)
+        public void Rename(string name)
         {
-            if (members.Any(member => member.Id == player.Id)) return null;
-            Member m = new Member(player.Id, DefaultRank);
-            members.Add(m);
-            return m;
+            this.Name = name;
+            _ = this.SaveAsync();
         }
+
         public Member AddMember(Player player, Rank rank)
         {
             if (members.Any(member => member.Id == player.Id)) return null;
             Member m = new Member(player.Id, rank);
+            m.Name = player.Name;
             members.Add(m);
             return m;
         }
-        public void AddMember(uint id, uint rankid)
+        public Member AddMember(uint id, uint rankid)
         {
-            if (members.Any(member => member.Id == id)) return;
+            if (members.Any(member => member.Id == id)) return null;
             Rank rank = GetRank(rankid);
-            if (rank == null) return;
-            members.Add(new Member(id, rank));
+            if (rank == null) return null;
+            Member m = new Member(id, rank);
+            members.Add(m);
+            return m;
         }
 
         public Member GetMember(uint id)
@@ -87,6 +76,7 @@ namespace Lambda.Organizations
         {
             Rank r = new Rank(this, name);
             ranks.Add(r);
+            _ = r.SaveAsync();
             return r;
         }
 
@@ -116,6 +106,7 @@ namespace Lambda.Organizations
         public void RemoveRank(Rank rank)
         {
             ranks.Remove(rank);
+            _ = rank.DeleteAsync();
         }
 
         public Rank[] GetRanks()
@@ -130,7 +121,9 @@ namespace Lambda.Organizations
             {
                 string[] result = data.Split(":");
                 if (result.Length < 2) return;
-                AddMember(uint.Parse(result[0]), uint.Parse(result[1]));
+                Member member = AddMember(uint.Parse(result[0]), uint.Parse(result[1]));
+                if (member != null) member.Name = DatabaseElement.Get<Player>(member.Id)["cha_firstname"] + " " +
+                                DatabaseElement.Get<Player>(member.Id)["cha_lastname"];
             }
         }
         public string GetMembersMetadata()
@@ -191,15 +184,27 @@ namespace Lambda.Organizations
             {
                 await rank.SaveAsync();
             }
+
             Alt.Log("Organization Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
 
         }
 
-        public Task DeleteAsync()
+        public async Task DeleteAsync()
         {
-            throw new NotImplementedException();
+            foreach (Rank rank in GetRanks())
+            {
+                await rank.DeleteAsync();
+            }
+            _ = DatabaseElement.DeleteAsync(this);
         }
 
+        public static Organization CreateOrganization(string name)
+        {
+            Organization o = new Organization(name);
+            Organizations.Add(o);
+            _ = o.SaveAsync();
+            return o;
+        }
 
         public static void LoadOrganizations()
         {

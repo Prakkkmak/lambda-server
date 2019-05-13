@@ -33,11 +33,11 @@ namespace Lambda.Organizations
             Name = name;
         }
 
-        public bool IsDefault()
+        public void Rename(string name)
         {
-            return Organization.DefaultRank == this;
+            Name = name;
+            _ = SaveAsync();
         }
-
 
         public Dictionary<string, string> GetData()
         {
@@ -45,7 +45,6 @@ namespace Lambda.Organizations
             //data["ran_id"] = vehicle.Model.ToString();
             data["ran_name"] = Name;
             data["ran_salary"] = Salary.ToString();
-            data["ran_default"] = (IsDefault() ? 1 : 0).ToString();
             data["org_id"] = Organization.Id.ToString();
             data["ran_permissions"] = Permissions.ToString();
             return data;
@@ -77,9 +76,9 @@ namespace Lambda.Organizations
             Alt.Log("Rank Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }
 
-        public Task DeleteAsync()
+        public async Task DeleteAsync()
         {
-            throw new NotImplementedException();
+            await DatabaseElement.DeleteAsync(this);
         }
     }
 }

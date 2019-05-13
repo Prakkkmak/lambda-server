@@ -202,32 +202,7 @@ namespace Lambda.Commands
             _ = org.SaveAsync();
             return new CmdReturn("Vous avez créé un leader");
         }
-        [Permission("LEADER")]
-        [Status(Command.CommandStatus.NEW)]
-        [Command(Command.CommandType.TEST, 2)]
-        [Syntax("Organization", "Joueur")]
-        [SyntaxType(typeof(Organization), typeof(Player))]
-        public static CmdReturn Inviter(Player player, object[] argv)
-        {
-            Organization org = (Organization)argv[0];
-            Player player2 = (Player)argv[1];
-            Request request = new Request(player2, "Don", $"{player.Name} veux vous inviter dans son organisation", player);
-            request.AddAnswer("Accepter", (sender, receiver) =>
-            {
-                org.AddMember(receiver);
-                sender.SendMessage("Machin a accepter la demande");
-            });
-            request.AddAnswer("Refuser", (sender, receiver) =>
-            {
-                sender.SendMessage($"{receiver.Name} a refusé votre demande");
-            });
-            request.Condition = (sender, receiver) =>
-            {
-                return true;
-            };
-            player2.SendRequest(request);
-            return new CmdReturn("Vous avez fait une leader");
-        }
+
     }
 }
 

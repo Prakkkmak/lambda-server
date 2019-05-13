@@ -7,12 +7,8 @@ namespace Lambda.Organizations
     public class Member
     {
         public uint Id;
+        public string Name = "";
         public Rank Rank;
-
-        public Member()
-        {
-
-        }
 
         public Member(uint id, Rank rank)
         {

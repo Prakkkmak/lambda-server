@@ -135,6 +135,14 @@ namespace Lambda.Database
             where[index] = entity.Id.ToString();
             DbConnect.Delete(tableName, where);
         }
+        public static async Task DeleteAsync<T>(T entity) where T : IDBElement
+        {
+            string tableName = GetTableName(typeof(T));
+            Dictionary<string, string> where = new Dictionary<string, string>();
+            string index = GetPrefix(tableName) + "_id";
+            where[index] = entity.Id.ToString();
+            await DbConnect.DeleteAsync(tableName, where);
+        }
 
         public static BaseItem[] GetAllBaseItems()
         {
@@ -236,7 +244,7 @@ namespace Lambda.Database
             List<Dictionary<string, string>> results = DbConnect.Select(tableName, new Dictionary<string, string>());
             foreach (Dictionary<string, string> result in results)
             {
-                Organization organization = new Organization();
+                Organization organization = new Organization("babar");
                 organization.SetData(result);
                 organization.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
                 organizations.Add(organization);
@@ -258,10 +266,6 @@ namespace Lambda.Database
                 rank.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
                 ranks.Add(rank);
                 //rank.Organization = organization;
-                if (result[GetPrefix(tableName) + "_default"] == "1")
-                {
-                    organization.DefaultRank = rank;
-                }
             }
 
             return ranks.ToArray();
@@ -290,8 +294,8 @@ namespace Lambda.Database
         {
             throw new NotImplementedException();
         }
-        
-        
+
+
 
         public void UpdateAll(T[] entity)
         {

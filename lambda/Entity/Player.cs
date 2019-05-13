@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AltV.Net;
+using AltV.Net.Async.Events;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
 using Items;
@@ -501,6 +502,16 @@ namespace Lambda.Entity
                 else if (player.Name.ToLower().StartsWith(nameOrId.ToLower())) players.Add(player);
             }
             return players.ToArray();
+        }
+
+        public static Player GetPlayer(uint databaseid)
+        {
+            foreach (Player player in Players)
+            {
+                if (player.Id == databaseid) return player;
+            }
+
+            return null;
         }
 
         public static IVoiceChannel VoiceChannel = Alt.CreateVoiceChannel(true, 15);

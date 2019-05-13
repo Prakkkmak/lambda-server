@@ -156,6 +156,16 @@ namespace Lambda.Database
             return rowsAffected;
         }
 
+        public async Task<int> DeleteAsync(string table, Dictionary<string, string> wheres)
+        {
+            MySqlConnection connection = OpenConnection();
+            string query = DataToDeleteQuery(table, wheres);
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            int rowsAffected = await cmd.ExecuteNonQueryAsync();
+            CloseConnection(connection);
+            return rowsAffected;
+        }
+
         /// <summary>
         /// Select the first item of a qurty result
         /// </summary>

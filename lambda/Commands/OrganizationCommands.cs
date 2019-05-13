@@ -46,7 +46,7 @@ namespace Lambda.Commands
         {
             Organization org = (Organization)argv[0];
             Player target = (Player)argv[1];
-            org.AddMember(target);
+            //org.AddMember(target);
             org.Save();
             target.SendMessage($"Vous avez été ajouté a l'organisation {org.Name}.");
             return new CmdReturn($"Vous avez ajouté {target.Name} à une organisation", CmdReturn.CmdReturnType.SUCCESS);
@@ -82,10 +82,10 @@ namespace Lambda.Commands
                 str = $"=> {organization.Name} : <br>";
                 foreach (Member member in organization.GetMembers())
                 {
-                    Player[] players = Player.GetPlayers(member.Id.ToString());
-                    if (players.Length > 0)
+                    Player player2 = Player.GetPlayer(member.Id);
+                    if (player2 != null)
                     {
-                        str += $"{member.Id} {players[0].Name} (Online)<br>";
+                        str += $"{member.Rank.Name} - {player2.ServerId} {player2.Name} (Online)<br>";
                     }
                     else
                     {
@@ -123,25 +123,13 @@ namespace Lambda.Commands
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Rang")]
         [SyntaxType(typeof(Organization), typeof(Rank))]
-        public static CmdReturn Organisation_Rang_Default(Player player, object[] argv)
-        {
-            Organization org = (Organization)argv[0];
-            Rank rank = (Rank)argv[1];
-            org.DefaultRank = rank;
-            _ = org.SaveAsync();
-            return new CmdReturn("Vous avez changé le rang par défaut!", CmdReturn.CmdReturnType.SUCCESS);
-
-        }
-        [Command(Command.CommandType.ORGANIZATION, 2)]
-        [Syntax("Organisation", "Rang")]
-        [SyntaxType(typeof(Organization), typeof(Rank))]
         public static CmdReturn Organisation_Rang_Supprimer(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             Rank rank = (Rank)argv[1];
             org.RemoveRank(rank);
             _ = org.SaveAsync();
-            return new CmdReturn("Vous avez changé supprimé un rang!", CmdReturn.CmdReturnType.SUCCESS);
+            return new CmdReturn("Vous avez supprimé un rang!", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.ORGANIZATION)]
         public static CmdReturn Organisation_Inviter(Player player, object[] argv)
