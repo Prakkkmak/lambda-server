@@ -40,16 +40,16 @@ namespace Lambda.Commands
             if (p == player) return new CmdReturn("Vous ne pouvez pas vous cibler vous meme", CmdReturn.CmdReturnType.WARNING);
             if (p.GetRequest() != null) return CmdReturn.RequestBusy;
             if (item.Amount < amount) return new CmdReturn("Vous n'avez pas assez d'objets", CmdReturn.CmdReturnType.WARNING);
-            Request request = new Request(p, "Don", $"{player.Name} veux vous donner un objet", player);
+            Request request = new Request(p, "Don", $"{player.FullName} veux vous donner un objet", player);
             request.AddAnswer("Accepter", (sender, receiver) =>
             {
-                sender.SendMessage($"{receiver.Name} a accepté votre demande");
+                sender.SendMessage($"{receiver.FullName} a accepté votre demande");
                 sender.Inventory.RemoveItem(item.GetBaseItem().Id, amount);
                 receiver.Inventory.AddItem(item.GetBaseItem().Id, amount);
             });
             request.AddAnswer("Refuser", (sender, receiver) =>
             {
-                sender.SendMessage($"{receiver.Name} a refusé votre demande");
+                sender.SendMessage($"{receiver.FullName} a refusé votre demande");
             });
             request.Condition = (sender, receiver) =>
             {

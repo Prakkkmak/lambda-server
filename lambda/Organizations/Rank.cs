@@ -13,7 +13,7 @@ namespace Lambda.Organizations
         public uint Id { get; set; }
 
         public string Name;
-        public uint Salary;
+        public long Salary;
         public Organization Organization;
         public Permissions Permissions = new Permissions();
 
@@ -36,6 +36,12 @@ namespace Lambda.Organizations
         public void Rename(string name)
         {
             Name = name;
+            _ = SaveAsync();
+        }
+
+        public void ChangeSalary(long salary)
+        {
+            Salary = salary;
             _ = SaveAsync();
         }
 

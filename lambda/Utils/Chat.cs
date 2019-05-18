@@ -18,24 +18,26 @@ namespace Lambda.Utils
 
         public static void OnClientChatMessage(IPlayer altPlayer, object[] args)
         {
+            Alt.Log("TEST");
             string msg = (string)args[0];
             if (string.IsNullOrWhiteSpace(msg)) return;
-            if (altPlayer.GetData("player", out Player player))
+            Player player = (Player)altPlayer;
+            if (player != null)
             {
                 if (msg[0] == '/')
                 {
-                    Alt.Log($"[chat:cmd] {player.Name}:{msg}");
+                    Alt.Log($"[chat:cmd] {player.FullName}:{msg}");
                     InvokeCmd(player, msg);
                 }
                 else if (msg[0] == '!')
                 {
-                    Alt.Log($"[chat:cmd] {player.Name}:{msg}");
+                    Alt.Log($"[chat:cmd] {player.FullName}:{msg}");
                     InvokeCmd(player, msg, false);
                 }
                 else
                 {
 
-                    Alt.Log($"[chat:msg] {player.Name}:{msg}");
+                    Alt.Log($"[chat:msg] {player.FullName}:{msg}");
                     SendInRange(player, 20, msg);
                 }
             }
@@ -88,7 +90,7 @@ namespace Lambda.Utils
         public static void Send(Player player, string msg)
         {
             if (string.IsNullOrWhiteSpace(msg)) return;
-            player.AltPlayer.Emit("chatmessage", null, msg);
+            player.Emit("chatmessage", null, msg);
         }
 
         public static void SendInRange(Player player, int range, string msg, bool named = true)
@@ -97,7 +99,7 @@ namespace Lambda.Utils
             {
                 if (player.Position.Distance(player2.Position) < range)
                 {
-                    player2.AltPlayer.Emit("chatmessage", named ? player.Name : null, msg);
+                    player2.Emit("chatmessage", named ? player.FullName : null, msg);
                 }
             }
 

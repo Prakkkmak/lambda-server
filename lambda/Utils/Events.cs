@@ -34,19 +34,19 @@ namespace Lambda
 
         public static void OnPlayerConnect(IPlayer altPlayer, string reason)
         {
-
+            Player pl = (Player)altPlayer;
         }
 
         private static void OnPlayerDisconnect(IPlayer altPlayer, string reason)
         {
-            altPlayer.GetData("player", out Player player);
+            Player player = (Player)altPlayer;
             player.Remove();
         }
 
         private static void OnPlayerDead(IPlayer altPlayer, AltV.Net.Elements.Entities.IEntity killer, uint nbr)
         {
-            altPlayer.GetData("player", out Player player);
-            player?.Spawn(Spawn.NewSpawn.Position);
+            Player player = (Player)altPlayer;
+            player.Spawn(Spawn.NewSpawn.Position);
         }
 
         public static void OnVehicleRemove(IVehicle vehicle)
@@ -57,7 +57,7 @@ namespace Lambda
 
         public static void OnVehicleEnter(IVehicle altVehicle, IPlayer altPlayer, byte seat)
         {
-            altVehicle.GetData("vehicle", out Vehicle vehicle);
+            Vehicle vehicle = (Vehicle)altVehicle;
             Player.VoiceChannel.RemovePlayer(altPlayer);
             vehicle.VoiceChannel.AddPlayer(altPlayer);
         }
@@ -72,10 +72,11 @@ namespace Lambda
 
         public static void OnPlayerSetLicenseHash(IPlayer altPlayer, object[] args)
         {
+            Player player = (Player)altPlayer;
             string license = (string)args[0];
             Alt.Log("License set to " + license);
             altPlayer.SetData("license", license);
-            Player player = new Player(altPlayer);
+
             player.Spawn(Spawn.NewSpawn.Position);
             player.Freeze(false);
             Account account = new Account(license);
@@ -87,13 +88,13 @@ namespace Lambda
             }
             else
             {
-                player.Account = new Account(player.license);
+                player.Account = new Account(player.License);
                 _ = player.SaveAsync();
 
             }
 
 
-            Alt.Log($"[{player.ServerId}]{player.Name} c'est connécté.");
+            Alt.Log($"[{player.ServerId}]{player.FullName} c'est connécté.");
             Player.AddPlayer(player);
             Alt.Log("Skin chargement");
             player.GetSkin().SendModel(player);

@@ -3,6 +3,7 @@ using AltV.Net;
 using AltV.Net.Async;
 using AltV.Net.Data;
 using AltV.Net.Elements.Entities;
+using AltV.Net.Elements.Factories;
 using AltV.Net.Enums;
 using Items;
 using Lambda.Administration;
@@ -15,11 +16,15 @@ using Lambda.Utils;
 using IEntity = AltV.Net.Elements.Entities.IEntity;
 using Player = Lambda.Entity.Player;
 using Vehicle = Lambda.Entity.Vehicle;
+using VehicleFactory = Lambda.FactoryStuff.VehicleFactory;
+using PlayerFactory = Lambda.FactoryStuff.PlayerFactory;
 
 namespace Lambda
 {
     public class Main : Resource
     {
+
+
 
         public Main()
         {
@@ -83,9 +88,15 @@ namespace Lambda
             Alt.Log("Stopping ...");
         }
 
+        public override IEntityFactory<IVehicle> GetVehicleFactory()
+        {
+            return new VehicleFactory();
+        }
 
-
-
+        public override IEntityFactory<IPlayer> GetPlayerFactory()
+        {
+            return new PlayerFactory();
+        }
 
 
 

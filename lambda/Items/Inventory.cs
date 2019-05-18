@@ -115,6 +115,8 @@ namespace Lambda.Items
 
             }
 
+            _ = SaveAsync();
+
         }
 
         public void TransferItem(Item item, Inventory inventory)
@@ -154,7 +156,12 @@ namespace Lambda.Items
 
         public void Clear()
         {
+            foreach (Item item in Items)
+            {
+                item.DeleteAsync();
+            }
             Items = new List<Item>();
+            _ = SaveAsync();
         }
 
         public Dictionary<string, string> GetData()

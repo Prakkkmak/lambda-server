@@ -39,8 +39,9 @@ namespace Lambda.Organizations
         {
             if (members.Any(member => member.Id == player.Id)) return null;
             Member m = new Member(player.Id, rank);
-            m.Name = player.Name;
+            m.Name = player.FullName;
             members.Add(m);
+            _ = SaveAsync();
             return m;
         }
         public Member AddMember(uint id, uint rankid)
@@ -50,7 +51,12 @@ namespace Lambda.Organizations
             if (rank == null) return null;
             Member m = new Member(id, rank);
             members.Add(m);
+            _ = SaveAsync();
             return m;
+        }
+        public void AddMember(Member member)
+        {
+            members.Add(member);
         }
 
         public Member GetMember(uint id)
@@ -62,9 +68,33 @@ namespace Lambda.Organizations
 
             return null;
         }
+
+        public Member[] GetMembers(string name)
+        {
+            List<Member> members = new List<Member>();
+            foreach (Member member in GetMembers())
+            {
+                if (member.Id.ToString().Equals(name)) members.Add(member);
+                else if (member.Name.ToLower().StartsWith(name.ToLower())) members.Add(member);
+            }
+            return members.ToArray();
+        }
         public Member[] GetMembers()
         {
             return members.ToArray();
+        }
+
+        public void RemoveMember(Member member)
+        {
+            members.Remove(member);
+            _ = SaveAsync();
+        }
+
+        public void ChangeMemberRank(Member member, Rank rank)
+        {
+            member.Rank = rank;
+            _ = SaveAsync();
+
         }
 
         public void AddRank(Rank rank)
@@ -98,7 +128,8 @@ namespace Lambda.Organizations
             List<Rank> rs = new List<Rank>();
             foreach (Rank rank in this.ranks)
             {
-                if (ranks.IndexOf(rank).ToString().Equals(name) || rank.Name.Replace(" ", "_").Equals(name)) rs.Add(rank);
+                if (ranks.IndexOf(rank).ToString().Equals(name) ||
+                    rank.Name.Replace(" ", "_").ToLower().Equals(name.ToLower())) rs.Add(rank);
             }
             return rs.ToArray();
 
@@ -114,34 +145,13 @@ namespace Lambda.Organizations
             return ranks.ToArray();
         }
 
-        public void SetMembers(string metadata)
-        {
-            string[] datas = metadata.Split(",");
-            foreach (string data in datas)
-            {
-                string[] result = data.Split(":");
-                if (result.Length < 2) return;
-                Member member = AddMember(uint.Parse(result[0]), uint.Parse(result[1]));
-                if (member != null) member.Name = DatabaseElement.Get<Player>(member.Id)["cha_firstname"] + " " +
-                                DatabaseElement.Get<Player>(member.Id)["cha_lastname"];
-            }
-        }
-        public string GetMembersMetadata()
-        {
-            string str = "";
-            foreach (Member member in members)
-            {
-                str += $"{member.Id}:{member.Rank.Id},";
-            }
 
-            return str;
-        }
 
         public Dictionary<string, string> GetData()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
             data["org_name"] = Name;
-            data["org_members"] = GetMembersMetadata();
+
             data["org_permissions"] = Permissions.ToString();
             return data;
         }
@@ -149,7 +159,6 @@ namespace Lambda.Organizations
         public void SetData(Dictionary<string, string> data)
         {
             Name = data["org_name"];
-            SetMembers(data["org_members"]);
             Permissions.Set(data["org_permissions"]);
         }
 
@@ -161,6 +170,10 @@ namespace Lambda.Organizations
             foreach (Rank rank in GetRanks())
             {
                 DatabaseElement.Save(rank);
+            }
+            foreach (Member member in GetMembers())
+            {
+                member.Save();
             }
             Alt.Log("Organization Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }
@@ -185,6 +198,10 @@ namespace Lambda.Organizations
                 await rank.SaveAsync();
             }
 
+            foreach (Member member in GetMembers())
+            {
+                await member.SaveAsync();
+            }
             Alt.Log("Organization Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
 
         }
@@ -215,6 +232,11 @@ namespace Lambda.Organizations
                 foreach (Rank rank in ranks)
                 {
                     organization.AddRank(rank);
+                    Member[] members = DatabaseElement.GetAllMembers(rank);
+                    foreach (Member member in members)
+                    {
+                        organization.AddMember(member);
+                    }
                 }
             }
         }
@@ -227,7 +249,8 @@ namespace Lambda.Organizations
             List<Organization> orgs = new List<Organization>();
             foreach (Organization organization in Organizations)
             {
-                if (organization.Id.ToString().Equals(name) || organization.Name.Replace(" ", "_").Equals(name)) orgs.Add(organization);
+                if (organization.Id.ToString().Equals(name) ||
+                    organization.Name.Replace(" ", "_").ToLower().Equals(name.ToLower())) orgs.Add(organization);
             }
             return orgs.ToArray();
         }

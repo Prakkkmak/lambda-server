@@ -51,7 +51,11 @@ namespace Lambda.Administration
 
         public void Set(string str)
         {
-            permissions = str.Split(",").ToList();
+            List<string> arr = str.Split(",").ToList();
+            foreach (string s in arr)
+            {
+                if (!string.IsNullOrWhiteSpace(s)) permissions.Add(s);
+            }
         }
 
         public override string ToString()
@@ -61,6 +65,7 @@ namespace Lambda.Administration
             {
                 str += permission + ",";
             }
+            if (str.Length > 0) str = str.Remove(str.Length - 1);
             return str;
         }
 
@@ -68,7 +73,7 @@ namespace Lambda.Administration
         {
             foreach (string s in CommandsPermissions)
             {
-                if (s.StartsWith(s + "_") || s.Equals(permission)) return true;
+                if (s.ToUpper().StartsWith(permission.ToUpper() + "_") || s.ToUpper().Equals(permission.ToUpper())) return true;
             }
             return false;
         }

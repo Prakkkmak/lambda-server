@@ -38,6 +38,12 @@ namespace Lambda.Commands
             if (players.Length < 1) return new CmdReturn("Aucun joueur trouvé", CmdReturnType.WARNING);
             return new CmdReturn("Player trouvé", CmdReturnType.SUCCESS);
         }
+        public static CmdReturn OnlyOneMember(Member[] members)
+        {
+            if (members.Length > 1) return new CmdReturn("Plusieurs membres ont le même nom; specifiez", CmdReturnType.WARNING);
+            if (members.Length < 1) return new CmdReturn("Aucun membre trouvé", CmdReturnType.WARNING);
+            return new CmdReturn("membres trouvé", CmdReturnType.SUCCESS);
+        }
         public static CmdReturn OnlyOneOrganization(Organization[] orgs)
         {
             if (orgs.Length > 1) return new CmdReturn("Plusieurs organisations ont le même nom; specifiez", CmdReturnType.WARNING);

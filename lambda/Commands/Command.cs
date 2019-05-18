@@ -79,7 +79,6 @@ namespace Lambda.Commands
             parametersString = RemoveCommandName(parametersString);
             CmdReturn result = ConvertParamameters(player, parametersString, out object[] parameters);
             if (result.Type != CmdReturn.CmdReturnType.SUCCESS) return result;
-            player.SendMessage("PERM : " + permission + " ? " + player.Permissions.Contains(permission));
             if (!string.IsNullOrWhiteSpace(permission) && !player.Permissions.Contains(permission)) return new CmdReturn("Pas permission");
             _ = player.SaveAsync();
             CmdReturn cmdReturn = action(player, parameters); // Launch the command
@@ -156,7 +155,16 @@ namespace Lambda.Commands
                     CmdReturn cmdReturn = CmdReturn.OnlyOneRank(ranks);
                     if (cmdReturn.Type != CmdReturn.CmdReturnType.SUCCESS) return cmdReturn;
                     result[i] = ranks[0];
-
+                }
+                else if (syntaxTypes[i] == typeof(Member))
+                {
+                    if (i <= 0 || syntaxTypes[i - 1] != typeof(Organization)) return CmdReturn.NotExceptedError;
+                    Organization org = (Organization)result[i - 1];
+                    string charName = parameters[i];
+                    Member[] members = org.GetMembers(charName);
+                    CmdReturn cmdReturn = CmdReturn.OnlyOneMember(members);
+                    if (cmdReturn.Type != CmdReturn.CmdReturnType.SUCCESS) return cmdReturn;
+                    result[i] = members[0];
                 }
                 else if (syntaxTypes[i] == typeof(Interior))
                 {

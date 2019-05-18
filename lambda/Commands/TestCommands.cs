@@ -45,7 +45,7 @@ namespace Lambda.Commands
         [SyntaxType(typeof(string))]
         public static CmdReturn Vehicule_Lockstate(Player player, object[] argv)
         {
-            Vehicle vehicle = player.Vehicle;
+            Vehicle vehicle = (Vehicle)player.Vehicle;
             if (vehicle == null) return CmdReturn.NotInVehicle;
             if (!Enum.TryParse((string)argv[0], true, out VehicleLockState lockstate))
             {
@@ -54,7 +54,7 @@ namespace Lambda.Commands
 
             if (!Enum.IsDefined(typeof(VehicleLockState), lockstate))
                 return new CmdReturn("State incorrect", CmdReturn.CmdReturnType.WARNING);
-            vehicle.SetLock(lockstate);
+            vehicle.LockState = lockstate;
             return new CmdReturn("Vous avez changé letat du lock");
         }
 
@@ -134,7 +134,7 @@ namespace Lambda.Commands
         [SyntaxType(typeof(string), typeof(string))]
         public static CmdReturn specificanim(Player player, object[] argv)
         {
-            player.AltPlayer.Emit("playAnim", argv);
+            player.Emit("playAnim", argv);
             return new CmdReturn("anim?");
         }
 
@@ -147,62 +147,56 @@ namespace Lambda.Commands
             uint index = (uint)argv[0];
             if (Anim.Anims.Length <= index) return CmdReturn.InvalidParameters;
             Anim anim = Anim.Anims[index];
-            player.AltPlayer.Emit("playAnim", anim.Dictionary, anim.Animation);
+            player.Emit("playAnim", anim.Dictionary, anim.Animation);
             return new CmdReturn(anim.Dictionary + " " + anim.Animation);
         }
+        [Permission("LEADER")]
         [Status(Command.CommandStatus.NEW)]
-        [Command(Command.CommandType.TEST, 2)]
-        [Syntax("Organization", "Permission")]
-        [SyntaxType(typeof(Organization), typeof(Permissions))]
-        public static CmdReturn Organisation_Permission_Ajouter(Player player, object[] argv)
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Leader_Test(Player player, object[] argv)
         {
-            Organization org = (Organization)argv[0];
-            string perm = (string)argv[1];
-            org.Permissions.Add(perm);
-            _ = org.SaveAsync();
-            return new CmdReturn("Vous avez ajouté une permission", CmdReturn.CmdReturnType.SUCCESS);
+            return new CmdReturn("Ca marche");
+        }
+        [Permission("TEST")]
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Truc_Marant(Player player, object[] argv)
+        {
+            if (player.IsInVehicle)
+            {
+
+            }
+            return new CmdReturn("Ca marche");
         }
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 2)]
-        [Syntax("Organization", "Permission")]
-        [SyntaxType(typeof(Organization), typeof(Permissions))]
-        public static CmdReturn Organisation_Permission_Supprimer(Player player, object[] argv)
+        [Syntax("1", "2")]
+        [SyntaxType(typeof(byte), typeof(byte))]
+        public static CmdReturn Bite(Player player, object[] argv)
         {
-            Organization org = (Organization)argv[0];
-            string perm = (string)argv[1];
-            org.Permissions.Remove(perm);
-            _ = org.SaveAsync();
-            return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
+            if (player.IsInVehicle)
+            {
+                player.Vehicle.ModKit = 1;
+                player.Vehicle.SetMod((byte)argv[0], (byte)argv[1]);
+            }
+            return new CmdReturn("Ca marche");
         }
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 1)]
-        [Syntax("Organization")]
-        [SyntaxType(typeof(Organization))]
-        public static CmdReturn Organisation_Permission_Voir(Player player, object[] argv)
+        [Syntax("Joueur")]
+        [SyntaxType(typeof(Player))]
+        public static CmdReturn Permission_Voir(Player player, object[] argv)
         {
-            Organization org = (Organization)argv[0];
-            string str = "";
-            foreach (string s in org.Permissions.Get())
-            {
-                str += s + " - ";
-            }
-            return new CmdReturn(str);
+            Player target = (Player)argv[0];
+            return new CmdReturn(target.Permissions.ToString());
         }
         [Status(Command.CommandStatus.NEW)]
-        [Command(Command.CommandType.TEST, 2)]
-        [Syntax("Organization", "Joueur")]
-        [SyntaxType(typeof(Organization), typeof(Player))]
-        public static CmdReturn Organisation_Leader_Creer(Player player, object[] argv)
+        [Command(Command.CommandType.TEST, 0)]
+        public static CmdReturn Menottes(Player player, object[] argv)
         {
-            Organization org = (Organization)argv[0];
-            Player player2 = (Player)argv[1];
-            Rank rank = org.AddRank("Leader");
-            rank.Permissions.Add("LEADER");
-            org.AddMember(player2, rank);
-            _ = org.SaveAsync();
-            return new CmdReturn("Vous avez créé un leader");
+            player.Emit("handcuff");
+            return new CmdReturn("ca devreé marsdfg");
         }
-
     }
 }
 

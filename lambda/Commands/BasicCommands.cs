@@ -15,6 +15,8 @@ namespace Lambda.Commands
         [SyntaxType(typeof(int))]
         public static CmdReturn Aide(Player player, object[] argv)
         {
+            int page = (int)argv[0];
+            if (!(page < Enum.GetNames(typeof(Command.CommandType)).Length)) return new CmdReturn("Page inexistante");
             Command.CommandType type = (Command.CommandType)argv[0];
             Command[] commands = Command.GetCommands(type);
             int maxpage = Enum.GetValues(typeof(Command.CommandType)).Cast<int>().Max();
@@ -31,6 +33,7 @@ namespace Lambda.Commands
                 "Banque",
                 "Skin",
                 "Admin",
+                "Test"
             };
             string pagename = "Non défini";
             if (pages.Length > (int)argv[0])
@@ -58,11 +61,11 @@ namespace Lambda.Commands
             string sender;
             if (player.Account != null)
             {
-                sender = player.Account.Mail + " - " + player.Name; //used for have the mail and the character name of the sender
+                sender = player.Account.Mail + " - " + player.FullName; //used for have the mail and the character name of the sender
             }
             else
             {
-                sender = player.AltPlayer.Name;
+                sender = player.FullName;
             }
             for (int i = 0; i < argv.Length; i++)
             {
@@ -85,7 +88,6 @@ namespace Lambda.Commands
             if (!regex.Match(lastName).Success) return new CmdReturn("Votre nom doit être de la forme : Jocombe");
             player.FirstName = firstName;
             player.LastName = lastName;
-            player.AltPlayer.Name = player.Name;
             return new CmdReturn("Vous avez changé de nom !", CmdReturn.CmdReturnType.SUCCESS);
         }
 
@@ -138,7 +140,7 @@ namespace Lambda.Commands
         {
             Location location = Area.GetDestination(player.Position, player.Dimension);
             //if (area == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
-            if (player.AltPlayer.Vehicle != null) return new CmdReturn("");
+            if (player.Vehicle != null) return new CmdReturn("");
             if (location.Equals(default(Location))) return new CmdReturn("");
             player.GotoLocation(location);
             return new CmdReturn("Vous vous êtes téléporté", CmdReturn.CmdReturnType.SUCCESS);

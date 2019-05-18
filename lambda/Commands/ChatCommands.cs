@@ -15,7 +15,7 @@ namespace Lambda.Commands
         public static CmdReturn OOC(Player player, object[] argv)
         {
             string str = string.Join(' ', argv);
-            Alt.EmitAllClients("chatmessage", player.Name, "((" + str + "))");
+            Alt.EmitAllClients("chatmessage", player.FullName, "((" + str + "))");
             return new CmdReturn("", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.CHAT, 1)]
@@ -25,7 +25,7 @@ namespace Lambda.Commands
         {
             string str = "{9b59b6}";
             str += string.Join(' ', argv);
-            str += " ((" + player.Name + "))";
+            str += " ((" + player.FullName + "))";
             Chat.SendInRange(player, 20, str, false);
             return new CmdReturn("", CmdReturn.CmdReturnType.SUCCESS);
         }
@@ -35,7 +35,7 @@ namespace Lambda.Commands
         public static CmdReturn Me(Player player, object[] argv)
         {
             string str = "{9b59b6}";
-            str += player.Name + " ";
+            str += player.FullName + " ";
             str += string.Join(' ', argv);
             Chat.SendInRange(player, 20, str, false);
             return new CmdReturn("", CmdReturn.CmdReturnType.SUCCESS);

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using AltV.Net;
 using AltV.Net.Async.Events;
 using AltV.Net.Data;
-using AltV.Net.Elements.Entities;
+using IVoiceChannel = AltV.Net.Elements.Entities.IVoiceChannel;
 using Items;
 using Lambda.Administration;
 using Lambda.Commands;
@@ -17,65 +17,33 @@ using Lambda.Organizations;
 using Lambda.Skills;
 using Lambda.Utils;
 
+
 namespace Lambda.Entity
 {
-    public class Player : IDBElement, IEntity
+    public class Player : AltV.Net.Elements.Entities.Player, IDBElement, IEntity
     {
 
         public List<Skill> Skills;
         public Permissions Permissions = new Permissions();
 
-        public string license
-        {
-            get {
-                if (AltPlayer != null)
-                {
-                    AltPlayer.GetData("license", out string result);
-                    return result;
-                }
+        public string License;
 
-                return "";
-            }
-
-        }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Name => $"{FirstName}_{LastName}";
+        public string FullName => $"{FirstName} {LastName}";
 
         public ulong TimeOnline = 0;
         public ulong TotalTimeOnline = 0;
 
-        public uint Id
+        public new uint Id
         {
             get;
             set;
         }
 
         public short Food { get; set; }
-        public short Dimension
-        {
-            get => AltPlayer.Dimension;
-            set {
-                if (AltPlayer != null)
-                {
-                    AltPlayer.Dimension = value;
-                }
-            }
-        }
 
-        public ushort Hp
-        {
-            get => AltPlayer.Health;
-            set {
-                if (AltPlayer != null)
-                {
-                    AltPlayer.Health = value;
-                }
-            }
-
-
-        }
-        public ushort ServerId => AltPlayer.Id;
+        public ushort ServerId => base.Id;
 
         public Account Account { get; set; }
 
@@ -83,35 +51,9 @@ namespace Lambda.Entity
 
         public Interior Interior { get; set; }
 
-        public Vehicle Vehicle
-        {
-            get {
-                if (!AltPlayer.IsInVehicle) return null;
-                AltPlayer.Vehicle.GetData("vehicle", out Vehicle vehicle);
-                return vehicle;
-            }
-        }
 
-        public IPlayer AltPlayer { get; }
+        public Position FeetPosition => new Position(Position.X, Position.Y, Position.Z - 1);
 
-        public Position Position
-        {
-            get => AltPlayer.Position;
-            set {
-                if (AltPlayer != null)
-                {
-                    AltPlayer.Position = value;
-                }
-            }
-
-        }
-        public Position FeetPosition => new Position(AltPlayer.Position.X, AltPlayer.Position.Y, AltPlayer.Position.Z - 1);
-
-        public Rotation Rotation
-        {
-            get => AltPlayer.Rotation;
-            set => AltPlayer.Rotation = value;
-        }
 
         private uint deathCount;
         private uint id; // The id in the database
@@ -122,7 +64,7 @@ namespace Lambda.Entity
 
         private Request request;
 
-        public Player()
+        public Player(IntPtr nativePointer, ushort id) : base(nativePointer, id)
         {
             Skills = new List<Skill>();
             deathCount = 0;
@@ -136,23 +78,6 @@ namespace Lambda.Entity
             Inventory.Deposit(100000);
         }
 
-        public Player(IPlayer altPlayer) : this()
-        {
-            AltPlayer = altPlayer;
-            altPlayer.SetData("player", this);
-            skin.SendModel(this);
-            skin.SendSkin(this);
-        }
-
-
-
-        public void SetSkin(Skin skin)
-        {
-            this.skin = skin;
-            //this.skin.Player = this;
-            this.skin.SendSkin(this);
-        }
-
         public Skin GetSkin()
         {
             return skin;
@@ -161,13 +86,12 @@ namespace Lambda.Entity
         public void Spawn(Position pos)
         {
             GotoLocation(new Location(pos, null, 0));
-            AltPlayer.Spawn(pos);
             Freeze(false);
         }
 
         public override string ToString()
         {
-            return $"[{id}]{Name}";
+            return $"[{id}]{FullName}";
         }
 
         public void SendMessage(string msg)
@@ -183,7 +107,7 @@ namespace Lambda.Entity
         public void Freeze(bool choice)
         {
 
-            AltPlayer.Emit("setfreeze", choice);
+            Emit("setfreeze", choice);
         }
 
         public void Goto(Position pos)
@@ -237,7 +161,7 @@ namespace Lambda.Entity
         {
             foreach (string ipl in interior.GetIPLs())
             {
-                this.AltPlayer.Emit("loadIpl", ipl);
+                Emit("loadIpl", ipl);
             }
 
         }
@@ -245,7 +169,7 @@ namespace Lambda.Entity
         {
             foreach (string ipl in interior.GetIPLs())
             {
-                this.AltPlayer.Emit("unloadIpl", ipl);
+                Emit("unloadIpl", ipl);
             }
         }
 
@@ -317,7 +241,7 @@ namespace Lambda.Entity
         public Vehicle[] GetVehiclesInRange(int range)
         {
             List<Vehicle> vehicles = new List<Vehicle>();
-            foreach (Vehicle vehicle in Vehicle.Vehicles)
+            foreach (Vehicle vehicle in Lambda.Entity.Vehicle.Vehicles)
             {
                 if (Position.Distance(vehicle.Position) < range) vehicles.Add(vehicle);
             }
@@ -392,7 +316,7 @@ namespace Lambda.Entity
             data["cha_position_z"] = Position.Z.ToString();
             data["cha_world"] = Dimension.ToString();
             data["cha_money"] = Inventory.Money.ToString();
-            data["cha_hp"] = Hp.ToString();
+            data["cha_hp"] = Health.ToString();
             data["cha_food"] = Food.ToString();
             data["cha_deathcount"] = "0";
             data["acc_id"] = Account.Id.ToString();
@@ -414,14 +338,13 @@ namespace Lambda.Entity
             Inventory.Money = long.Parse(data["cha_money"]);
             SetBankMoney(long.Parse(data["cha_bankaccount"]));
             Food = short.Parse(data["cha_food"]);
-            if (AltPlayer == null) return;
             Position position = new Position();
             position.X = float.Parse(data["cha_position_x"]);
             position.Y = float.Parse(data["cha_position_y"]);
             position.Z = float.Parse(data["cha_position_z"]);
             Position = position;
             Dimension = short.Parse(data["cha_world"]);
-            Hp = ushort.Parse(data["cha_hp"]);
+            Health = ushort.Parse(data["cha_hp"]);
             GetSkin().Id = uint.Parse(data["ski_id"]);
             if (!string.IsNullOrWhiteSpace(data["cha_permissions"]))
                 Permissions.Set(data["cha_permissions"].Split(',').ToList());
@@ -454,8 +377,8 @@ namespace Lambda.Entity
         public void Remove()
         {
             Players.Remove(this);
-            VoiceChannel.RemovePlayer(AltPlayer);
-            Alt.EmitAllClients("chatmessage", $"{AltPlayer.Name} c'est déconnecté!");
+            VoiceChannel.RemovePlayer(this);
+            Alt.EmitAllClients("chatmessage", $"{FullName} c'est déconnecté!");
         }
 
         public async Task SaveAsync()
@@ -480,8 +403,8 @@ namespace Lambda.Entity
         public static void AddPlayer(Player player)
         {
             Players.Add(player);
-            VoiceChannel.AddPlayer(player.AltPlayer);
-            Alt.EmitAllClients("chatmessage", null, $"{player.AltPlayer.Name} c'est connecté!");
+            VoiceChannel.AddPlayer(player);
+            Alt.EmitAllClients("chatmessage", null, $"{player.FullName} c'est connecté!");
         }
         public static Player GetPlayerByDbId(uint id)
         {
@@ -499,7 +422,7 @@ namespace Lambda.Entity
             foreach (Player player in Players)
             {
                 if (player.ServerId.ToString().Equals(nameOrId)) players.Add(player);
-                else if (player.Name.ToLower().StartsWith(nameOrId.ToLower())) players.Add(player);
+                else if (player.FullName.ToLower().StartsWith(nameOrId.ToLower())) players.Add(player);
             }
             return players.ToArray();
         }

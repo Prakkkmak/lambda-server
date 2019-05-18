@@ -3,6 +3,7 @@ using Lambda.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using AltV.Net;
@@ -15,7 +16,7 @@ using Lambda.Utils;
 
 namespace Lambda.Entity
 {
-    public class Vehicle : IEntity, IDBElement
+    public class Vehicle : AltV.Net.Elements.Entities.Vehicle, IEntity, IDBElement
     {
         public enum OwnerType
         {
@@ -23,116 +24,42 @@ namespace Lambda.Entity
             ORGANIZATION
         }
 
-        private ushort fuel;
-        private OwnerType ownerType;
-        private uint ownerId;
-        private ushort rank; // The rank of acces to the AltVehicle
-        private ushort hp;
-        private Rgba color;
+        public uint Id { get; set; }
 
+        public ushort Fuel = 0;
+        public OwnerType ownerType = OwnerType.CHARACTER;
+        public uint OwnerId = 0;
 
         public IVoiceChannel VoiceChannel { get; set; }
 
-        public uint Id { get; set; }
-
-
         public Inventory Inventory;
-        public IVehicle AltVehicle { get; set; }
-        public VehicleModel Model { get; set; }
-        public Position SpawnPosition { get; set; }
-        public Rotation SpawnRotation { get; set; }
-
         public Lock Lock { get; set; }
 
-        public Position Position
+        //public IVehicle AltVehicle { get; set; }
+        public VehicleModel Model { get; set; } = VehicleModel.Adder;
+        public Position SpawnPosition { get; set; } = Position.Zero;
+        public Rotation SpawnRotation { get; set; } = Rotation.Zero;
+
+        public Vehicle(IntPtr nativePointer, ushort id) : base(nativePointer, id)
         {
-            get => AltVehicle?.Position ?? SpawnPosition;
-            set {
-                if (AltVehicle != null) AltVehicle.Position = value;
-            }
-        }
-
-        public Rotation Rotation
-        {
-            get => AltVehicle?.Rotation ?? SpawnRotation;
-            set {
-                if (AltVehicle != null) AltVehicle.Rotation = value;
-            }
-        }
-
-        public Rgba Color
-        {
-            get => AltVehicle?.PrimaryColorRgb ?? new Rgba(0, 0, 0, 0);
-            set {
-                if (AltVehicle != null) AltVehicle.PrimaryColorRgb = value;
-            }
-        }
-
-
-
-        public Rgba SecondaryColor
-        {
-            get => AltVehicle?.SecondaryColorRgb ?? new Rgba(0, 0, 0, 0);
-            set {
-                if (AltVehicle != null) AltVehicle.SecondaryColorRgb = value;
-            }
-        }
-
-        public short Dimension { get; set; }
-
-        public Vehicle()
-        {
-            this.SpawnPosition = new Position(0, 0, 0);
-            this.SpawnRotation = new Rotation(0, 0, 0);
-            this.Model = VehicleModel.Adder;
-            this.Id = 0;
-            this.fuel = 100;
-            this.ownerType = OwnerType.CHARACTER;
-            this.ownerId = 0;
-            this.rank = 0;
-            this.hp = 100;
             this.Inventory = new Inventory(this);
             this.VoiceChannel = Alt.CreateVoiceChannel(true, 10);
             this.Lock = new Lock(10, Lock.Complexity.NUMERICAL, Lock.Complexity.ALPHAMAJ);
         }
 
-        public Vehicle(Position position) : this()
-        {
-            this.SpawnPosition = position;
-        }
-
-        public Vehicle(Position position, VehicleModel model) : this()
-        {
-            this.SpawnPosition = position;
-            this.Model = model;
-        }
-
         public void Respawn()
         {
-            Rgba col1 = this.Color;
-            Rgba col2 = this.SecondaryColor;
-            AltVehicle.Remove();
-            this.Spawn();
-            this.Color = col1;
-            this.SecondaryColor = col2;
-        }
-        public void Spawn()
-        {
-            this.AltVehicle = Alt.CreateVehicle(Model, SpawnPosition, SpawnRotation);
-            this.AltVehicle.SetData("vehicle", this);
-            this.Color = new Rgba(0, 0, 0, 255);
-            this.SecondaryColor = new Rgba(0, 0, 0, 0);
+            Position = SpawnPosition;
         }
 
         public void Repair()
         {
-            AltVehicle.BodyHealth = 100;
-            AltVehicle.EngineHealth = 100;
-            AltVehicle.BodyAdditionalHealth = 100;
-            AltVehicle.PetrolTankHealth = 100;
-            hp = 100;
-            AltVehicle.DamageData = "AA==";
-            AltVehicle.HealthData = "DwAi";
+            BodyHealth = 100;
+            EngineHealth = 100;
+            BodyAdditionalHealth = 100;
+            PetrolTankHealth = 100;
+            DamageData = "AA==";
+            HealthData = "DwAi";
         }
 
         public void Park()
@@ -149,44 +76,9 @@ namespace Lambda.Entity
 
         public void SetEngine(bool status)
         {
-            AltVehicle.EngineOn = status;
-            if (status) AltVehicle.PetrolTankHealth = 100;
-            else AltVehicle.PetrolTankHealth = 0;
-        }
-        public bool GetEngine()
-        {
-            return AltVehicle.EngineOn;
-        }
-
-        public void SetPlate(string text)
-        {
-            AltVehicle.NumberplateText = text;
-        }
-
-        public string GetPlate()
-        {
-            return AltVehicle.NumberplateText;
-
-        }
-
-        public void SetLock(VehicleLockState state)
-        {
-            AltVehicle.LockState = state;
-        }
-
-        public VehicleLockState GetLock()
-        {
-            return AltVehicle.LockState;
-        }
-
-        public uint GetOwnerId()
-        {
-            return ownerId;
-        }
-
-        public void SetOwnerId(uint id)
-        {
-            ownerId = id;
+            EngineOn = status;
+            if (status) PetrolTankHealth = 100;
+            else PetrolTankHealth = 0;
         }
 
         public OwnerType GetOwnerType()
@@ -201,7 +93,7 @@ namespace Lambda.Entity
 
         public void SetOwner(uint id, OwnerType owner = OwnerType.CHARACTER)
         {
-            SetOwnerId(id);
+            OwnerId = id;
             SetOwnerType(owner);
         }
         public void SetOwner(Player player)
@@ -219,17 +111,17 @@ namespace Lambda.Entity
             data["veh_rotation_r"] = SpawnRotation.Roll.ToString();
             data["veh_rotation_p"] = SpawnRotation.Pitch.ToString();
             data["veh_rotation_y"] = SpawnRotation.Yaw.ToString();
-            data["veh_color_r"] = Color.R.ToString();
-            data["veh_color_g"] = Color.G.ToString();
-            data["veh_color_b"] = Color.B.ToString();
-            data["veh_color2_r"] = SecondaryColor.R.ToString();
-            data["veh_color2_g"] = SecondaryColor.G.ToString();
-            data["veh_color2_b"] = SecondaryColor.B.ToString();
+            data["veh_color_r"] = PrimaryColorRgb.R.ToString();
+            data["veh_color_g"] = PrimaryColorRgb.G.ToString();
+            data["veh_color_b"] = PrimaryColorRgb.B.ToString();
+            data["veh_color2_r"] = SecondaryColorRgb.R.ToString();
+            data["veh_color2_g"] = SecondaryColorRgb.G.ToString();
+            data["veh_color2_b"] = SecondaryColorRgb.B.ToString();
             data["veh_lock"] = Lock.Code;
-            data["veh_plate"] = GetPlate();
-            if (GetOwnerId() == 0) return data;
-            if (GetOwnerType() == Vehicle.OwnerType.CHARACTER) data["cha_id"] = GetOwnerId().ToString();
-            else if (GetOwnerType() == Vehicle.OwnerType.ORGANIZATION) data["org_id"] = GetOwnerId().ToString();
+            data["veh_plate"] = NumberplateText;
+            if (OwnerId == 0) return data;
+            if (GetOwnerType() == Vehicle.OwnerType.CHARACTER) data["cha_id"] = OwnerId.ToString();
+            else if (GetOwnerType() == Vehicle.OwnerType.ORGANIZATION) data["org_id"] = OwnerId.ToString();
             return data;
         }
 
@@ -242,7 +134,7 @@ namespace Lambda.Entity
             position.Z = float.Parse(data["veh_position_z"]);
             SpawnPosition = position;
             Lock.Code = data["veh_lock"];
-            Spawn();
+            //Spawn();
             Rotation rotation = new Rotation();
             rotation.Roll = float.Parse(data["veh_rotation_r"]);
             rotation.Pitch = float.Parse(data["veh_rotation_p"]);
@@ -256,18 +148,18 @@ namespace Lambda.Entity
             secondaryColor.R = byte.Parse(data["veh_color2_r"]);
             secondaryColor.G = byte.Parse(data["veh_color2_g"]);
             secondaryColor.B = byte.Parse(data["veh_color2_b"]);
-            SetPlate(data["veh_plate"]);
-            Color = color;
-            SecondaryColor = secondaryColor;
+            NumberplateText = data["veh_plate"];
+            PrimaryColorRgb = color;
+            SecondaryColorRgb = secondaryColor;
             if (data.ContainsKey("cha_id"))
             {
                 SetOwnerType(Vehicle.OwnerType.CHARACTER);
-                SetOwnerId(uint.Parse(data["cha_id"]));
+                OwnerId = uint.Parse(data["cha_id"]);
             }
             if (data.ContainsKey("org_id"))
             {
                 SetOwnerType(Vehicle.OwnerType.ORGANIZATION);
-                SetOwnerId(uint.Parse(data["org_id"]));
+                OwnerId = uint.Parse(data["org_id"]);
             }
         }
 
@@ -295,12 +187,6 @@ namespace Lambda.Entity
             throw new NotImplementedException();
         }
 
-        public void Remove()
-        {
-            Vehicles.Remove(this);
-            this.AltVehicle.Remove();
-        }
-
         public static void AddVehicle(Vehicle vehicle)
         {
             Vehicles.Add(vehicle);
@@ -310,6 +196,7 @@ namespace Lambda.Entity
         {
             Vehicles.AddRange(DatabaseElement.GetAllVehicles());
         }
+
 
         public static List<Vehicle> Vehicles = new List<Vehicle>();
     }

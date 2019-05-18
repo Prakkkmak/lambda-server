@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AltV.Net;
 using AltV.Net.Data;
+using AltV.Net.Enums;
 using Items;
 using Lambda.Administration;
 using Lambda.Entity;
@@ -33,7 +34,8 @@ namespace Lambda.Database
             {typeof(Link), "t_link_lin" },
             {typeof(Inventory), "t_inventory_inv" },
             {typeof(Item), "t_item_ite" },
-            {typeof(Skill), "t_skill_skl" }
+            {typeof(Skill), "t_skill_skl" },
+            {typeof(Member), "t_member_mem" }
         };
 
         public static string GetPrefix(string str)
@@ -167,7 +169,7 @@ namespace Lambda.Database
             List<Dictionary<string, string>> results = DbConnect.Select(tableName, new Dictionary<string, string>());
             foreach (Dictionary<string, string> result in results)
             {
-                Vehicle entity = new Vehicle();
+                Vehicle entity = (Vehicle)Alt.CreateVehicle(VehicleModel.Adder, Position.Zero, Rotation.Zero);
                 entity.SetData(result);
                 entity.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
                 entities.Add(entity);
@@ -236,6 +238,27 @@ namespace Lambda.Database
             }
 
             return items.ToArray();
+        }
+        public static Member[] GetAllMembers(Rank rank)
+        {
+            string tableName = GetTableName(typeof(Member));
+            List<Member> members = new List<Member>();
+            Dictionary<string, string> where = new Dictionary<string, string>();
+            string index = "ran_id";
+            where[index] = rank.Id.ToString();
+            List<Dictionary<string, string>> results = DbConnect.Select(tableName, where);
+            foreach (Dictionary<string, string> result in results)
+            {
+                Member member = new Member();
+                member.SetData(result);
+                member.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
+                member.Rank = rank;
+                Dictionary<string, string> playerdata = Get<Player>(member.PlayerId);
+                member.Name = playerdata["cha_firstname"] + " " + playerdata["cha_lastname"];
+                members.Add(member);
+            }
+
+            return members.ToArray();
         }
         public static Organization[] GetAllOrganizations()
         {

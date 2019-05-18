@@ -106,7 +106,7 @@ namespace Items
 
 
             //player.Game.DbSkin.Save(this);
-            player.AltPlayer.Emit("setComponent", clothes.ToArray());
+            player.Emit("setComponent", clothes.ToArray());
         }
         /*
         public Link[] ExtractLinks()
@@ -211,7 +211,7 @@ namespace Items
         {
             //if (!Enum.TryParse(player.GetSkin().Model, true, out PedModel model)) model = PedModel.FreemodeMale01;
             //if (!Enum.IsDefined(typeof(PedModel), model)) model = PedModel.FreemodeMale01;
-            player.AltPlayer.Model = (uint)Model;
+            player.Model = (uint)Model;
             Alt.Log("Model set en " + (uint)Model);
         }
 
