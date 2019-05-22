@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AltV.Net.Data;
 using Lambda.Entity;
 using Lambda.Utils;
 
@@ -8,32 +9,42 @@ namespace Lambda.Commands
 {
     class AreaCommands
     {
-        [Command(Command.CommandType.AREA)]
-        public static CmdReturn Interieur_Liste(Player player, object[] argv)
-        {
-            Interior[] interiors = Interior.Interiors.ToArray();
-            string txt = "Voici la liste des interieurs : <br>";
-            foreach (Interior interior in interiors)
-            {
-                txt += interior.Id + " - " + interior.GetIPLs()[0] + "<br>";
-            }
-            return new CmdReturn(txt);
-        }
-        [Command(Command.CommandType.AREA)]
-        public static CmdReturn Interieur_Recharger(Player player, object[] argv)
-        {
-            Interior.LoadInteriors();
-            return new CmdReturn("Vous avez rechargé les interieurs", CmdReturn.CmdReturnType.SUCCESS);
-        }
         [Command(Command.CommandType.AREA, 1)]
-        [Syntax("Interieur")]
-        [SyntaxType(typeof(Interior))]
-        public static CmdReturn Interieur_Goto(Player player, object[] argv)
+        [Syntax("ipl")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Interieur_Ajouter(Player player, object[] argv)
         {
-            Interior interior = (Interior)argv[0];
-            player.Goto(interior);
-            return new CmdReturn("Vous vous etes téléporté dans un interieur", CmdReturn.CmdReturnType.SUCCESS);
+            Area area = (Area)Area.GetArea(player.FeetPosition);
+            area.InteriorLocation.Interior.AddIpl((string)argv[0]);
+            area.SetLocations();
+            _ = area.SaveAsync();
+            return new CmdReturn("Vous avez ajouter ipl");
+        }
+        [Command(Command.CommandType.AREA)]
+        public static CmdReturn Interieur_Raz(Player player, object[] argv)
+        {
+            Area area = (Area)Area.GetArea(player.FeetPosition);
+            area.InteriorLocation.Interior.SetIPLs("");
+            area.SetLocations();
+            _ = area.SaveAsync();
+            return new CmdReturn("Vous avez remis à zéro l'interieur");
         }
 
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 3)]
+        [Syntax("x", "y", "z")]
+        [SyntaxType(typeof(float), typeof(float), typeof(float))]
+        public static CmdReturn Interieur_Position(Player player, object[] argv)
+        {
+            Area area = (Area)Area.GetArea(player.FeetPosition);
+            Position pos = area.InteriorLocation.Interior.Position;
+            pos.X = (float)argv[0];
+            pos.Y = (float)argv[1];
+            pos.Z = (float)argv[2];
+            area.InteriorLocation.Interior.Position = pos;
+            area.SetLocations(area.InteriorLocation.Interior, area.Dimension);
+            _ = area.SaveAsync();
+            return new CmdReturn("Vous avez changé la position de l'interieur");
+        }
     }
 }

@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Items>
+  <Item>
+    <Id>1</Id>
+    <Name>Pomme</Name>
+    <Description>Une simple pomme</Description>
+    <Weight>1</Weight>
+    <Maxstack>100</Maxstack>
+    <Type>1</Type>
+    <Nutrition>25</Nutrition>
+  </Item>
+  <Item>
+    <Id>2</Id>
+    <Name>Donnut</Name>
+    <Description>Mhhh dunnut</Description>
+    <Weight>1</Weight>
+    <Maxstack>100</Maxstack>
+    <Type>1</Type>
+    <Nutrition>50</Nutrition>
+  </Item>
+  <Item>
+    <Id>3</Id>
+    <Name>Eau</Name>
+    <Description>De l'eau en bouteille</Description>
+    <Weight>1</Weight>
+    <Maxstack>100</Maxstack>
+    <Type>1</Type>
+    <Nutrition>5</Nutrition>
+  </Item>
+  <Item>
+    <Id>100</Id>
+    <Name>Clé de voiture</Name>
+    <Description>Une clé permettant d'ouvrir et de démarrer un véhicule</Description>
+    <Weight>0</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>6</Type>
+    <Metadatas>
+      <Metadata>Code</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>101</Id>
+    <Name>Clé de maison</Name>
+    <Description>Une clé de la porte d'une maison</Description>
+    <Weight>0</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>6</Type>
+    <metaMetadatasdatas>
+      <Metadata>Code</Metadata>
+    </metaMetadatasdatas>
+  </Item>
+
+</Items>

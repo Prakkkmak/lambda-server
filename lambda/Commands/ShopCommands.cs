@@ -75,6 +75,7 @@ namespace Lambda.Commands
         {
             BaseItem baseItem = (BaseItem)argv[0];
             uint amount = (uint)argv[1];
+            if (amount <= 0) return new CmdReturn("Montant invalide", CmdReturn.CmdReturnType.WARNING);
             Shop shop = (Shop)Area.GetArea(player.FeetPosition, Area.AreaType.SHOP);
             if (shop == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
             CmdReturn returnType = shop.Sell(baseItem.Id, amount, player.Inventory);

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
 using AltV.Net;
 using Lambda.Database;
 
@@ -67,12 +69,33 @@ namespace Lambda.Items
         }
         public static void LoadBaseItems()
         {
-            BaseItems = DatabaseElement.GetAllBaseItems().ToList();
+            XDocument xml = XDocument.Load("./resources/lambda/Resources/Items.xml");
+            IEnumerable<XElement> items = xml.Root.Descendants("Item");
+            foreach (XElement item in items)
+            {
+                BaseItem baseItem = new BaseItem();
+                XElement idElement = item.Element("Id");
+                if (idElement != null) baseItem.Id = Convert.ToUInt32(idElement.Value);
+                XElement nameElement = item.Element("Name");
+                if (nameElement != null) baseItem.Name = nameElement.Value;
+                XElement descriptionElement = item.Element("Description");
+                if (descriptionElement != null) baseItem.Description = descriptionElement.Value;
+                XElement weightElement = item.Element("Weight");
+                if (weightElement != null) baseItem.Weight = Convert.ToInt32(weightElement.Value);
+                XElement maxStack = item.Element("Maxstack");
+                if (maxStack != null) baseItem.MaxStack = Convert.ToUInt32(maxStack.Value);
+                Alt.Log($"ajout aux items : {baseItem.Id} - {baseItem.Name}");
+                BaseItems.Add(baseItem);
+            }
+
         }
+        //string animText = File.ReadAllText("");
+
         public static BaseItem GetBaseItem(uint id)
         {
             return BaseItems.FirstOrDefault(baseitem => baseitem.Id == id);
         }
+
         public static List<BaseItem> BaseItems = new List<BaseItem>();
     }
 }

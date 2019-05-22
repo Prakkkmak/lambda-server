@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using AltV.Net;
@@ -36,7 +37,6 @@ namespace Lambda.Entity
         public Lock Lock { get; set; }
 
         //public IVehicle AltVehicle { get; set; }
-        public VehicleModel Model { get; set; } = VehicleModel.Adder;
         public Position SpawnPosition { get; set; } = Position.Zero;
         public Rotation SpawnRotation { get; set; } = Rotation.Zero;
 
@@ -65,7 +65,8 @@ namespace Lambda.Entity
         public void Park()
         {
             SpawnPosition = Position;
-            Save();
+            SpawnRotation = Rotation;
+            _ = SaveAsync();
         }
 
         public void Park(Rotation rot)
@@ -127,7 +128,6 @@ namespace Lambda.Entity
 
         public void SetData(Dictionary<string, string> data)
         {
-            Model = (VehicleModel)Enum.Parse(typeof(VehicleModel), data["veh_model"]);
             Position position = new Position();
             position.X = float.Parse(data["veh_position_x"]);
             position.Y = float.Parse(data["veh_position_y"]);

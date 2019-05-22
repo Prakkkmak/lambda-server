@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Interiors>
+  <Interior>
+    <Id>1</Id>
+    <Name>Modern 1 Apartment</Name>
+    <Description></Description>
+    <IPL>apa_v_mp_h_01_a</IPL>
+    <Location>-786.8663, 315.7642, 217.6385</Location>
+  </Interior>
+  <Interior>
+    <Id>2</Id>
+    <Name>Modern 2 Apartment</Name>
+    <Description></Description>
+    <IPL>apa_v_mp_h_01_c</IPL>
+    <Location>-786.9563, 315.6229, 187.9136</Location>
+  </Interior>
+  <Interior>
+    <Id>3</Id>
+    <Name>Modern 3 Apartment</Name>
+    <Description></Description>
+    <IPL>apa_v_mp_h_01_b</IPL>
+    <Location>-774.0126, 342.0428, 196.6864</Location>
+  </Interior>
+  <Interior>
+    <Id>3</Id>
+    <Name>Mody 1 Apartment</Name>
+    <Description></Description>
+    <IPL>	apa_v_mp_h_02_a</IPL>
+    <Location>-787.0749, 315.8198, 217.6386</Location>
+  </Interior>
+</Interiors>

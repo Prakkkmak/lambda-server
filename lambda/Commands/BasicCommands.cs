@@ -142,6 +142,7 @@ namespace Lambda.Commands
             //if (area == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
             if (player.Vehicle != null) return new CmdReturn("");
             if (location.Equals(default(Location))) return new CmdReturn("");
+            if (location.Position.Equals(new Position())) return new CmdReturn("Il n'y a pas d'interieur");
             player.GotoLocation(location);
             return new CmdReturn("Vous vous êtes téléporté", CmdReturn.CmdReturnType.SUCCESS);
         }

@@ -62,6 +62,16 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Events\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\Items.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="cp -r $(ProjectDir)\bin\Release\netcoreapp2.2\publish\* E:/Lambda/serv/resources/lambda &#xD;&#xA;cp -r $(TargetPath) E:/Lambda/serv/resources/lambda&#xD;&#xA;" />
   </Target>

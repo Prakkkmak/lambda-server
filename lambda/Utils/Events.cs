@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using AltV.Net;
 using AltV.Net.Elements.Entities;
@@ -27,6 +28,7 @@ namespace Lambda
             Alt.OnVehicleRemove += OnVehicleRemove;
             Alt.Log("[EVENT] OnPlayerDisconnect registered");
             Alt.OnClient("setlicense", OnPlayerSetLicenseHash);
+            Alt.OnClient("setskin", OnClientSetSkin);
             Alt.Log("[EVENT] OnVehicleEnter registered");
             Alt.OnPlayerEnterVehicle += OnVehicleEnter;
             Alt.OnPlayerLeaveVehicle += OnVehicleLeave;
@@ -99,6 +101,21 @@ namespace Lambda
             Alt.Log("Skin chargement");
             player.GetSkin().SendModel(player);
             player.GetSkin().SendSkin(player);
+        }
+
+        public static void OnClientSetSkin(IPlayer altPlayer, object[] args)
+        {
+            Player player = (Player)altPlayer;
+            string str = "";
+            object[] arg = (object[])args[0];
+            foreach (object o in arg)
+            {
+                str += o.ToString() + ',';
+            }
+
+            str = str.Remove(str.Length - 1);
+            player.GetSkin().SetString(str);
+            _ = player.SaveAsync();
         }
 
 

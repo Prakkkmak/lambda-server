@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AltV.Net.Data;
 using AltV.Net.Enums;
 using Lambda.Administration;
 using Lambda.Entity;
@@ -191,11 +192,65 @@ namespace Lambda.Commands
             return new CmdReturn(target.Permissions.ToString());
         }
         [Status(Command.CommandStatus.NEW)]
-        [Command(Command.CommandType.TEST, 0)]
-        public static CmdReturn Menottes(Player player, object[] argv)
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("Joueur")]
+        [SyntaxType(typeof(Player))]
+        public static CmdReturn Menotter(Player player, object[] argv)
         {
-            player.Emit("handcuff");
-            return new CmdReturn("ca devreé marsdfg");
+            Player target = (Player)argv[0];
+            target.Emit("setHandcuff");
+            target.SendMessage("Vous avez été menotté/démenotté");
+            return new CmdReturn("Vous avez menotté/démenotté quelqu'un");
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("Nom")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Arme(Player player, object[] argv)
+        {
+            player.Emit("giveWeapon", (string)argv[0]);
+            return new CmdReturn("Vous avez menotté/démenotté quelqu'un");
+        }
+
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("ipl")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Zone_Interieur_Ajouter_Ipl(Player player, object[] argv)
+        {
+            Area area = (Area)Area.GetArea(player.FeetPosition);
+            area.InteriorLocation.Interior.AddIpl((string)argv[0]);
+            return new CmdReturn("Vous avez ajouter ipl");
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 3)]
+        [Syntax("x", "y", "z")]
+        [SyntaxType(typeof(float), typeof(float), typeof(float))]
+        public static CmdReturn Zone_Interieur_Position(Player player, object[] argv)
+        {
+            Area area = (Area)Area.GetArea(player.FeetPosition);
+            Position pos = area.InteriorLocation.Interior.Position;
+            pos.X = (float)argv[0];
+            pos.Y = (float)argv[1];
+            pos.Z = (float)argv[2];
+            area.InteriorLocation.Interior.Position = pos;
+            return new CmdReturn("Vous avez changé pos");
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Zone_Interieur_Activer(Player player, object[] argv)
+        {
+            Area area = (Area)Area.GetArea(player.FeetPosition);
+            area.SetLocations(area.InteriorLocation.Interior, area.Dimension);
+            return new CmdReturn("Vous avez changé pos");
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 0)]
+        public static CmdReturn Zone_Save(Player player, object[] argv)
+        {
+            Area area = (Area)Area.GetArea(player.FeetPosition);
+            _ = area.SaveAsync();
+            return new CmdReturn("Vous avez save la zone");
         }
     }
 }

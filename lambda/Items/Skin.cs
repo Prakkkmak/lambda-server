@@ -102,111 +102,48 @@ namespace Items
             for (byte i = 0; i <= MAX_COMPONENT_NUMBER; i++)
             {
                 clothes.Add(GetComponent(i).Drawable);
+                clothes.Add(GetComponent(i).Texture);
+                clothes.Add(GetComponent(i).Palette);
             }
 
 
             //player.Game.DbSkin.Save(this);
             player.Emit("setComponent", clothes.ToArray());
         }
-        /*
-        public Link[] ExtractLinks()
-        {
-            List<Link> links = new List<Link>();
-            foreach (Tuple<byte, byte> linksPair in Link.LinksPairs)
-            {
-                Component comp1 = GetComponent(linksPair.Item1);
-                Component comp2 = GetComponent(linksPair.Item2);
-                Link link = new Link(linksPair.Item1, linksPair.Item2, comp1.Drawable, comp2.Drawable);
-                Link sLink = Game.GetLink(link);
-                if (sLink == null)
-                {
-                    link.Type = Link.LinkType.UNKNOW;
-                    links.Add(link);
-                }
-                else
-                {
-                    links.Add(sLink);
-                }
 
+        public override string ToString()
+        {
+            string str = "";
+            foreach (Component component in components)
+            {
+                str += component.Drawable + ",";
+                str += component.Texture + ",";
+                str += component.Palette + ",";
             }
 
-            return links.ToArray();
-        }
-
-        public Link[] ExtractLinks(Link.LinkType type)
-        {
-            Link[] links = ExtractLinks();
-            return links.Where(link => link.Type == type).ToArray();
-        }
-
-        public void SetValid(bool validity)
-        {
-            if (validity)
+            if (str.Length > 0)
             {
-                Alt.Log("Passage d'un skin en bon");
-                Link[] links = ExtractLinks();
-                foreach (Link link in links)
-                {
-                    link.Type = Link.LinkType.VALID;
-                    Game.AddLink(link);
-                }
-            }
-            else
-            {
-                Link[] unknowLinks = ExtractLinks(Link.LinkType.UNKNOW);
-                Link[] unvalidLinks = ExtractLinks(Link.LinkType.UNVALID);
-                if (unknowLinks.Length + unvalidLinks.Length == 0)
-                {
-                    Alt.Log("Passage d'un bon skin => Unknow skin");
-                    Link[] links = ExtractLinks();
-                    foreach (Link link in links)
-                    {
-                        link.Type = Link.LinkType.UNKNOW;
-                        Game.AddLink(link);
-                    }
-
-                }
-                else if (unvalidLinks.Length + unvalidLinks.Length == 1)
-                {
-                    Alt.Log("Définission d'un skin en invalide");
-                    if (unvalidLinks.Length == 1)
-                    {
-                        unvalidLinks[0].Type = Link.LinkType.UNVALID;
-                    }
-
-                }
+                str = str.Remove(str.Length - 1);
             }
 
+            return str;
         }
 
-        public bool IsValid()
+        public void SetString(string str)
         {
-            Link[] links = ExtractLinks();
-            foreach (Link link in links)
+            if (str.Length == 0) return;
+            string[] vals = str.Split(',');
+            for (int i = 0; i < MAX_COMPONENT_NUMBER; i++)
             {
-                if (link.Type != Link.LinkType.VALID) return false;
-            }
+                ushort drawable = ushort.Parse(vals[i * 3]);
+                ushort texture = ushort.Parse(vals[i * 3 + 1]);
+                ushort palette = ushort.Parse(vals[i * 3 + 2]);
 
-            return true;
-        }
-
-        public void SetNextNotValidSkin()
-        {
-            for (byte i = 0; i < components.Length; i++)
-            {
-                //Component component = components[i];
-                for (ushort j = 0; j < Component.MaxValues[i]; j++)
-                {
-                    SetComponent(i, new Component(j));
-                    Alt.Log("Composant " + i + " set à " + j);
-                    if (!IsValid())
-                    {
-                        return;
-                    }
-                }
+                Component comp = new Component(drawable, texture, palette);
+                SetComponent((byte)i, comp);
             }
         }
-        */
+
         public void SendModel(Player player)
         {
             //if (!Enum.TryParse(player.GetSkin().Model, true, out PedModel model)) model = PedModel.FreemodeMale01;

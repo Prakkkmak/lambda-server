@@ -84,14 +84,12 @@ namespace Lambda.Commands
             if (!player.HaveKeyOf(vehicle.Lock.Code)) return new CmdReturn("Vous n'avez pas les clés", CmdReturn.CmdReturnType.WARNING);
             if (vehicle.EngineOn)
             {
-                vehicle.EngineOn = false;
-                vehicle.PetrolTankHealth = 0;
+                vehicle.SetEngine(false);
                 return new CmdReturn("Vous avez eteint le moteur");
             }
             else
             {
-                vehicle.EngineOn = true;
-                vehicle.PetrolTankHealth = 100;
+                vehicle.SetEngine(true);
                 return new CmdReturn("Vous avez allumé le moteur");
             }
 

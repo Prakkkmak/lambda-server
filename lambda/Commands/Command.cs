@@ -102,6 +102,11 @@ namespace Lambda.Commands
                     if (!int.TryParse(parameters[i], out int value)) return new CmdReturn($"[DEBUG] 1 - {syntax[i]} doit être un nombre", CmdReturn.CmdReturnType.WARNING);
                     result[i] = value;
                 }
+                else if (syntaxTypes[i] == typeof(float))
+                {
+                    if (!float.TryParse(parameters[i], out float value)) return new CmdReturn($"[DEBUG] 1 - {syntax[i]} doit être un nombre", CmdReturn.CmdReturnType.WARNING);
+                    result[i] = value;
+                }
                 else if (syntaxTypes[i] == typeof(uint))
                 {
                     if (!uint.TryParse(parameters[i], out uint value)) return new CmdReturn($"[DEBUG] 1 - {syntax[i]} doit être un nombre suppérieur à zéro", CmdReturn.CmdReturnType.WARNING);

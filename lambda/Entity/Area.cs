@@ -70,7 +70,7 @@ namespace Lambda.Entity
 
         public Area()
         {
-            //Spawn(0, new Position(0, 0, 0), new Rgba(0, 0, 0, 255));
+
         }
 
         public Area(float radius, float height, AreaType type = AreaType.NORMAL) : this()
@@ -84,6 +84,7 @@ namespace Lambda.Entity
                 BlipTypeId = 0;
 
             }
+            SetLocations(new Interior(), 0);
 
         }
 
@@ -106,6 +107,14 @@ namespace Lambda.Entity
         public void SetLocations(Interior interior, short dim)
         {
             Location interiorLocation = new Location(interior.Position, interior, dim);
+            Location exteriorLocation = new Location(Position, null, 0);
+            SetInteriorLocation(interiorLocation);
+            SetExteriorLocation(exteriorLocation);
+        }
+        public void SetLocations()
+        {
+            Interior interior = InteriorLocation.Interior;
+            Location interiorLocation = new Location(interior.Position, interior, Dimension);
             Location exteriorLocation = new Location(Position, null, 0);
             SetInteriorLocation(interiorLocation);
             SetExteriorLocation(exteriorLocation);
@@ -133,8 +142,11 @@ namespace Lambda.Entity
             data["are_position_z"] = Position.Z.ToString();
             data["are_radius"] = Radius.ToString();
             data["are_metadata"] = GetMetaData();
-            if (InteriorLocation.Equals(default(Location))) data["are_interior"] = "0";
-            else data["are_interior"] = InteriorLocation.Interior.Id.ToString();
+            data["are_interioripls"] = string.Join(',', InteriorLocation.Interior.GetIPLs());
+            data["are_interiorposition_x"] = InteriorLocation.Position.X.ToString();
+            data["are_interiorposition_y"] = InteriorLocation.Position.Y.ToString();
+            data["are_interiorposition_z"] = InteriorLocation.Position.Z.ToString();
+
             return data;
         }
 
@@ -149,8 +161,14 @@ namespace Lambda.Entity
             Radius = float.Parse(data["are_radius"]);
             Spawn(position);
             SetMetaData(data["are_metadata"]);
-            Interior interior = Interior.GetInterior(uint.Parse(data["are_interior"]));
-            if (interior != null) SetLocations(interior, short.Parse(data["are_id"]));
+            Interior interior = new Interior();
+            interior.SetIPLs(data["are_interioripls"]);
+            Position pos = new Position();
+            pos.X = float.Parse(data["are_interiorposition_x"]);
+            pos.Y = float.Parse(data["are_interiorposition_y"]);
+            pos.Z = float.Parse(data["are_interiorposition_z"]);
+            interior.Position = position;
+            SetLocations(interior, short.Parse(data["are_id"]));
         }
 
         public void Remove()

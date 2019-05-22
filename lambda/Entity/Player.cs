@@ -326,6 +326,7 @@ namespace Lambda.Entity
             data["cha_bankaccount"] = GetBankMoney().ToString();
             data["cha_timeonline"] = TimeOnline.ToString();
             data["cha_totaltimeonline"] = TotalTimeOnline.ToString();
+            data["cha_skin"] = skin.ToString();
             return data;
 
         }
@@ -345,21 +346,19 @@ namespace Lambda.Entity
             Position = position;
             Dimension = short.Parse(data["cha_world"]);
             Health = ushort.Parse(data["cha_hp"]);
-            GetSkin().Id = uint.Parse(data["ski_id"]);
             if (!string.IsNullOrWhiteSpace(data["cha_permissions"]))
                 Permissions.Set(data["cha_permissions"].Split(',').ToList());
             if (data["inv_id"] != null) DatabaseElement.Get<Inventory>(Inventory, uint.Parse(data["inv_id"]));
             else Inventory.Save();
-            DatabaseElement.Get<Skin>(GetSkin(), GetSkin().Id);
             TimeOnline = ulong.Parse(data["cha_timeonline"]);
             TotalTimeOnline = ulong.Parse(data["cha_totaltimeonline"]);
+            GetSkin().SetString(data["cha_skin"]);
         }
 
         public void Save()
         {
             long t = DateTime.Now.Ticks;
             Account.Save();
-            GetSkin().Save();
             Inventory.Save();
             foreach (Skill playerSkill in Skills)
             {

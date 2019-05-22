@@ -17,13 +17,13 @@ namespace Lambda.Utils
 
 
         public string Name { get; set; }
-        private string[] IPLs { get; set; }
+        private List<string> IPLs { get; set; }
         public Position Position { get; set; }
         public Area Area { get; set; }
         public Interior()
         {
             Id = 0;
-            IPLs = new string[0];
+            IPLs = new List<string>();
             Position = new Position(0, 0, 0);
         }
 
@@ -41,12 +41,17 @@ namespace Lambda.Utils
         public void SetIPLs(string iplstr)
         {
             iplstr.Replace(" ", "");
-            IPLs = iplstr.Split(",");
+            IPLs = iplstr.Split(",").ToList();
+        }
+
+        public void AddIpl(string iplstr)
+        {
+            IPLs.Add(iplstr);
         }
 
         public string[] GetIPLs()
         {
-            return IPLs;
+            return IPLs.ToArray();
         }
 
         public Dictionary<string, string> GetData()

@@ -169,7 +169,16 @@ namespace Lambda.Database
             List<Dictionary<string, string>> results = DbConnect.Select(tableName, new Dictionary<string, string>());
             foreach (Dictionary<string, string> result in results)
             {
-                Vehicle entity = (Vehicle)Alt.CreateVehicle(VehicleModel.Adder, Position.Zero, Rotation.Zero);
+                VehicleModel model = (VehicleModel)Enum.Parse(typeof(VehicleModel), result["veh_model"]);
+                Position position = new Position();
+                position.X = float.Parse(result["veh_position_x"]);
+                position.Y = float.Parse(result["veh_position_y"]);
+                position.Z = float.Parse(result["veh_position_z"]);
+                Rotation rotation = new Rotation();
+                rotation.Roll = float.Parse(result["veh_rotation_r"]);
+                rotation.Pitch = float.Parse(result["veh_rotation_p"]);
+                rotation.Yaw = float.Parse(result["veh_rotation_y"]);
+                Vehicle entity = (Vehicle)Alt.CreateVehicle(model, position, rotation);
                 entity.SetData(result);
                 entity.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
                 entities.Add(entity);
