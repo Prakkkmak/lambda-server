@@ -61,6 +61,7 @@ namespace Lambda.Items
             }
 
             Item item = new Item(this, BaseItem.GetBaseItem(id), amount);
+            if (item == null) return false;
             //if (item.GetBaseItem().MaxStack < 1) item.Amount = amount;
             while (item.Amount > item.GetBaseItem().MaxStack && item.GetBaseItem().MaxStack > 0)
             {

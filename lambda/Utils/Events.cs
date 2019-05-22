@@ -29,6 +29,7 @@ namespace Lambda
             Alt.Log("[EVENT] OnPlayerDisconnect registered");
             Alt.OnClient("setlicense", OnPlayerSetLicenseHash);
             Alt.OnClient("setskin", OnClientSetSkin);
+            Alt.OnClient("setheaddata", OnClientSetHeadData);
             Alt.Log("[EVENT] OnVehicleEnter registered");
             Alt.OnPlayerEnterVehicle += OnVehicleEnter;
             Alt.OnPlayerLeaveVehicle += OnVehicleLeave;
@@ -48,7 +49,7 @@ namespace Lambda
         private static void OnPlayerDead(IPlayer altPlayer, AltV.Net.Elements.Entities.IEntity killer, uint nbr)
         {
             Player player = (Player)altPlayer;
-            player.Spawn(Spawn.NewSpawn.Position);
+            //player.Spawn(Spawn.NewSpawn.Position);
         }
 
         public static void OnVehicleRemove(IVehicle vehicle)
@@ -115,6 +116,18 @@ namespace Lambda
 
             str = str.Remove(str.Length - 1);
             player.GetSkin().SetString(str);
+            _ = player.SaveAsync();
+        }
+        public static void OnClientSetHeadData(IPlayer altPlayer, object[] args)
+        {
+            Player player = (Player)altPlayer;
+            string str = "";
+            foreach (object o in args)
+            {
+                str += o.ToString() + ',';
+            }
+            str = str.Remove(str.Length - 1);
+            player.GetSkin().SetHeadDataString(str);
             _ = player.SaveAsync();
         }
 

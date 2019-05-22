@@ -327,6 +327,7 @@ namespace Lambda.Entity
             data["cha_timeonline"] = TimeOnline.ToString();
             data["cha_totaltimeonline"] = TotalTimeOnline.ToString();
             data["cha_skin"] = skin.ToString();
+            data["cha_headdata"] = skin.HeadDataToString();
             return data;
 
         }
@@ -353,6 +354,7 @@ namespace Lambda.Entity
             TimeOnline = ulong.Parse(data["cha_timeonline"]);
             TotalTimeOnline = ulong.Parse(data["cha_totaltimeonline"]);
             GetSkin().SetString(data["cha_skin"]);
+            GetSkin().SetHeadDataString(data["cha_headdata"]);
         }
 
         public void Save()
@@ -384,7 +386,6 @@ namespace Lambda.Entity
         {
             long t = DateTime.Now.Ticks;
             await Account.SaveAsync();
-            await GetSkin().SaveAsync();
             await Inventory.SaveAsync();
             foreach (Skill playerSkill in Skills)
             {

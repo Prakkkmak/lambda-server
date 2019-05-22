@@ -40,22 +40,26 @@ namespace Items
             TOP
         }
 
-        private Component[] components;
+        public Component[] Components;
+        public Component[] Props;
+        public float[] HeadData;
         public string Type;
         public PedModel Model;
 
         public Skin()
         {
-            components = new Component[MAX_COMPONENT_NUMBER];
+            Components = new Component[COMPONENT_LENGTH];
+            Props = new Component[PROP_LENGTH];
+            HeadData = new float[6];
             Type = "DEFAULT";
             Model = PedModel.FreemodeMale01;
         }
 
         public bool Equals(Skin skin)
         {
-            foreach (Component component in components)
+            foreach (Component component in Components)
             {
-                foreach (Component skinComponent in skin.components)
+                foreach (Component skinComponent in skin.Components)
                 {
                     if (!component.Equals(skinComponent))
                     {
@@ -69,7 +73,7 @@ namespace Items
         public override int GetHashCode()
         {
             int code = 1;
-            foreach (Component component in components)
+            foreach (Component component in Components)
             {
                 code *= component.Drawable + 1;
             }
@@ -80,52 +84,69 @@ namespace Items
 
         public void SetComponent(byte i, Component comp)
         {
-            if (i < MAX_COMPONENT_NUMBER)
+            if (i < COMPONENT_LENGTH)
             {
-                components[i] = comp;
+                Components[i] = comp;
             }
 
         }
 
+
         public Component GetComponent(byte i)
         {
-            if (i < MAX_COMPONENT_NUMBER)
+            if (i < COMPONENT_LENGTH)
             {
-                return components[i];
+                return Components[i];
             }
             else return new Component();
         }
 
-        public void SendSkin(Player player)
+        public string HeadDataToString()
         {
-            List<uint> clothes = new List<uint>();
-            for (byte i = 0; i <= MAX_COMPONENT_NUMBER; i++)
+            string str = "";
+            foreach (float f in HeadData)
             {
-                clothes.Add(GetComponent(i).Drawable);
-                clothes.Add(GetComponent(i).Texture);
-                clothes.Add(GetComponent(i).Palette);
+                str += f + ",";
+            }
+            if (str.Length > 0)
+            {
+                str = str.Remove(str.Length - 1);
+            }
+            return str;
+        }
+
+        public void SetHeadDataString(string str)
+        {
+            if (str.Length == 0) return;
+            string[] vals = str.Split(',');
+            for (int i = 0; i < HeadData.Length; i++)
+            {
+                if (i >= vals.Length) return;
+                HeadData[i] = float.Parse(vals[i]);
             }
 
-
-            //player.Game.DbSkin.Save(this);
-            player.Emit("setComponent", clothes.ToArray());
         }
 
         public override string ToString()
         {
             string str = "";
-            foreach (Component component in components)
+            foreach (Component component in Components)
             {
                 str += component.Drawable + ",";
                 str += component.Texture + ",";
                 str += component.Palette + ",";
             }
 
+            foreach (Component prop in Props)
+            {
+                str += prop.Drawable + ",";
+                str += prop.Texture + ",";
+            }
+
             if (str.Length > 0)
             {
                 str = str.Remove(str.Length - 1);
             }
-
             return str;
         }
 
@@ -133,14 +154,24 @@ namespace Items
         {
             if (str.Length == 0) return;
             string[] vals = str.Split(',');
-            for (int i = 0; i < MAX_COMPONENT_NUMBER; i++)
+            for (int i = 0; i < COMPONENT_LENGTH; i++)
             {
+                if (i >= vals.Length) return;
                 ushort drawable = ushort.Parse(vals[i * 3]);
                 ushort texture = ushort.Parse(vals[i * 3 + 1]);
                 ushort palette = ushort.Parse(vals[i * 3 + 2]);
 
                 Component comp = new Component(drawable, texture, palette);
                 SetComponent((byte)i, comp);
+            }
+
+            for (int i = 0; i < Props.Length; i++)
+            {
+                if (i + COMPONENT_LENGTH >= vals.Length) return;
+                ushort drawable = ushort.Parse(vals[(COMPONENT_LENGTH * 3) + (i * 2)]);
+                ushort texture = ushort.Parse(vals[(COMPONENT_LENGTH * 3) + (i * 2 + 1)]);
+                Component comp = new Component(drawable, texture);
+                Props[i] = comp;
             }
         }
 
@@ -150,6 +181,27 @@ namespace Items
             //if (!Enum.IsDefined(typeof(PedModel), model)) model = PedModel.FreemodeMale01;
             player.Model = (uint)Model;
             Alt.Log("Model set en " + (uint)Model);
+        }
+
+        public void SendSkin(Player player)
+        {
+            List<uint> clothes = new List<uint>();
+            for (byte i = 0; i <= COMPONENT_LENGTH; i++)
+            {
+                clothes.Add(GetComponent(i).Drawable);
+                clothes.Add(GetComponent(i).Texture);
+                clothes.Add(GetComponent(i).Palette);
+            }
+            //player.Game.DbSkin.Save(this);
+            player.Emit("setComponents", clothes.ToArray());
+            List<uint> props = new List<uint>();
+            for (byte i = 0; i < Props.Length; i++)
+            {
+                props.Add(Props[i].Drawable);
+                props.Add(Props[i].Texture);
+            }
+            player.Emit("setProps", props.ToArray());
+            player.Emit("setHeadData", HeadData);
         }
 
         public Dictionary<string, string> GetData()
@@ -365,7 +417,8 @@ namespace Items
         return null;
     }
         */
-        public static ushort MAX_COMPONENT_NUMBER = 12;
+        public static ushort COMPONENT_LENGTH = 12;
+        public static ushort PROP_LENGTH = 5;
 
 
     }

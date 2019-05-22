@@ -12,7 +12,7 @@ namespace Lambda.Commands
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("Joueur")]
         [SyntaxType(typeof(Player))]
-        public static CmdReturn Goto_Joueur(Player player, object[] argv)
+        public static CmdReturn Goto(Player player, object[] argv)
         {
             player.Goto((Player)argv[0]);
             return new CmdReturn("Vous vous êtes téléporté.", CmdReturn.CmdReturnType.SUCCESS);
@@ -21,7 +21,7 @@ namespace Lambda.Commands
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("Joueur")]
         [SyntaxType(typeof(Player))]
-        public static CmdReturn Gethere_Joueur(Player player, object[] argv)
+        public static CmdReturn Gethere(Player player, object[] argv)
         {
             ((Player)argv[0]).Goto(player);
             ((Player)argv[0]).SendMessage("Vous vous êtes fait téléporté.");

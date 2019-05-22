@@ -209,7 +209,7 @@ namespace Lambda.Commands
         public static CmdReturn Arme(Player player, object[] argv)
         {
             player.Emit("giveWeapon", (string)argv[0]);
-            return new CmdReturn("Vous avez menotté/démenotté quelqu'un");
+            return new CmdReturn("Vous vous etes donné un objet");
         }
 
         [Status(Command.CommandStatus.NEW)]
@@ -251,6 +251,40 @@ namespace Lambda.Commands
             Area area = (Area)Area.GetArea(player.FeetPosition);
             _ = area.SaveAsync();
             return new CmdReturn("Vous avez save la zone");
+        }
+
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 2)]
+        [Syntax("1", "2")]
+        [SyntaxType(typeof(uint), typeof(uint))]
+        public static CmdReturn Cheveux(Player player, object[] argv)
+        {
+            player.Emit("setHairColor", (uint)argv[0], (uint)argv[1]);
+            return new CmdReturn("Vous avez changé la couleur de vos cheveux");
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 3)]
+        [Syntax("Maman", "Papa", "Mix")]
+        [SyntaxType(typeof(uint), typeof(uint), typeof(float))]
+        public static CmdReturn Forme(Player player, object[] argv)
+        {
+            uint mother = (uint)argv[0];
+            uint father = (uint)argv[1];
+            float mix = (float)argv[2];
+            player.Emit("setShape", mother, father, mix);
+            return new CmdReturn("Vous avez changé la forme");
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 3)]
+        [Syntax("Maman", "Papa", "Mix")]
+        [SyntaxType(typeof(uint), typeof(uint), typeof(float))]
+        public static CmdReturn Peau(Player player, object[] argv)
+        {
+            uint mother = (uint)argv[0];
+            uint father = (uint)argv[1];
+            float mix = (float)argv[2];
+            player.Emit("setSkin", mother, father, mix);
+            return new CmdReturn("Vous avez changé la peau");
         }
     }
 }
