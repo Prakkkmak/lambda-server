@@ -16,6 +16,7 @@ using Lambda.Items;
 using Lambda.Organizations;
 using Lambda.Skills;
 using Lambda.Utils;
+using MoreLinq;
 
 
 namespace Lambda.Entity
@@ -328,6 +329,10 @@ namespace Lambda.Entity
             data["cha_totaltimeonline"] = TotalTimeOnline.ToString();
             data["cha_skin"] = skin.ToString();
             data["cha_headdata"] = skin.HeadDataToString();
+            data["cha_haircolor"] = skin.HairColor + "," + skin.HairTaint;
+            data["cha_eyecolor"] = skin.EyeColor.ToString();
+            data["cha_features"] = string.Join(',', skin.Features);
+            data["cha_overlays"] = skin.OverlaysToString();
             return data;
 
         }
@@ -355,6 +360,11 @@ namespace Lambda.Entity
             TotalTimeOnline = ulong.Parse(data["cha_totaltimeonline"]);
             GetSkin().SetString(data["cha_skin"]);
             GetSkin().SetHeadDataString(data["cha_headdata"]);
+            if (data["cha_haircolor"].Length > 0) GetSkin().HairColor = uint.Parse(data["cha_haircolor"].Split(',')[0]);
+            if (data["cha_haircolor"].Length > 0) GetSkin().HairTaint = uint.Parse(data["cha_haircolor"].Split(',')[1]);
+            GetSkin().EyeColor = uint.Parse(data["cha_eyecolor"]);
+            GetSkin().SetFeatures(data["cha_features"]);
+            GetSkin().SetOverlays(data["cha_overlays"]);
         }
 
         public void Save()

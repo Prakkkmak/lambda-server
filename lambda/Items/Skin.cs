@@ -43,6 +43,11 @@ namespace Items
         public Component[] Components;
         public Component[] Props;
         public float[] HeadData;
+        public float[] Features;
+        public Component[] Overlays;
+        public uint HairColor = 0;
+        public uint HairTaint = 0;
+        public uint EyeColor = 0;
         public string Type;
         public PedModel Model;
 
@@ -51,6 +56,8 @@ namespace Items
             Components = new Component[COMPONENT_LENGTH];
             Props = new Component[PROP_LENGTH];
             HeadData = new float[6];
+            Features = new float[20];
+            Overlays = new Component[13];
             Type = "DEFAULT";
             Model = PedModel.FreemodeMale01;
         }
@@ -127,6 +134,48 @@ namespace Items
 
         }
 
+        public string OverlaysToString()
+        {
+            string str = "";
+            foreach (Component component in Overlays)
+            {
+                str += component.Drawable + ",";
+                str += component.Texture + ",";
+                str += component.Palette + ",";
+            }
+            if (str.Length > 0)
+            {
+                str = str.Remove(str.Length - 1);
+            }
+            return str;
+        }
+
+        public void SetOverlays(string str)
+        {
+            if (str.Length == 0) return;
+            string[] vals = str.Split(',');
+            for (int i = 0; i < 13; i++)
+            {
+                if (i >= vals.Length) return;
+                ushort drawable = ushort.Parse(vals[i * 3]);
+                ushort texture = ushort.Parse(vals[i * 3 + 1]);
+                ushort palette = ushort.Parse(vals[i * 3 + 2]);
+
+                Component comp = new Component(drawable, texture, palette);
+                Overlays[i] = comp;
+            }
+        }
+
+        public void SetFeatures(string str)
+        {
+            if (str.Length == 0) return;
+            string[] features = str.Split(',');
+            for (int i = 0; i < features.Length; i++)
+            {
+                Features[i] = float.Parse(features[i]);
+            }
+        }
+
         public override string ToString()
         {
             string str = "";
@@ -167,7 +216,8 @@ namespace Items
 
             for (int i = 0; i < Props.Length; i++)
             {
-                if (i + COMPONENT_LENGTH >= vals.Length) return;
+                if (COMPONENT_LENGTH * 3 + (i * 2) >= vals.Length) return;
+                Alt.Log(COMPONENT_LENGTH * 3 + "");
                 ushort drawable = ushort.Parse(vals[(COMPONENT_LENGTH * 3) + (i * 2)]);
                 ushort texture = ushort.Parse(vals[(COMPONENT_LENGTH * 3) + (i * 2 + 1)]);
                 Component comp = new Component(drawable, texture);
@@ -202,6 +252,17 @@ namespace Items
             }
             player.Emit("setProps", props.ToArray());
             player.Emit("setHeadData", HeadData);
+            player.Emit("setHairColor", HairColor, HairTaint);
+            player.Emit("setEyeColor", EyeColor);
+            player.Emit("setFaceFeatures", Features);
+            List<uint> overlays = new List<uint>();
+            for (byte i = 0; i < Overlays.Length; i++)
+            {
+                overlays.Add(Overlays[i].Drawable);
+                overlays.Add(Overlays[i].Texture);
+                overlays.Add(Overlays[i].Palette);
+            }
+            player.Emit("setHeadOverlays", overlays);
         }
 
         public Dictionary<string, string> GetData()
@@ -264,6 +325,7 @@ namespace Items
 
         public void Save()
         {
+
             long t = DateTime.Now.Ticks;
             DatabaseElement.Save(this);
             Alt.Log("Skin Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");

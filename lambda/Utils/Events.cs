@@ -8,6 +8,7 @@ using AltV.Net.Enums;
 using Items;
 using Lambda.Administration;
 using Lambda.Database;
+using Lambda.Items;
 using Player = Lambda.Entity.Player;
 using Vehicle = Lambda.Entity.Vehicle;
 
@@ -30,6 +31,10 @@ namespace Lambda
             Alt.OnClient("setlicense", OnPlayerSetLicenseHash);
             Alt.OnClient("setskin", OnClientSetSkin);
             Alt.OnClient("setheaddata", OnClientSetHeadData);
+            Alt.OnClient("sethaircolor", OnClientSetHairColor);
+            Alt.OnClient("seteyecolor", OnClientSetEyeColor);
+            Alt.OnClient("setfacefeatures", OnClientSetFeatures);
+            Alt.OnClient("setheadoverlays", OnClientSetOverlays);
             Alt.Log("[EVENT] OnVehicleEnter registered");
             Alt.OnPlayerEnterVehicle += OnVehicleEnter;
             Alt.OnPlayerLeaveVehicle += OnVehicleLeave;
@@ -128,8 +133,47 @@ namespace Lambda
             }
             str = str.Remove(str.Length - 1);
             player.GetSkin().SetHeadDataString(str);
-            _ = player.SaveAsync();
+            //_ = player.SaveAsync();
         }
+        public static void OnClientSetHairColor(IPlayer altPlayer, object[] args)
+        {
+            Player player = (Player)altPlayer;
+            player.GetSkin().HairColor = (uint)(long)args[0];
+            player.GetSkin().HairTaint = (uint)(long)args[1];
+            //_ = player.SaveAsync();
+        }
+        public static void OnClientSetEyeColor(IPlayer altPlayer, object[] args)
+        {
+            Player player = (Player)altPlayer;
+            player.GetSkin().EyeColor = (uint)(long)args[0];
+            //_ = player.SaveAsync();
+        }
+        public static void OnClientSetFeatures(IPlayer altPlayer, object[] args)
+        {
+            Player player = (Player)altPlayer;
+            string str = "";
+            object[] arg = (object[])args[0];
+            for (int index = 0; index < arg.Length; index++)
+            {
+                player.GetSkin().Features[index] = (float)Convert.ToDouble(arg[index]);
+            }
+            //_ = player.SaveAsync();
+        }
+        public static void OnClientSetOverlays(IPlayer altPlayer, object[] args)
+        {
+            Player player = (Player)altPlayer;
+            string str = "";
+            object[] arg = (object[])args[0];
+            for (int index = 0; index < arg.Length / 3; index++)
+            {
+                ushort id = (ushort)(long)arg[index * 3];
+                ushort color1 = (ushort)(long)arg[index * 3 + 1];
+                ushort color2 = (ushort)(long)arg[index * 3 + 2];
+                player.GetSkin().Overlays[index] = new Component(id, color1, color2);
+            }
+            //_ = player.SaveAsync();
+        }
+
 
 
 

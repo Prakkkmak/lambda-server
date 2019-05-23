@@ -263,6 +263,15 @@ namespace Lambda.Commands
             return new CmdReturn("Vous avez changé la couleur de vos cheveux");
         }
         [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("1")]
+        [SyntaxType(typeof(uint))]
+        public static CmdReturn Yeux(Player player, object[] argv)
+        {
+            player.Emit("setEyeColor", (uint)argv[0]);
+            return new CmdReturn("Vous avez changé la couleur de vos yeux");
+        }
+        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 3)]
         [Syntax("Maman", "Papa", "Mix")]
         [SyntaxType(typeof(uint), typeof(uint), typeof(float))]
