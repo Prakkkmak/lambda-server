@@ -29,7 +29,7 @@ namespace Lambda.Commands
             Vehicle vehicle = (Vehicle)Alt.CreateVehicle(model, pos, player.Rotation);
             Vehicle.AddVehicle(vehicle);
             //vehicle.Spawn();
-            player.Inventory.AddItem(100, 1, vehicle.Lock.Code);
+            player.Inventory.AddItem(Enums.Items.CarKey, 1, vehicle.Lock.Code);
             return new CmdReturn("Vous avez fait apparaitre un véhicule", CmdReturn.CmdReturnType.SUCCESS);
         }
 
@@ -133,7 +133,7 @@ namespace Lambda.Commands
         {
             Vehicle vehicle = (Vehicle)player.Vehicle;
             if (vehicle == null) return CmdReturn.NotInVehicle;
-            player.Inventory.AddItem(1000, 1, vehicle.Lock.Code);
+            player.Inventory.AddItem(Enums.Items.CarKey, 1, vehicle.Lock.Code);
             return new CmdReturn(vehicle.Lock.Code);
         }
         [Status(Command.CommandStatus.NEW)]

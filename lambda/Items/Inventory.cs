@@ -50,6 +50,11 @@ namespace Lambda.Items
             return true;
         }
 
+        public bool AddItem(Enums.Items id, uint amount, string metadata = "")
+        {
+            if (id == Enums.Items.Invalid) return false;
+            return AddItem((uint)id, amount, metadata);
+        }
         public bool AddItem(uint id, uint amount, string metadata = "")
         {
             Item itemWithLessStack = GetItemWithLessStack(id);
@@ -188,6 +193,10 @@ namespace Lambda.Items
         public async Task SaveAsync()
         {
             long t = DateTime.Now.Ticks;
+            foreach (Item item in Items)
+            {
+                await item.SaveAsync();
+            }
             await DatabaseElement.SaveAsync(this);
             Alt.Log("Inventory Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }
@@ -200,6 +209,10 @@ namespace Lambda.Items
         public void Save()
         {
             long t = DateTime.Now.Ticks;
+            foreach (Item item in Items)
+            {
+                item.Save();
+            }
             DatabaseElement.Save(this);
             Alt.Log("Inventory Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }

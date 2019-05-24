@@ -365,6 +365,7 @@ namespace Lambda.Entity
             GetSkin().EyeColor = uint.Parse(data["cha_eyecolor"]);
             GetSkin().SetFeatures(data["cha_features"]);
             GetSkin().SetOverlays(data["cha_overlays"]);
+            _ = SaveAsync();
         }
 
         public void Save()
@@ -428,6 +429,7 @@ namespace Lambda.Entity
 
         public static Player[] GetPlayers(string nameOrId)
         {
+            nameOrId.Replace('_', ' ');
             List<Player> players = new List<Player>();
             foreach (Player player in Players)
             {

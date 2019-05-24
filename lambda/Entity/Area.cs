@@ -167,7 +167,7 @@ namespace Lambda.Entity
             pos.X = float.Parse(data["are_interiorposition_x"]);
             pos.Y = float.Parse(data["are_interiorposition_y"]);
             pos.Z = float.Parse(data["are_interiorposition_z"]);
-            interior.Position = position;
+            interior.Position = pos;
             SetLocations(interior, short.Parse(data["are_id"]));
         }
 

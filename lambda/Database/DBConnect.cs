@@ -106,7 +106,15 @@ namespace Lambda.Database
             MySqlConnection connection = OpenConnection();
             string query = DataToInsertQuery(table, data);
             MySqlCommand cmd = new MySqlCommand(query, connection);
-            await cmd.ExecuteNonQueryAsync();
+            try
+            {
+                await cmd.ExecuteNonQueryAsync();
+            }
+            catch (Exception ex)
+            {
+                //await DoCleanupAsync();
+                throw ex;
+            }
             long last = cmd.LastInsertedId;
             CloseConnection(connection);
             return last;
