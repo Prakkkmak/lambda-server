@@ -35,6 +35,7 @@ namespace Lambda
             Alt.OnClient("seteyecolor", OnClientSetEyeColor);
             Alt.OnClient("setfacefeatures", OnClientSetFeatures);
             Alt.OnClient("setheadoverlays", OnClientSetOverlays);
+            Alt.OnClient("changeSelectedPlayer", OnClientChangePlayerSelected);
             Alt.Log("[EVENT] OnVehicleEnter registered");
             Alt.OnPlayerEnterVehicle += OnVehicleEnter;
             Alt.OnPlayerLeaveVehicle += OnVehicleLeave;
@@ -169,6 +170,19 @@ namespace Lambda
                 player.GetSkin().Overlays[index] = new Component(id, color1, color2);
             }
             //_ = player.SaveAsync();
+        }
+        public static void OnClientChangePlayerSelected(IPlayer altPlayer, object[] args)
+        {
+            Player player = (Player)altPlayer;
+            int selectedId = Convert.ToInt32(args[0]);
+            if (selectedId == -1) player.PlayerSelected = null;
+            else
+            {
+                player.PlayerSelected = Player.GetPlayers(selectedId + "")[0];
+                Alt.Log(player.Name + " Séléctionne " + player.PlayerSelected.Name);
+            }
+
+
         }
 
 

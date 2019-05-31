@@ -282,6 +282,15 @@ namespace Lambda.Commands
             Alt.CreateCheckpoint(1, pos, 0.30f, 0.5f, new Rgba(0, 0, 0, 255));
             return new CmdReturn("Vous avez changé la peau");
         }
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn munotter(Player player, object[] argv)
+        {
+            Player target = player.PlayerSelected;
+            if (player.PlayerSelected == null) return new CmdReturn("Vous ne selectionnez personne");
+            target.Emit("setHandcuff");
+            target.SendMessage("Vous avez été menotté/démenotté");
+            return new CmdReturn("Vous avez menotté quelqu'un");
+        }
     }
 }
 

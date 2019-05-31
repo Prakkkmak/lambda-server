@@ -57,6 +57,7 @@ namespace Lambda.Entity
 
         public Position FeetPosition => new Position(Position.X, Position.Y, Position.Z - 1);
 
+        public Player PlayerSelected = null;
 
         private uint deathCount;
         private uint id; // The id in the database
@@ -66,6 +67,8 @@ namespace Lambda.Entity
         private Skin skin;
 
         private Request request;
+
+
 
         public Player(IntPtr nativePointer, ushort id) : base(nativePointer, id)
         {
