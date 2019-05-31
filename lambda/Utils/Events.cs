@@ -84,7 +84,6 @@ namespace Lambda
             string license = (string)args[0];
             Alt.Log("License set to " + license);
             altPlayer.SetData("license", license);
-
             player.Spawn(Spawn.NewSpawn.Position);
             player.Freeze(false);
             Account account = new Account(license);
@@ -100,9 +99,7 @@ namespace Lambda
                 _ = player.SaveAsync();
 
             }
-
-
-            Alt.Log($"[{player.ServerId}]{player.FullName} c'est connécté.");
+            Alt.Log($"[{player.ServerId}]{player.FullName} s'est connecté.");
             Player.AddPlayer(player);
             Alt.Log("Skin chargement");
             player.GetSkin().SendModel(player);

@@ -62,5 +62,18 @@ namespace Lambda.Commands
             org.ChangeMemberRank(member, rank);
             return new CmdReturn($"Vous avez changé le rang de {member.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("LEADER_PROMOTE")]
+        [Command(Command.CommandType.ORGANIZATION, 3)]
+        [Syntax("Organisation", "Rang", "Salaire")]
+        [SyntaxType(typeof(Organization), typeof(Rank), typeof(uint))]
+        public static CmdReturn Leader_Salaire(Player player, object[] argv)
+        {
+            Organization org = (Organization)argv[0];
+            Rank rank = (Rank)argv[1];
+            uint salary = (uint)argv[2];
+            if (!player.AllowedTo(org, "LEADER_SALARY")) return new CmdReturn("Vous n'etes pas autorisés a faire cela");
+            rank.Salary = salary;
+            return new CmdReturn($"Vous avez changé le salaire du rang {rank.Name} à {salary}$.", CmdReturn.CmdReturnType.SUCCESS);
+        }
     }
 }

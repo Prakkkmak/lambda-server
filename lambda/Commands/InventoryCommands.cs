@@ -90,7 +90,6 @@ namespace Lambda.Commands
             if (amount > 10) return new CmdReturn("Ne te donne pas trop d'objets stp");
             return new CmdReturn("Vous avez donné des objets", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.INVENTORY, 1)]
         [Syntax("Objet")]
         [SyntaxType(typeof(Item))]
@@ -99,7 +98,6 @@ namespace Lambda.Commands
             Item item = (Item)argv[0];
             return new CmdReturn($"{item.GetBaseItem().Id} {item.GetBaseItem().Name} ({item.Amount}) : {item.MetaData}");
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.INVENTORY, 2)]
         [Syntax("Objet", "Valeur")]
         [SyntaxType(typeof(Item), typeof(string))]
@@ -109,22 +107,21 @@ namespace Lambda.Commands
             item.MetaData = argv[1] + "";
             return new CmdReturn("Vous avez changé le metadata de l'objet.");
         }
-
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.INVENTORY)]
         public static CmdReturn Inventaire_Vider(Player player, object[] argv)
         {
-            player.Inventory.Clear();
+            _ = player.Inventory.ClearAsync();
             return new CmdReturn("Vous avez vidé votre inventaire.");
         }
-        [Status(Command.CommandStatus.NEW)]
-        [Command(Command.CommandType.INVENTORY, 1)]
-        [Syntax("Objet")]
-        [SyntaxType(typeof(Item))]
+        [Command(Command.CommandType.INVENTORY, 2)]
+        [Syntax("Objet", "Nombre")]
+        [SyntaxType(typeof(uint), typeof(uint))]
         public static CmdReturn Objet_Jeter(Player player, object[] argv)
         {
-            Item item = (Item)argv[0];
-            player.Inventory.RemoveItem(item.Id, item.Amount);
+            uint slot = (uint)argv[0];
+            uint amount = (uint)argv[1];
+            if (player.Inventory.Items.Count <= slot) return new CmdReturn("Index incorrect");
+            player.Inventory.RemoveItem(slot, amount);
             return new CmdReturn($"Vous avez jeté un objet");
         }
     }

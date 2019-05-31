@@ -11,7 +11,7 @@
   </Item>
   <Item>
     <Id>2</Id>
-    <Name>Donnut</Name>
+    <Name>Donut</Name>
     <Description>Mhhh dunnut</Description>
     <Weight>1</Weight>
     <Maxstack>100</Maxstack>

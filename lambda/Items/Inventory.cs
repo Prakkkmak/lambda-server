@@ -98,29 +98,15 @@ namespace Lambda.Items
 
         public void RemoveItem(uint id, uint amount)
         {
-
-            while (amount > 0)
+            int slot = (int)id;
+            if (amount < Items[slot].Amount && amount != 0)
             {
-                Item itemWithLessStack = GetItemWithLessStack(id);
-                if (itemWithLessStack != null)
-                {
-                    if (amount >= itemWithLessStack.Amount)
-                    {
-                        amount -= itemWithLessStack.Amount;
-                        Items.Remove(itemWithLessStack);
-                    }
-                    else
-                    {
-                        itemWithLessStack.Amount -= amount;
-                    }
-                }
-                else
-                {
-                    return;
-                }
-
+                Items[slot].Amount -= amount;
             }
-
+            else
+            {
+                Items.RemoveAt(slot);
+            }
             _ = SaveAsync();
 
         }
@@ -160,15 +146,6 @@ namespace Lambda.Items
             return null;
         }
 
-        public void Clear()
-        {
-            foreach (Item item in Items)
-            {
-                item.DeleteAsync();
-            }
-            Items = new List<Item>();
-            _ = SaveAsync();
-        }
 
         public Dictionary<string, string> GetData()
         {
@@ -184,7 +161,39 @@ namespace Lambda.Items
             Money = long.Parse(data["inv_money"]);
             Items = DatabaseElement.GetAllItems(this).ToList();
         }
+        public void Clear()
+        {
+            List<Item> items = Items;
+            Items = new List<Item>();
+            foreach (Item item in items)
+            {
+                item.Delete();
+            }
+            Save();
+        }
+        public async Task ClearAsync()
+        {
+            List<Item> items = Items;
+            Items = new List<Item>();
+            foreach (Item item in items)
+            {
+                await item.DeleteAsync();
+            }
 
+            await SaveAsync();
+        }
+
+
+        public void Save()
+        {
+            long t = DateTime.Now.Ticks;
+            foreach (Item item in Items)
+            {
+                item.Save();
+            }
+            DatabaseElement.Save(this);
+            Alt.Log("Inventory Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
+        }
         public void Delete()
         {
             DatabaseElement.Delete(this);
@@ -206,16 +215,7 @@ namespace Lambda.Items
             throw new NotImplementedException();
         }
 
-        public void Save()
-        {
-            long t = DateTime.Now.Ticks;
-            foreach (Item item in Items)
-            {
-                item.Save();
-            }
-            DatabaseElement.Save(this);
-            Alt.Log("Inventory Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
-        }
+
 
 
 

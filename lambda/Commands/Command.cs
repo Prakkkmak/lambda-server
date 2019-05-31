@@ -181,7 +181,7 @@ namespace Lambda.Commands
                 else if (syntaxTypes[i] == typeof(Permissions))
                 {
                     if (!Permissions.PermissionExist(parameters[i])) return new CmdReturn("Permissions n'existe pas", CmdReturn.CmdReturnType.WARNING);
-                    result[i] = parameters[0];
+                    result[i] = parameters[i];
                 }
                 else
                 {

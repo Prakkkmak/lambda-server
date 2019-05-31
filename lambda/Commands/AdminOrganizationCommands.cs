@@ -159,8 +159,8 @@ namespace Lambda.Commands
             Organization org = (Organization)argv[0];
             Rank rank = (Rank)argv[1];
             Player target = (Player)argv[2];
-            org.AddMember(target, rank);
             if (org.GetMember(target.Id) != null) return new CmdReturn($"{target.FullName} est déjà d'ans l'organisation", CmdReturn.CmdReturnType.WARNING);
+            org.AddMember(target, rank);
             return new CmdReturn($"Vous avez ajouté {target.FullName} à l'organisation {org.Name} au rang de {rank.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.ORGANIZATION, 4)]

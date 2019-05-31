@@ -24,10 +24,15 @@ namespace Lambda.Commands
                 return new CmdReturn("Modele incorrect", CmdReturn.CmdReturnType.WARNING);
             }
             if (!Enum.IsDefined(typeof(VehicleModel), model)) return new CmdReturn("Modele incorrect", CmdReturn.CmdReturnType.WARNING);
-            Position pos = player.Position;
-            pos.X += 5;
-            Vehicle vehicle = (Vehicle)Alt.CreateVehicle(model, pos, player.Rotation);
+            Position pos = PositionHelper.PositionInAngle(player.Position, player.Rotation, 2);
+            Rotation rot = player.Rotation;
+            rot.Yaw -= (float)Math.PI / 2;
+            while (rot.Yaw < -(float)Math.PI) rot.Yaw += 2 * (float)Math.PI;
+            while (rot.Yaw > (float)Math.PI) rot.Yaw -= 2 * (float)Math.PI;
+            Vehicle vehicle = (Vehicle)Alt.CreateVehicle(model, pos, rot);
             Vehicle.AddVehicle(vehicle);
+            player.SendMessage("veh : " + vehicle.Rotation.Yaw);
+            player.SendMessage("Player : " + player.Rotation.Yaw);
             //vehicle.Spawn();
             player.Inventory.AddItem(Enums.Items.CarKey, 1, vehicle.Lock.Code);
             return new CmdReturn("Vous avez fait apparaitre un véhicule", CmdReturn.CmdReturnType.SUCCESS);
@@ -73,8 +78,6 @@ namespace Lambda.Commands
             if (veh.Id != 0) veh.Delete();
             return new CmdReturn("Vous avez supprimé un véhicule", CmdReturn.CmdReturnType.SUCCESS);
         }
-
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.VEHICLE)]
         public static CmdReturn Vehicule_Clef(Player player, object[] argv)
         {
@@ -95,7 +98,6 @@ namespace Lambda.Commands
 
 
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.VEHICLE)]
         public static CmdReturn Vehicule_Fermer(Player player, object[] argv)
         {
@@ -105,7 +107,6 @@ namespace Lambda.Commands
             vehicle.LockState = VehicleLockState.Locked;
             return new CmdReturn("Vous avez fermé le véhicule");
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.VEHICLE)]
         public static CmdReturn Vehicule_Ouvrir(Player player, object[] argv)
         {
@@ -115,7 +116,6 @@ namespace Lambda.Commands
             vehicle.LockState = VehicleLockState.None;
             return new CmdReturn("Vous avez ouvert le véhicule");
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.VEHICLE, 1)]
         [Syntax("Plaque")]
         [SyntaxType(typeof(string))]
@@ -127,16 +127,14 @@ namespace Lambda.Commands
             vehicle.NumberplateText = text;
             return new CmdReturn("Vous avez changé la plaque du véhicule");
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.VEHICLE)]
-        public static CmdReturn Vehicule_Cle_Obtenir(Player player, object[] argv)
+        public static CmdReturn Vehicule_Obtenir_Clef(Player player, object[] argv)
         {
             Vehicle vehicle = (Vehicle)player.Vehicle;
             if (vehicle == null) return CmdReturn.NotInVehicle;
             player.Inventory.AddItem(Enums.Items.CarKey, 1, vehicle.Lock.Code);
             return new CmdReturn(vehicle.Lock.Code);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.VEHICLE, 1)]
         [Syntax("Joueur")]
         [SyntaxType(typeof(Player))]
@@ -147,7 +145,6 @@ namespace Lambda.Commands
             vehicle.SetOwner(player);
             return new CmdReturn("Vous avez changé le propriétaire du véhicule");
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.VEHICLE)]
         public static CmdReturn Vehicule_Info(Player player, object[] argv)
         {

@@ -45,6 +45,9 @@ namespace Lambda.Entity
             this.Inventory = new Inventory(this);
             this.VoiceChannel = Alt.CreateVoiceChannel(true, 10);
             this.Lock = new Lock(10, Lock.Complexity.NUMERICAL, Lock.Complexity.ALPHAMAJ);
+            ModKit = 1;
+            PrimaryColorRgb = new Rgba(0, 0, 0, 255);
+            SecondaryColorRgb = new Rgba(0, 0, 0, 255);
         }
 
         public void Respawn()
@@ -102,6 +105,27 @@ namespace Lambda.Entity
             SetOwner(player.Id);
         }
 
+        public string ModToString()
+        {
+            string str = "";
+            for (byte i = 0; i < 68; i++)
+            {
+                str += GetMod(i) + ",";
+            }
+            str += str.Remove(str.Length - 1);
+            return str;
+        }
+        public void SetModString(string str)
+        {
+            string[] mods = str.Split(',');
+            if (string.IsNullOrWhiteSpace(mods[0])) return;
+            for (byte i = 0; i < mods.Length; i++)
+            {
+                byte mod = byte.Parse(mods[i]);
+                SetMod(i, mod);
+            }
+        }
+
         public Dictionary<string, string> GetData()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
@@ -120,6 +144,7 @@ namespace Lambda.Entity
             data["veh_color2_b"] = SecondaryColorRgb.B.ToString();
             data["veh_lock"] = Lock.Code;
             data["veh_plate"] = NumberplateText;
+            data["veh_mods"] = ModToString();
             if (OwnerId == 0) return data;
             if (GetOwnerType() == Vehicle.OwnerType.CHARACTER) data["cha_id"] = OwnerId.ToString();
             else if (GetOwnerType() == Vehicle.OwnerType.ORGANIZATION) data["org_id"] = OwnerId.ToString();
@@ -134,12 +159,13 @@ namespace Lambda.Entity
             position.Z = float.Parse(data["veh_position_z"]);
             SpawnPosition = position;
             Lock.Code = data["veh_lock"];
-            //Spawn();
             Rotation rotation = new Rotation();
             rotation.Roll = float.Parse(data["veh_rotation_r"]);
             rotation.Pitch = float.Parse(data["veh_rotation_p"]);
             rotation.Yaw = float.Parse(data["veh_rotation_y"]);
-            Rotation = rotation;
+            SpawnRotation = rotation;
+            Position = SpawnPosition;
+            Rotation = SpawnRotation;
             Rgba color = new Color();
             color.R = byte.Parse(data["veh_color_r"]);
             color.G = byte.Parse(data["veh_color_g"]);
@@ -151,6 +177,7 @@ namespace Lambda.Entity
             NumberplateText = data["veh_plate"];
             PrimaryColorRgb = color;
             SecondaryColorRgb = secondaryColor;
+            SetModString(data["veh_mods"]);
             if (data.ContainsKey("cha_id"))
             {
                 SetOwnerType(Vehicle.OwnerType.CHARACTER);

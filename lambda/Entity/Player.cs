@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using AltV.Net;
 using AltV.Net.Async.Events;
 using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
+using AltV.Net.Enums;
 using IVoiceChannel = AltV.Net.Elements.Entities.IVoiceChannel;
 using Items;
 using Lambda.Administration;
@@ -108,7 +110,7 @@ namespace Lambda.Entity
         public void Freeze(bool choice)
         {
 
-            Emit("setfreeze", choice);
+            Emit("setFreeze", choice);
         }
 
         public void Goto(Position pos)
@@ -250,7 +252,10 @@ namespace Lambda.Entity
             return vehicles.ToArray();
         }
 
-
+        public new bool IsInVehicle
+        {
+            get { return Vehicle != null; }
+        }
 
         public Vehicle GetNearestVehicle(int range)
         {
@@ -269,7 +274,7 @@ namespace Lambda.Entity
 
         public bool HaveKeyOf(string code)
         {
-            return Inventory.GetItemWithBaseItemIdAndMetaData(1000, code) != null;
+            return Inventory.GetItemWithBaseItemIdAndMetaData((int)Enums.Items.CarKey, code) != null;
         }
 
         public Skill GetSkill(Skill.SkillType type)
@@ -307,6 +312,44 @@ namespace Lambda.Entity
             }
         }
 
+
+
+        public Player GetClosePlayerInDistance(int distance = 0)
+        {
+            Player closePlayer = null;
+            Position targetPosition;
+            foreach (Player player in Players)
+            {
+                if (player.Position.Distance(this.Position) < closePlayer.Position.Distance(this.Position) && player != this)
+                {
+                    closePlayer = player;
+                }
+            }
+
+            if (closePlayer != null && distance <= 0) return closePlayer;
+            if (closePlayer != null && closePlayer.Position.Distance(this.Position) < distance) return closePlayer;
+
+            return null;
+        }
+
+        public Vehicle GetCloseVehicleInDistance(int distance = 0)
+        {
+            Vehicle closeVehicle = null;
+            foreach (Vehicle vehicle in Lambda.Entity.Vehicle.Vehicles)
+            {
+                if (vehicle.Position.Distance(this.Position) < closeVehicle.Position.Distance(this.Position))
+                {
+                    closeVehicle = vehicle;
+                }
+            }
+
+            if (closeVehicle != null && distance <= 0) return closeVehicle;
+            if (closeVehicle != null && closeVehicle.Position.Distance(this.Position) < distance) return closeVehicle;
+
+            return null;
+        }
+
+
         public Dictionary<string, string> GetData()
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
@@ -333,6 +376,7 @@ namespace Lambda.Entity
             data["cha_eyecolor"] = skin.EyeColor.ToString();
             data["cha_features"] = string.Join(',', skin.Features);
             data["cha_overlays"] = skin.OverlaysToString();
+            data["cha_model"] = Model.ToString();
             return data;
 
         }
@@ -365,6 +409,8 @@ namespace Lambda.Entity
             GetSkin().EyeColor = uint.Parse(data["cha_eyecolor"]);
             GetSkin().SetFeatures(data["cha_features"]);
             GetSkin().SetOverlays(data["cha_overlays"]);
+            if (uint.Parse(data["cha_model"]) != 0) Model = uint.Parse(data["cha_model"]);
+            GetSkin().Model = (PedModel)Model;
             _ = SaveAsync();
         }
 

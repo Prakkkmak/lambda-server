@@ -15,6 +15,7 @@ namespace Lambda.Commands
         public static CmdReturn Interieur_Ajouter(Player player, object[] argv)
         {
             Area area = (Area)Area.GetArea(player.FeetPosition);
+            if (area == null) return new CmdReturn("Pas de interieur ici");
             area.InteriorLocation.Interior.AddIpl((string)argv[0]);
             area.SetLocations();
             _ = area.SaveAsync();
@@ -24,19 +25,19 @@ namespace Lambda.Commands
         public static CmdReturn Interieur_Raz(Player player, object[] argv)
         {
             Area area = (Area)Area.GetArea(player.FeetPosition);
+            if (area == null) return new CmdReturn("Pas de interieur ici");
             area.InteriorLocation.Interior.SetIPLs("");
             area.SetLocations();
             _ = area.SaveAsync();
             return new CmdReturn("Vous avez remis à zéro l'interieur");
         }
-
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 3)]
         [Syntax("x", "y", "z")]
         [SyntaxType(typeof(float), typeof(float), typeof(float))]
         public static CmdReturn Interieur_Position(Player player, object[] argv)
         {
             Area area = (Area)Area.GetArea(player.FeetPosition);
+            if (area == null) return new CmdReturn("Pas de interieur ici");
             Position pos = area.InteriorLocation.Interior.Position;
             pos.X = (float)argv[0];
             pos.Y = (float)argv[1];

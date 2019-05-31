@@ -179,6 +179,7 @@ namespace Lambda.Database
                 rotation.Pitch = float.Parse(result["veh_rotation_p"]);
                 rotation.Yaw = float.Parse(result["veh_rotation_y"]);
                 Vehicle entity = (Vehicle)Alt.CreateVehicle(model, position, rotation);
+                Alt.Log(entity.Rotation.Pitch + " " + entity.Rotation.Roll + " " + entity.Rotation.Yaw);
                 entity.SetData(result);
                 entity.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
                 entities.Add(entity);

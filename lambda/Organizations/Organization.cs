@@ -63,7 +63,7 @@ namespace Lambda.Organizations
         {
             foreach (Member member in members)
             {
-                if (member.Id == id) return member;
+                if (member.PlayerId == id) return member;
             }
 
             return null;
@@ -249,8 +249,10 @@ namespace Lambda.Organizations
             List<Organization> orgs = new List<Organization>();
             foreach (Organization organization in Organizations)
             {
-                if (organization.Id.ToString().Equals(name) ||
-                    organization.Name.Replace(" ", "_").ToLower().Equals(name.ToLower())) orgs.Add(organization);
+                if (organization.Id.ToString().Equals(name)) orgs.Add(organization);
+                if (organization.Name.Replace(" ", "_").ToLower().StartsWith(name.ToLower())) orgs.Add(organization);
+
+
             }
             return orgs.ToArray();
         }

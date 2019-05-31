@@ -26,7 +26,7 @@ namespace Lambda.Commands
             House house = (House)Area.GetArea(player.FeetPosition, Area.AreaType.HOUSE);
             if (house == null) return new CmdReturn("Aucune maison n a ete trouvée", CmdReturn.CmdReturnType.LOCATION);
             house.SetLocations(interior, (short)house.Id);
-            house.SaveAsync();
+            _ = house.SaveAsync();
             return new CmdReturn("Vous avez changé l'interieur!", CmdReturn.CmdReturnType.SUCCESS);
         }
     }

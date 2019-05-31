@@ -21,38 +21,5 @@ namespace Lambda.Commands
             player.GetSkin().SendSkin(player);
             return new CmdReturn("Vous avez set un skin !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        // Change the component to the next at a specific slot
-        // /vetement suivant 1
-        [Command(Command.CommandType.SKIN, 1)]
-        [Syntax("Slot")]
-        [SyntaxType(typeof(byte))]
-        public static CmdReturn Vetement_Suivant(Player player, object[] argv)
-        {
-            byte componentId = (byte)argv[0];
-            Skin skin = player.GetSkin();
-            Component comp = skin.GetComponent(componentId);
-            comp.Drawable++;
-            skin.SetComponent(componentId, comp);
-            skin.SendSkin(player);
-            string clothName = Enum.GetName(typeof(Skin.ClothNumber), componentId);
-            return new CmdReturn("Vous avez changé votre vetement en slot " + clothName.ToLower() + " valeur: " + (comp.Drawable), CmdReturn.CmdReturnType.SUCCESS);
-        }
-        [Command(Command.CommandType.SKIN, 1)]
-        [Syntax("Slot")]
-        [SyntaxType(typeof(byte))]
-        public static CmdReturn Vetement_Precedent(Player player, object[] argv)
-        {
-            byte componentId = (byte)argv[0];
-            Skin skin = player.GetSkin();
-            Component comp = skin.GetComponent(componentId);
-            if (comp.Drawable >= 1)
-            {
-                comp.Drawable--;
-                skin.SetComponent(componentId, comp);
-                skin.SendSkin(player);
-            }
-            string clothName = Enum.GetName(typeof(Skin.ClothNumber), componentId);
-            return new CmdReturn("Vous avez changé votre vetement en slot " + clothName.ToLower() + " valeur: " + (comp.Drawable), CmdReturn.CmdReturnType.SUCCESS);
-        }
     }
 }

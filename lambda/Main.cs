@@ -53,6 +53,11 @@ namespace Lambda
         }
         public override void OnStart()
         {
+            Alt.Log("LAMBDA BUILD #5 pre1");
+            Alt.Log("<br>");
+            Alt.Log("<br>");
+            Alt.Log("<br>");
+            Alt.Log("<br>");
             //DatabaseElement.DbConnect = new DBConnect();
             Alt.Log("=== Register events... ===");
             Events.RegisterEvents();

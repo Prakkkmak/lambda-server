@@ -77,7 +77,6 @@ namespace Lambda.Commands
             player.Spawn(Spawn.NewSpawn.Position);
             return new CmdReturn("Vous vous avez respawn!", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("Permission")]
         [SyntaxType(typeof(string))]
@@ -86,7 +85,6 @@ namespace Lambda.Commands
             player.Permissions.Add((string)argv[0]);
             return new CmdReturn("Vous avez ajouté une permission", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("Permission")]
         [SyntaxType(typeof(string))]

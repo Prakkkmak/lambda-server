@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AltV.Net;
 using AltV.Net.Data;
 using AltV.Net.Enums;
 using Lambda.Administration;
@@ -116,7 +117,9 @@ namespace Lambda.Commands
         public static CmdReturn Level(Player player, object[] argv)
         {
             Skill.SkillType type = (Skill.SkillType)argv[0];
+            if (type == default) return new CmdReturn("Cette competence n'existe pas");
             Skill skill = player.GetSkill(type);
+            if (skill == null) return new CmdReturn("Vous n'avez pas la competence");
             return new CmdReturn("Vous etes level " + skill.GetLevel());
         }
         [Command(Command.CommandType.TEST)]
@@ -175,12 +178,29 @@ namespace Lambda.Commands
         [SyntaxType(typeof(byte), typeof(byte))]
         public static CmdReturn Bite(Player player, object[] argv)
         {
-            if (player.IsInVehicle)
-            {
-                player.Vehicle.ModKit = 1;
-                player.Vehicle.SetMod((byte)argv[0], (byte)argv[1]);
-            }
+            Alt.Log("pr3");
+            Alt.Log(player.IsInVehicle + "");
+            Alt.Log("pr32");
+            if (!player.IsInVehicle) return new CmdReturn("Vous n'etes pas dans un véhicule");
+            Alt.Log("pr31");
+            byte category = (byte)argv[0];
+            Alt.Log("ici0");
+            byte value = (byte)argv[1];
+            Alt.Log("ici");
+            player.Vehicle.ModKit = 1;
+            Alt.Log("ici2");
+            player.Vehicle.SetMod(category, value);
+            Alt.Log("ici3");
             return new CmdReturn("Ca marche");
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn kouki(Player player, object[] argv)
+        {
+            Alt.Log("pr3");
+            Alt.Log(player.IsInVehicle + "");
+            Alt.Log("pr32");
+            return new CmdReturn("ok");
         }
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 1)]
@@ -212,46 +232,6 @@ namespace Lambda.Commands
             return new CmdReturn("Vous vous etes donné un objet");
         }
 
-        [Status(Command.CommandStatus.NEW)]
-        [Command(Command.CommandType.TEST, 1)]
-        [Syntax("ipl")]
-        [SyntaxType(typeof(string))]
-        public static CmdReturn Zone_Interieur_Ajouter_Ipl(Player player, object[] argv)
-        {
-            Area area = (Area)Area.GetArea(player.FeetPosition);
-            area.InteriorLocation.Interior.AddIpl((string)argv[0]);
-            return new CmdReturn("Vous avez ajouter ipl");
-        }
-        [Status(Command.CommandStatus.NEW)]
-        [Command(Command.CommandType.TEST, 3)]
-        [Syntax("x", "y", "z")]
-        [SyntaxType(typeof(float), typeof(float), typeof(float))]
-        public static CmdReturn Zone_Interieur_Position(Player player, object[] argv)
-        {
-            Area area = (Area)Area.GetArea(player.FeetPosition);
-            Position pos = area.InteriorLocation.Interior.Position;
-            pos.X = (float)argv[0];
-            pos.Y = (float)argv[1];
-            pos.Z = (float)argv[2];
-            area.InteriorLocation.Interior.Position = pos;
-            return new CmdReturn("Vous avez changé pos");
-        }
-        [Status(Command.CommandStatus.NEW)]
-        [Command(Command.CommandType.TEST)]
-        public static CmdReturn Zone_Interieur_Activer(Player player, object[] argv)
-        {
-            Area area = (Area)Area.GetArea(player.FeetPosition);
-            area.SetLocations(area.InteriorLocation.Interior, area.Dimension);
-            return new CmdReturn("Vous avez changé pos");
-        }
-        [Status(Command.CommandStatus.NEW)]
-        [Command(Command.CommandType.TEST, 0)]
-        public static CmdReturn Zone_Save(Player player, object[] argv)
-        {
-            Area area = (Area)Area.GetArea(player.FeetPosition);
-            _ = area.SaveAsync();
-            return new CmdReturn("Vous avez save la zone");
-        }
 
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 2)]
@@ -293,6 +273,13 @@ namespace Lambda.Commands
             uint father = (uint)argv[1];
             float mix = (float)argv[2];
             player.Emit("setSkin", mother, father, mix);
+            return new CmdReturn("Vous avez changé la peau");
+        }
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn front_pos(Player player, object[] argv)
+        {
+            Position pos = PositionHelper.PositionInAngle(player.Position, player.Rotation, 0.25f);
+            Alt.CreateCheckpoint(1, pos, 0.30f, 0.5f, new Rgba(0, 0, 0, 255));
             return new CmdReturn("Vous avez changé la peau");
         }
     }

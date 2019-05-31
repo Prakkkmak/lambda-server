@@ -12,12 +12,12 @@ namespace Lambda.Commands
 
         [Command(Command.CommandType.DEFAULT, 1)]
         [Syntax("Page")]
-        [SyntaxType(typeof(int))]
+        [SyntaxType(typeof(uint))]
         public static CmdReturn Aide(Player player, object[] argv)
         {
-            int page = (int)argv[0];
+            int page = (int)(uint)argv[0];
             if (!(page < Enum.GetNames(typeof(Command.CommandType)).Length)) return new CmdReturn("Page inexistante");
-            Command.CommandType type = (Command.CommandType)argv[0];
+            Command.CommandType type = (Command.CommandType)page;
             Command[] commands = Command.GetCommands(type);
             int maxpage = Enum.GetValues(typeof(Command.CommandType)).Cast<int>().Max();
             string[] pages = new[]
@@ -146,7 +146,6 @@ namespace Lambda.Commands
             player.GotoLocation(location);
             return new CmdReturn("Vous vous êtes téléporté", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Clear(Player player, object[] argv)
         {
