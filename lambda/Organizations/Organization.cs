@@ -37,7 +37,7 @@ namespace Lambda.Organizations
 
         public Member AddMember(Player player, Rank rank)
         {
-            if (members.Any(member => member.Id == player.Id)) return null;
+            if (members.Any(member => member.PlayerId == player.Id)) return null;
             Member m = new Member(player.Id, rank);
             m.Name = player.FullName;
             members.Add(m);

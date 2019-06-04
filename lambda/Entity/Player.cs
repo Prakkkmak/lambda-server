@@ -12,6 +12,7 @@ using AltV.Net.Enums;
 using IVoiceChannel = AltV.Net.Elements.Entities.IVoiceChannel;
 using Items;
 using Lambda.Administration;
+using Lambda.Clothing;
 using Lambda.Commands;
 using Lambda.Database;
 using Lambda.Items;
@@ -64,7 +65,7 @@ namespace Lambda.Entity
 
         private long bankMoney;
 
-        private Skin skin;
+        public Skin Skin = new Skin();
 
         private Request request;
 
@@ -79,15 +80,10 @@ namespace Lambda.Entity
             FirstName = "";
             LastName = "";
             Account = null;
-            skin = new Skin();
             Inventory = new Inventory(this);
             Inventory.Deposit(100000);
         }
 
-        public Skin GetSkin()
-        {
-            return skin;
-        }
 
         public void Spawn(Position pos)
         {
@@ -148,7 +144,7 @@ namespace Lambda.Entity
         }
 
 
-        public bool AllowedTo(string perm)
+        public bool IsAllowedTo(string perm)
         {
             if (Permissions.Contains(perm)) return true;
             foreach (Rank rank in GetRanks())
@@ -157,7 +153,8 @@ namespace Lambda.Entity
             }
             return false;
         }
-        public bool AllowedTo(Organization organization, string perm)
+
+        public bool IsAllowedTo(Organization organization, string perm)
         {
             Member member = organization.GetMember(Id);
             return member != null && member.Rank.Permissions.Contains(perm);
@@ -367,19 +364,16 @@ namespace Lambda.Entity
             data["cha_food"] = Food.ToString();
             data["cha_deathcount"] = "0";
             data["acc_id"] = Account.Id.ToString();
-            data["ski_id"] = GetSkin().Id.ToString();
             data["cha_permissions"] = Permissions.ToString();
             data["inv_id"] = Inventory.Id.ToString();
             data["cha_bankaccount"] = GetBankMoney().ToString();
             data["cha_timeonline"] = TimeOnline.ToString();
             data["cha_totaltimeonline"] = TotalTimeOnline.ToString();
-            data["cha_skin"] = skin.ToString();
-            data["cha_headdata"] = skin.HeadDataToString();
-            data["cha_haircolor"] = skin.HairColor + "," + skin.HairTaint;
-            data["cha_eyecolor"] = skin.EyeColor.ToString();
-            data["cha_features"] = string.Join(',', skin.Features);
-            data["cha_overlays"] = skin.OverlaysToString();
-            data["cha_model"] = Model.ToString();
+            data["cha_model"] = Skin.Model.ToString();
+            data["cha_face"] = Skin.Face.ToString();
+            data["cha_hairiness"] = Skin.Hairiness.ToString();
+            data["cha_cosmetic"] = Skin.Cosmetic.ToString();
+            data["cha_clothes"] = Skin.Clothes.ToString();
             return data;
 
         }
@@ -405,15 +399,12 @@ namespace Lambda.Entity
             else Inventory.Save();
             TimeOnline = ulong.Parse(data["cha_timeonline"]);
             TotalTimeOnline = ulong.Parse(data["cha_totaltimeonline"]);
-            GetSkin().SetString(data["cha_skin"]);
-            GetSkin().SetHeadDataString(data["cha_headdata"]);
-            if (data["cha_haircolor"].Length > 0) GetSkin().HairColor = uint.Parse(data["cha_haircolor"].Split(',')[0]);
-            if (data["cha_haircolor"].Length > 0) GetSkin().HairTaint = uint.Parse(data["cha_haircolor"].Split(',')[1]);
-            GetSkin().EyeColor = uint.Parse(data["cha_eyecolor"]);
-            GetSkin().SetFeatures(data["cha_features"]);
-            GetSkin().SetOverlays(data["cha_overlays"]);
-            if (uint.Parse(data["cha_model"]) != 0) Model = uint.Parse(data["cha_model"]);
-            GetSkin().Model = (PedModel)Model;
+            Skin.Model = Convert.ToUInt32(data["cha_model"]);
+            if (data["cha_face"].Length == Skin.Face.ToString().Length) Skin.Face.Set(data["cha_face"]);
+            if (data["cha_hairiness"].Length == Skin.Hairiness.ToString().Length) Skin.Hairiness.Set(data["cha_hairiness"]);
+            if (data["cha_cosmetic"].Length == Skin.Cosmetic.ToString().Length) Skin.Cosmetic.Set(data["cha_cosmetic"]);
+            if (data["cha_clothes"].Length == Skin.Clothes.ToString().Length) Skin.Clothes.Set(data["cha_clothes"]);
+            Skin.Send(this);
             _ = SaveAsync();
         }
 
@@ -464,7 +455,7 @@ namespace Lambda.Entity
         {
             Players.Add(player);
             VoiceChannel.AddPlayer(player);
-            Alt.EmitAllClients("chatmessage", null, $"{player.FullName} c'est connecté!");
+            Alt.EmitAllClients("chatmessage", null, $"{player.FullName} s'est connecté!");
         }
         public static Player GetPlayerByDbId(uint id)
         {

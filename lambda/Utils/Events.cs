@@ -35,6 +35,7 @@ namespace Lambda
             Alt.OnClient("seteyecolor", OnClientSetEyeColor);
             Alt.OnClient("setfacefeatures", OnClientSetFeatures);
             Alt.OnClient("setheadoverlays", OnClientSetOverlays);
+            Alt.OnClient("setprops", OnClientSetProps);
             Alt.OnClient("changeSelectedPlayer", OnClientChangePlayerSelected);
             Alt.Log("[EVENT] OnVehicleEnter registered");
             Alt.OnPlayerEnterVehicle += OnVehicleEnter;
@@ -102,73 +103,64 @@ namespace Lambda
             }
             Alt.Log($"[{player.ServerId}]{player.FullName} s'est connecté.");
             Player.AddPlayer(player);
-            Alt.Log("Skin chargement");
-            player.GetSkin().SendModel(player);
-            player.GetSkin().SendSkin(player);
+
+            //player.Skin.SendModel(player);
+            //player.GetSkin().SendSkin(player);
         }
 
         public static void OnClientSetSkin(IPlayer altPlayer, object[] args)
         {
             Player player = (Player)altPlayer;
-            string str = "";
-            object[] arg = (object[])args[0];
-            foreach (object o in arg)
-            {
-                str += o.ToString() + ',';
-            }
-
-            str = str.Remove(str.Length - 1);
-            player.GetSkin().SetString(str);
+            object[] test = (object[])args[0];
+            int[] converted = Array.ConvertAll(test, item => (int)(long)item);
+            player.Skin.SetComponents(converted);
             _ = player.SaveAsync();
         }
         public static void OnClientSetHeadData(IPlayer altPlayer, object[] args)
         {
             Player player = (Player)altPlayer;
-            string str = "";
-            foreach (object o in args)
-            {
-                str += o.ToString() + ',';
-            }
-            str = str.Remove(str.Length - 1);
-            player.GetSkin().SetHeadDataString(str);
+            string[] converted = Array.ConvertAll(args, item => item + "");
+            player.Skin.SetHeadData(converted);
             //_ = player.SaveAsync();
         }
         public static void OnClientSetHairColor(IPlayer altPlayer, object[] args)
         {
             Player player = (Player)altPlayer;
-            player.GetSkin().HairColor = (uint)(long)args[0];
-            player.GetSkin().HairTaint = (uint)(long)args[1];
+            player.Skin.Hairiness.HairColor = (uint)(long)args[0];
+            player.Skin.Hairiness.HairColor2 = (uint)(long)args[1];
             //_ = player.SaveAsync();
         }
         public static void OnClientSetEyeColor(IPlayer altPlayer, object[] args)
         {
             Player player = (Player)altPlayer;
-            player.GetSkin().EyeColor = (uint)(long)args[0];
+            player.Skin.Face.EyeColor = (uint)(long)args[0];
             //_ = player.SaveAsync();
         }
         public static void OnClientSetFeatures(IPlayer altPlayer, object[] args)
         {
             Player player = (Player)altPlayer;
             string str = "";
-            object[] arg = (object[])args[0];
-            for (int index = 0; index < arg.Length; index++)
-            {
-                player.GetSkin().Features[index] = (float)Convert.ToDouble(arg[index]);
-            }
+            object[] test = (object[])args[0];
+            int[] converted = Array.ConvertAll(test, item => (int)(long)item);
+            player.Skin.SetFeatures(converted);
+            //_ = player.SaveAsync();
+        }
+        public static void OnClientSetProps(IPlayer altPlayer, object[] args)
+        {
+            Player player = (Player)altPlayer;
+            string str = "";
+            object[] test = (object[])args[0];
+            int[] converted = Array.ConvertAll(test, item => (int)(long)item);
+            player.Skin.SetProps(converted);
             //_ = player.SaveAsync();
         }
         public static void OnClientSetOverlays(IPlayer altPlayer, object[] args)
         {
             Player player = (Player)altPlayer;
             string str = "";
-            object[] arg = (object[])args[0];
-            for (int index = 0; index < arg.Length / 3; index++)
-            {
-                ushort id = (ushort)(long)arg[index * 3];
-                ushort color1 = (ushort)(long)arg[index * 3 + 1];
-                ushort color2 = (ushort)(long)arg[index * 3 + 2];
-                player.GetSkin().Overlays[index] = new Component(id, color1, color2);
-            }
+            object[] test = (object[])args[0];
+            int[] converted = Array.ConvertAll(test, item => (int)(long)item);
+            player.Skin.SetOverlays(converted);
             //_ = player.SaveAsync();
         }
         public static void OnClientChangePlayerSelected(IPlayer altPlayer, object[] args)

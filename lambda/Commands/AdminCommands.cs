@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text;
 using AltV.Net.Data;
 using Lambda.Entity;
+using Lambda.Items;
 
 namespace Lambda.Commands
 {
@@ -92,6 +93,19 @@ namespace Lambda.Commands
         {
             player.Permissions.Add((string)argv[0]);
             return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Command(Command.CommandType.INVENTORY, 3)]
+        [Syntax("Joueur", "Objet", "Quantité")]
+        [SyntaxType(typeof(Player), typeof(BaseItem), typeof(uint))]
+        public static CmdReturn Give(Player player, object[] argv)
+        {
+
+            Player target = (Player)argv[0];
+            BaseItem baseItem = (BaseItem)argv[1];
+            uint amount = (uint)argv[2];
+            if (amount > 10) return new CmdReturn("Ne te donne pas trop d'objets stp");
+            target.Inventory.AddItem(baseItem.Id, amount);
+            return new CmdReturn("Vous avez donné des objets", CmdReturn.CmdReturnType.SUCCESS);
         }
     }
 }

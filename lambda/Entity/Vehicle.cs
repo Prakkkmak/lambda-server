@@ -99,6 +99,7 @@ namespace Lambda.Entity
         {
             OwnerId = id;
             SetOwnerType(owner);
+
         }
         public void SetOwner(Player player)
         {

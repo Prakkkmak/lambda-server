@@ -37,6 +37,7 @@ namespace Lambda.Commands
             BANK,
             SKIN,
             ADMIN,
+            POLICE,
             TEST,
         }
 
@@ -79,7 +80,7 @@ namespace Lambda.Commands
             parametersString = RemoveCommandName(parametersString);
             CmdReturn result = ConvertParamameters(player, parametersString, out object[] parameters);
             if (result.Type != CmdReturn.CmdReturnType.SUCCESS) return result;
-            if (!string.IsNullOrWhiteSpace(permission) && !player.Permissions.Contains(permission)) return new CmdReturn("Pas permission");
+            if (!string.IsNullOrWhiteSpace(permission) && !player.IsAllowedTo(permission)) return new CmdReturn("Vous n'avez pas la permission de faire ceci", CmdReturn.CmdReturnType.WARNING);
             _ = player.SaveAsync();
             CmdReturn cmdReturn = action(player, parameters); // Launch the command
             return cmdReturn;

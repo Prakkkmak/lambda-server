@@ -55,7 +55,7 @@ namespace Lambda.Items
             if (id == Enums.Items.Invalid) return false;
             return AddItem((uint)id, amount, metadata);
         }
-        public bool AddItem(uint id, uint amount, string metadata = "")
+        public bool AddItemOld(uint id, uint amount, string metadata = "")
         {
             Item itemWithLessStack = GetItemWithLessStack(id);
             if (itemWithLessStack != null)
@@ -66,8 +66,32 @@ namespace Lambda.Items
             }
 
             Item item = new Item(this, BaseItem.GetBaseItem(id), amount);
-            if (item == null) return false;
-            //if (item.GetBaseItem().MaxStack < 1) item.Amount = amount;
+            if (item.GetBaseItem().MaxStack < 1) item.Amount = amount;
+            while (item.Amount > item.GetBaseItem().MaxStack && item.GetBaseItem().MaxStack > 0)
+            {
+                item.Amount = item.GetBaseItem().MaxStack;
+                amount -= item.GetBaseItem().MaxStack;
+                Items.Add(item);
+                item = new Item(this, BaseItem.GetBaseItem(id), amount);
+            }
+
+            item.MetaData = metadata;
+            Items.Add(item);
+            return true;
+        }
+        public bool AddItem(uint id, uint amount, string metadata = "")
+        {
+            Item itemWithLessStack = GetItemWithLessStack(id);
+            if (itemWithLessStack != null)
+            {
+                uint nbrToAdd = itemWithLessStack.GetBaseItem().MaxStack - itemWithLessStack.Amount;
+                if (amount <= nbrToAdd) itemWithLessStack.Amount += amount;
+                amount -= nbrToAdd;
+                itemWithLessStack.Amount += nbrToAdd;
+            }
+
+            Item item = new Item(this, BaseItem.GetBaseItem(id), amount);
+            if (item.GetBaseItem().MaxStack < 1) item.Amount = amount;
             while (item.Amount > item.GetBaseItem().MaxStack && item.GetBaseItem().MaxStack > 0)
             {
                 item.Amount = item.GetBaseItem().MaxStack;

@@ -250,5 +250,15 @@ namespace Lambda.Commands
             org.RemoveMember(member);
             return new CmdReturn($"Vous avez viré quelqu'un d'une organisation.", CmdReturn.CmdReturnType.SUCCESS);
         }
+
+        [Command(Command.CommandType.ORGANIZATION, 2)]
+        [Syntax("Organisation", "Rang")]
+        [SyntaxType(typeof(Organization), typeof(Rank))]
+        public static CmdReturn Admin_Organisation_Permission_Rang_Voir(Player player, object[] argv)
+        {
+            Organization org = (Organization)argv[0];
+            Rank rank = (Rank)argv[1];
+            return new CmdReturn($"{rank.Permissions}", CmdReturn.CmdReturnType.SUCCESS);
+        }
     }
 }

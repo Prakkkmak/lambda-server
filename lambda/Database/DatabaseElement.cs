@@ -8,6 +8,7 @@ using AltV.Net.Data;
 using AltV.Net.Enums;
 using Items;
 using Lambda.Administration;
+using Lambda.Clothing;
 using Lambda.Entity;
 using Lambda.Items;
 using Lambda.Organizations;

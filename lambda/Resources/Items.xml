@@ -28,6 +28,17 @@
     <Nutrition>5</Nutrition>
   </Item>
   <Item>
+    <Id>50</Id>
+    <Name>Vetements</Name>
+    <Description>Une tenue</Description>
+    <Weight>1</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>5</Type>
+    <Metadatas>
+      <Metadata>Vetements</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
     <Id>100</Id>
     <Name>Clé de voiture</Name>
     <Description>Une clé permettant d'ouvrir et de démarrer un véhicule</Description>

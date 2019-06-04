@@ -4,6 +4,8 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Net.Mail;
+using System.Threading.Tasks;
+
 namespace Lambda.Utils
 {
     class Bug
@@ -27,6 +29,10 @@ namespace Lambda.Utils
         public void Send()
         {
             SmtpClient.Send(Mail);
+        }
+        public void SendAsync()
+        {
+            SmtpClient.SendAsync(Mail, null);
         }
 
         public static SmtpClient InitSmtpClient()

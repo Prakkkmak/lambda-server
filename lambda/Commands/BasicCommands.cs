@@ -36,11 +36,11 @@ namespace Lambda.Commands
                 "Test"
             };
             string pagename = "Non défini";
-            if (pages.Length > (int)argv[0])
+            if (pages.Length > page)
             {
-                pagename = pages[(int)argv[0]];
+                pagename = pages[page];
             }
-            string text = $"Voici la liste des commandes ({pagename}) {(int)argv[0]}/{maxpage}:<br>";
+            string text = $"Voici la liste des commandes ({pagename}) {page}/{maxpage}:<br>";
             foreach (Command command in commands)
             {
                 if (command.Status == Command.CommandStatus.NEW) text += "{2980b9}";
@@ -73,7 +73,7 @@ namespace Lambda.Commands
             }
             if (text.Length < minSize) return new CmdReturn("Votre bug doit être plus long ! ", CmdReturn.CmdReturnType.SYNTAX); // The minimum length of the report bugg
             Bug bug = new Bug(text, sender); // Create the bugg object
-            bug.Send(); // Send the bugg
+            bug.SendAsync(); // Send the bugg
             return new CmdReturn("Vous avez envoyé votre bug !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.DEFAULT, 2)]

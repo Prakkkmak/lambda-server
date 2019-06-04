@@ -10,8 +10,6 @@ namespace Lambda.Administration
     {
         private List<string> permissions = new List<string>();
 
-
-
         public void Add(string permission)
         {
             permission = permission.ToUpper();
@@ -31,7 +29,7 @@ namespace Lambda.Administration
         {
             foreach (string perm in permissions)
             {
-                if (perm.Equals(permission) || perm.StartsWith(permission + "_")) return true;
+                if (permission.Equals(perm) || permission.StartsWith(perm + "_")) return true;
 
             }
 

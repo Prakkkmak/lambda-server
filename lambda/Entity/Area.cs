@@ -30,7 +30,8 @@ namespace Lambda.Entity
             NORMAL,
             SHOP,
             HOUSE,
-            BANK
+            BANK,
+            POLICE_DUTY,
         }
 
 

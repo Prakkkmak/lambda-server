@@ -18,7 +18,7 @@ namespace Lambda.Commands
             Organization org = (Organization)argv[0];
             Rank rank = (Rank)argv[1];
             Player target = (Player)argv[2];
-            if (!player.AllowedTo(org, "LEADER_INVITE")) return new CmdReturn("Vous n'etes pas autorisés a faire cela");
+            if (!player.IsAllowedTo(org, "LEADER_INVITE")) return new CmdReturn("Vous n'etes pas autorisés a faire cela");
             Request request = new Request(target, "Invitation", $"{player.FullName} veux vous vous inviter dans son organisation {org.Name}", player);
             request.AddAnswer("Accepter", (sender, receiver) =>
             {
@@ -44,7 +44,7 @@ namespace Lambda.Commands
         {
             Organization org = (Organization)argv[0];
             Member member = (Member)argv[1];
-            if (!player.AllowedTo(org, "LEADER_FIRE")) return new CmdReturn("Vous n'etes pas autorisés a faire cela");
+            if (!player.IsAllowedTo(org, "LEADER_FIRE")) return new CmdReturn("Vous n'etes pas autorisés a faire cela");
             org.RemoveMember(member);
             return new CmdReturn($"Vous avez viré quelqu'un de votre organisation.", CmdReturn.CmdReturnType.SUCCESS);
         }
@@ -58,7 +58,7 @@ namespace Lambda.Commands
             Member member = (Member)argv[1];
             if ((Organization)argv[2] != org) return new CmdReturn("Organisations différentes", CmdReturn.CmdReturnType.WARNING);
             Rank rank = (Rank)argv[3];
-            if (!player.AllowedTo(org, "LEADER_PROMOTE")) return new CmdReturn("Vous n'etes pas autorisés a faire cela");
+            if (!player.IsAllowedTo(org, "LEADER_PROMOTE")) return new CmdReturn("Vous n'etes pas autorisés a faire cela");
             org.ChangeMemberRank(member, rank);
             return new CmdReturn($"Vous avez changé le rang de {member.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
@@ -71,7 +71,7 @@ namespace Lambda.Commands
             Organization org = (Organization)argv[0];
             Rank rank = (Rank)argv[1];
             uint salary = (uint)argv[2];
-            if (!player.AllowedTo(org, "LEADER_SALARY")) return new CmdReturn("Vous n'etes pas autorisés a faire cela");
+            if (!player.IsAllowedTo(org, "LEADER_SALARY")) return new CmdReturn("Vous n'etes pas autorisés a faire cela");
             rank.Salary = salary;
             return new CmdReturn($"Vous avez changé le salaire du rang {rank.Name} à {salary}$.", CmdReturn.CmdReturnType.SUCCESS);
         }

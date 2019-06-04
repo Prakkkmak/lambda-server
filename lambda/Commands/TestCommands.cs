@@ -29,8 +29,8 @@ namespace Lambda.Commands
             if (!Enum.IsDefined(typeof(PedModel), model))
                 return new CmdReturn("Modele incorrect", CmdReturn.CmdReturnType.WARNING);
 
-            player.GetSkin().Model = model;
-            player.GetSkin().SendModel(player);
+            player.Skin.Model = (uint)model;
+            player.Skin.Send(player);
             return CmdReturn.Success;
         }
 
@@ -282,14 +282,105 @@ namespace Lambda.Commands
             Alt.CreateCheckpoint(1, pos, 0.30f, 0.5f, new Rgba(0, 0, 0, 255));
             return new CmdReturn("Vous avez changé la peau");
         }
-        [Command(Command.CommandType.TEST)]
-        public static CmdReturn munotter(Player player, object[] argv)
+
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("Orga")]
+        [SyntaxType(typeof(Organization))]
+        public static CmdReturn Voiture_Organization(Player player, object[] argv)
         {
-            Player target = player.PlayerSelected;
-            if (player.PlayerSelected == null) return new CmdReturn("Vous ne selectionnez personne");
-            target.Emit("setHandcuff");
-            target.SendMessage("Vous avez été menotté/démenotté");
-            return new CmdReturn("Vous avez menotté quelqu'un");
+            Organization org = (Organization)argv[0];
+            if (player.Vehicle == null) return CmdReturn.NotInVehicle;
+            Vehicle veh = (Vehicle)player.Vehicle;
+            veh.SetOwner(org.Id, Vehicle.OwnerType.ORGANIZATION);
+            return new CmdReturn("Vous avez changé le proprio du véhicule");
+        }
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("Serrure")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Vehicule_Serrure(Player player, object[] argv)
+        {
+            if (player.Vehicle == null) return CmdReturn.NotInVehicle;
+            Vehicle veh = (Vehicle)player.Vehicle;
+            veh.Lock.Code = (string)argv[0];
+            return new CmdReturn("Vous avez changé le proprio du véhicule");
+        }
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("Joueur")]
+        [SyntaxType(typeof(Player))]
+        public static CmdReturn Balise(Player player, object[] argv)
+        {
+            Player target = (Player)argv[0];
+            target.Emit("attachBeaconToPlayer", target);
+            return new CmdReturn("Vous avez changé le proprio du véhicule");
+        }
+        [Permission("POLICE_BEACON")]
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Osseccour(Player player, object[] argv)
+        {
+            foreach (Player target in Player.Players)
+            {
+                if (target.IsAllowedTo("POLICE_BEACON"))
+                {
+                    target.Emit("attachBeaconToPlayer", player);
+                }
+            }
+            return new CmdReturn("Vous avez envoyé une balise");
+        }
+        [Permission("POLICE_BEACON")]
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Enfaitcava(Player player, object[] argv)
+        {
+            foreach (Player target in Player.Players)
+            {
+                if (target.IsAllowedTo("POLICE_BEACON"))
+                {
+                    target.Emit("detachBeaconToPlayer", player);
+                }
+            }
+            return new CmdReturn("Vous avez retiré une balise");
+        }
+
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Jetenferme(Player player, object[] argv)
+        {
+            Alt.EmitAllClients("closeDoortest");
+
+            return new CmdReturn("Vous avez fermé bla   h");
+        }
+
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Jetenfouvre(Player player, object[] argv)
+        {
+            Alt.EmitAllClients("openDoortest");
+
+            return new CmdReturn("Vous avez open bla   h");
+        }
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Invisible(Player player, object[] argv)
+        {
+            player.Emit("toggleInvisibility");
+            return new CmdReturn("Vous avez changé votre invisibilité.");
+        }
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Dieu(Player player, object[] argv)
+        {
+            player.Emit("toggleInvinsibility");
+            return new CmdReturn("Vous avez changé votre invinsibilité.");
+        }
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("Joueur")]
+        [SyntaxType(typeof(Player))]
+        public static CmdReturn Spec_Joueur(Player player, object[] argv)
+        {
+            Player target = (Player)argv[0];
+            player.Emit("setSpecTarget", target, true);
+            return new CmdReturn("Vous spequez quelqu'un.");
+        }
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Spec_Stop(Player player, object[] argv)
+        {
+            player.Emit("stopSpecTarget");
+            return new CmdReturn("Vous arrêtez de spequer quelqu'un.");
         }
     }
 }

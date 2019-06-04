@@ -77,19 +77,7 @@ namespace Lambda.Commands
             str += BaseItem.BaseItems.Aggregate("", (current, item) => current + $"[{item.Id}]{item.Name} ");
             return new CmdReturn(str);
         }
-        [Command(Command.CommandType.INVENTORY, 3)]
-        [Syntax("Joueur", "Objet", "Quantité")]
-        [SyntaxType(typeof(Player), typeof(BaseItem), typeof(uint))]
-        public static CmdReturn Give(Player player, object[] argv)
-        {
 
-            Player target = (Player)argv[0];
-            BaseItem baseItem = (BaseItem)argv[1];
-            uint amount = (uint)argv[2];
-            target.Inventory.AddItem(baseItem.Id, amount);
-            if (amount > 10) return new CmdReturn("Ne te donne pas trop d'objets stp");
-            return new CmdReturn("Vous avez donné des objets", CmdReturn.CmdReturnType.SUCCESS);
-        }
         [Command(Command.CommandType.INVENTORY, 1)]
         [Syntax("Objet")]
         [SyntaxType(typeof(Item))]
@@ -123,6 +111,21 @@ namespace Lambda.Commands
             if (player.Inventory.Items.Count <= slot) return new CmdReturn("Index incorrect");
             player.Inventory.RemoveItem(slot, amount);
             return new CmdReturn($"Vous avez jeté un objet");
+        }
+        [Command(Command.CommandType.INVENTORY, 1)]
+        [Syntax("Objet")]
+        [SyntaxType(typeof(Item))]
+        public static CmdReturn Utiliser(Player player, object[] argv)
+        {
+            Item item = (Item)argv[0];
+            return new CmdReturn($"Vous avez jeté un objet");
+        }
+        [Command(Command.CommandType.INVENTORY)]
+        public static CmdReturn Deshabiller(Player player, object[] argv)
+        {
+            player.Inventory.AddItem(Enums.Items.Clothes, 1, player.Skin.Clothes.ToString());
+            //player.Skin.Clothes.Set("");
+            return new CmdReturn($"Vous vous êtes déshabillé");
         }
     }
 }

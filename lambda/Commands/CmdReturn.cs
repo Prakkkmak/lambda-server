@@ -73,5 +73,6 @@ namespace Lambda.Commands
         public static CmdReturn NotImplemented = new CmdReturn("Non implémenté", CmdReturnType.ERROR);
         public static CmdReturn InvalidParameters = new CmdReturn("Parametres incorects", CmdReturnType.WARNING);
         public static CmdReturn RequestBusy = new CmdReturn("Le joueur a déjà une requete en cours", CmdReturnType.WARNING);
+        public static CmdReturn NoSelected = new CmdReturn("Vous ne séléctionnez personne", CmdReturnType.WARNING);
     }
 }
