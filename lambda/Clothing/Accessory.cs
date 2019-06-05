@@ -11,8 +11,8 @@ namespace Lambda.Clothing
         public Prop Hat = new Prop(8); // Prop 0
         public Prop Glasses = new Prop(0); // Prop 1
         public Prop Ears = new Prop(33); // Prop 2
-        public Prop Watch = new Prop(); // Prop 6
-        public Prop Bracelet = new Prop(); // Prop 7
+        public Prop Watch = new Prop(0); // Prop 6
+        public Prop Bracelet = new Prop(0); // Prop 7
 
 
         public void Set(string str)

@@ -15,18 +15,16 @@ namespace Lambda.Clothing
             Texture = texture;
         }
 
-        public Prop(Dictionary<string, string> datas, string name)
+        public void Set(string str)
         {
-            Drawable = ushort.Parse(datas[name + "_drawable"]);
-            Texture = ushort.Parse(datas[name + "_texture"]);
+            string[] s = str.Split(',');
+            Drawable = Convert.ToUInt32(s[0]);
+            Texture = Convert.ToUInt32(s[1]);
         }
 
-        public Dictionary<string, string> Data(string name)
+        public override string ToString()
         {
-            Dictionary<string, string> data = new Dictionary<string, string>();
-            data[name + "_drawable"] = Drawable.ToString();
-            data[name + "_texture"] = Texture.ToString();
-            return data;
+            return Drawable + "," + Texture;
         }
 
         public bool Equals(Prop prop)

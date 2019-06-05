@@ -18,9 +18,9 @@ namespace Lambda.Clothing
         public Accessory Accessory = new Accessory();
 
 
-        public void Send(Player player)
+        public void Send(Player player, bool resetModel = true)
         {
-            player.Model = Model;
+            if (resetModel) player.Model = Model;
             Face.Send(player);
             Hairiness.Send(player);
             Cosmetic.Send(player);

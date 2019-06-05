@@ -12,7 +12,7 @@
   <Item>
     <Id>2</Id>
     <Name>Donut</Name>
-    <Description>Mhhh dunnut</Description>
+    <Description>Mhhh dunut</Description>
     <Weight>1</Weight>
     <Maxstack>100</Maxstack>
     <Type>1</Type>
@@ -29,13 +29,134 @@
   </Item>
   <Item>
     <Id>50</Id>
-    <Name>Vetements</Name>
+    <Name>Vetements Homme</Name>
     <Description>Une tenue</Description>
     <Weight>1</Weight>
     <Maxstack>1</Maxstack>
     <Type>5</Type>
     <Metadatas>
-      <Metadata>Vetements</Metadata>
+      <Metadata>Identifiant</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>51</Id>
+    <Name>Chapeau Homme</Name>
+    <Description>Un chapeau</Description>
+    <Weight>1</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>5</Type>
+    <Metadatas>
+      <Metadata>Identifiant</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>52</Id>
+    <Name>Lunettes Homme</Name>
+    <Description>Des lunettes</Description>
+    <Weight>1</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>5</Type>
+    <Metadatas>
+      <Metadata>Identifiant</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>53</Id>
+    <Name>Boucle d'oreille Homme</Name>
+    <Description></Description>
+    <Weight>1</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>5</Type>
+    <Metadatas>
+      <Metadata>Identifiant</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>54</Id>
+    <Name>Montre Homme</Name>
+    <Description></Description>
+    <Weight>1</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>5</Type>
+    <Metadatas>
+      <Metadata>Identifiant</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>55</Id>
+    <Name>Bracelet Homme</Name>
+    <Description></Description>
+    <Weight>1</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>5</Type>
+    <Metadatas>
+      <Metadata>Identifiant</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>56</Id>
+    <Name>Vetements Femme</Name>
+    <Description>Une tenue</Description>
+    <Weight>1</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>5</Type>
+    <Metadatas>
+      <Metadata>Identifiant</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>57</Id>
+    <Name>Chapeau Femme</Name>
+    <Description>Un chapeau</Description>
+    <Weight>1</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>5</Type>
+    <Metadatas>
+      <Metadata>Identifiant</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>58</Id>
+    <Name>Lunettes Femme</Name>
+    <Description>Des lunettes</Description>
+    <Weight>1</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>5</Type>
+    <Metadatas>
+      <Metadata>Identifiant</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>59</Id>
+    <Name>Boucle d'oreille Femme</Name>
+    <Description></Description>
+    <Weight>1</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>5</Type>
+    <Metadatas>
+      <Metadata>Identifiant</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>60</Id>
+    <Name>Montre Femme</Name>
+    <Description></Description>
+    <Weight>1</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>5</Type>
+    <Metadatas>
+      <Metadata>Identifiant</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>61</Id>
+    <Name>Bracelet Femme</Name>
+    <Description></Description>
+    <Weight>1</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>5</Type>
+    <Metadatas>
+      <Metadata>Identifiant</Metadata>
     </Metadatas>
   </Item>
   <Item>

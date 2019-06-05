@@ -364,7 +364,7 @@ namespace Lambda.Commands
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Dieu(Player player, object[] argv)
         {
-            player.Emit("toggleInvinsibility");
+            player.Emit("toggleInvincibility");
             return new CmdReturn("Vous avez changé votre invinsibilité.");
         }
         [Command(Command.CommandType.TEST, 1)]
@@ -381,6 +381,12 @@ namespace Lambda.Commands
         {
             player.Emit("stopSpecTarget");
             return new CmdReturn("Vous arrêtez de spequer quelqu'un.");
+        }
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Context(Player player, object[] argv)
+        {
+            player.GenerateContext();
+            return new CmdReturn("Vous générez un contexte");
         }
     }
 }

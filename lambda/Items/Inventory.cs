@@ -135,6 +135,28 @@ namespace Lambda.Items
 
         }
 
+        public async Task RemoveItemAsync(uint id)
+        {
+            Item item = Items[(int)id];
+            Items.Remove(item);
+            await item.DeleteAsync();
+            await SaveAsync();
+        }
+        public void RemoveItem(Item item)
+        {
+            Items.Remove(item);
+            item.Delete();
+            Save();
+
+        }
+        public async Task RemoveItemAsync(Item item)
+        {
+            Items.Remove(item);
+            await item.DeleteAsync();
+            await SaveAsync();
+        }
+
+
         public void TransferItem(Item item, Inventory inventory)
         {
             this.Items.Remove(item);

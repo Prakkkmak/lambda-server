@@ -134,7 +134,7 @@ namespace Lambda.Commands
                 else if (syntaxTypes[i] == typeof(Item))
                 {
                     if (!int.TryParse(parameters[i], out int itemid)) return new CmdReturn($"{syntax[i]} doit être un identifier d objet", CmdReturn.CmdReturnType.WARNING);
-                    if (player.Inventory.Items.Count < i) return new CmdReturn($"Le nombre doit etre inférieur à {player.Inventory.Items.Count}, vous avez {player.Inventory.Items.Count} objets dans votre inventaire", CmdReturn.CmdReturnType.WARNING);
+                    if (player.Inventory.Items.Count <= itemid) return new CmdReturn($"Le nombre doit etre inférieur à {player.Inventory.Items.Count}, vous avez {player.Inventory.Items.Count} objets dans votre inventaire", CmdReturn.CmdReturnType.WARNING);
                     Item item = player.Inventory.Items[itemid];
                     if (item == null) return new CmdReturn("Vous n'avez pas cet objet dans votre inventaire", CmdReturn.CmdReturnType.WARNING);
                     result[i] = item;

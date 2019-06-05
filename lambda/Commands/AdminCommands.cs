@@ -54,7 +54,7 @@ namespace Lambda.Commands
         [Command(Command.CommandType.ADMIN, 3)]
         [Syntax("X", "Y", "Z")]
         [SyntaxType(typeof(int), typeof(int), typeof(int))]
-        public static CmdReturn Goto_Position(Player player, object[] argv)
+        public static CmdReturn Gotp(Player player, object[] argv)
         {
             int x = (int)argv[0];
             int y = (int)argv[1];

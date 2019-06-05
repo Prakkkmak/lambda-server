@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AltV.Net;
+using AltV.Net.Enums;
 using Lambda.Database;
+using Lambda.Entity;
 
 namespace Lambda.Items
 {
@@ -52,6 +54,91 @@ namespace Lambda.Items
         public void SetInventory(Inventory inv)
         {
             inventory = inv;
+        }
+
+        public int Use(Player player)
+        {
+            uint baseId = GetBaseItem().Id;
+            switch (baseId)
+            {
+                case 50:
+                    if (player.Skin.Model == (uint)PedModel.FreemodeFemale01) return 1;
+                    player.Skin.Clothes.Set(MetaData);
+                    player.Skin.Send(player, false);
+                    _ = inventory.RemoveItemAsync(this);
+                    break;
+                case 51:
+                    if (player.Skin.Model == (uint)PedModel.FreemodeFemale01) return 1;
+                    player.Skin.Accessory.Hat.Set(MetaData);
+                    player.Skin.Send(player, false);
+                    _ = inventory.RemoveItemAsync(this);
+                    break;
+                case 52:
+                    if (player.Skin.Model == (uint)PedModel.FreemodeFemale01) return 1;
+                    player.Skin.Accessory.Glasses.Set(MetaData);
+                    player.Skin.Send(player, false);
+                    _ = inventory.RemoveItemAsync(this);
+                    break;
+                case 53:
+                    if (player.Skin.Model == (uint)PedModel.FreemodeFemale01) return 1;
+                    player.Skin.Accessory.Ears.Set(MetaData);
+                    player.Skin.Send(player, false);
+                    _ = inventory.RemoveItemAsync(this);
+                    break;
+                case 54:
+                    if (player.Skin.Model == (uint)PedModel.FreemodeFemale01) return 1;
+                    player.Skin.Accessory.Watch.Set(MetaData);
+                    player.Skin.Send(player, false);
+                    _ = inventory.RemoveItemAsync(this);
+                    break;
+                case 55:
+                    if (player.Skin.Model == (uint)PedModel.FreemodeFemale01) return 1;
+                    player.Skin.Accessory.Bracelet.Set(MetaData);
+                    player.Skin.Send(player, false);
+                    _ = inventory.RemoveItemAsync(this);
+                    break;
+                case 56:
+                    if (player.Skin.Model == (uint)PedModel.FreemodeMale01) return 1;
+                    player.Skin.Clothes.Set(MetaData);
+                    player.Skin.Send(player, false);
+                    _ = inventory.RemoveItemAsync(this);
+                    break;
+                case 57:
+                    if (player.Skin.Model == (uint)PedModel.FreemodeMale01) return 1;
+                    player.Skin.Accessory.Hat.Set(MetaData);
+                    player.Skin.Send(player, false);
+                    _ = inventory.RemoveItemAsync(this);
+                    break;
+                case 58:
+                    if (player.Skin.Model == (uint)PedModel.FreemodeMale01) return 1;
+                    player.Skin.Accessory.Glasses.Set(MetaData);
+                    player.Skin.Send(player, false);
+                    _ = inventory.RemoveItemAsync(this);
+                    break;
+                case 59:
+                    if (player.Skin.Model == (uint)PedModel.FreemodeMale01) return 1;
+                    player.Skin.Accessory.Ears.Set(MetaData);
+                    player.Skin.Send(player, false);
+                    _ = inventory.RemoveItemAsync(this);
+                    break;
+                case 60:
+                    if (player.Skin.Model == (uint)PedModel.FreemodeMale01) return 1;
+                    player.Skin.Accessory.Watch.Set(MetaData);
+                    player.Skin.Send(player, false);
+                    _ = inventory.RemoveItemAsync(this);
+                    break;
+                case 61:
+                    if (player.Skin.Model == (uint)PedModel.FreemodeMale01) return 1;
+                    player.Skin.Accessory.Bracelet.Set(MetaData);
+                    player.Skin.Send(player, false);
+                    _ = inventory.RemoveItemAsync(this);
+                    break;
+                default:
+                    return 1;
+                    break;
+            }
+
+            return 0;
         }
 
         public Dictionary<string, string> GetData()

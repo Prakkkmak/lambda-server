@@ -11,9 +11,9 @@ namespace Lambda.Clothing
         public Component Head = new Component(0); // componentVariation 2: 0 - 73
         public uint HairColor = 0;
         public uint HairColor2 = 0;
-        public Overlay Facial = new Overlay(); // headOverlay 1: 0 - 28 29 ?
-        public Overlay EyeBrows = new Overlay(); // headOverlay 2 : 0 - 33
-        public Overlay Chest = new Overlay(); // headOverlay 10: 0 - 16
+        public Overlay Facial = new Overlay(0); // headOverlay 1: 0 - 28 29 ?
+        public Overlay EyeBrows = new Overlay(0); // headOverlay 2 : 0 - 33
+        public Overlay Chest = new Overlay(0); // headOverlay 10: 0 - 16
 
 
         public void Set(string str)

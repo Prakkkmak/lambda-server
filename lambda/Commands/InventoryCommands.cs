@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using AltV.Net;
 using Lambda.Entity;
 using Lambda.Items;
 using Lambda.Utils;
@@ -23,6 +24,17 @@ namespace Lambda.Commands
             }
 
             return new CmdReturn(str);
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.INVENTORY, 1)]
+        [Syntax("Objet")]
+        [SyntaxType(typeof(Item))]
+        public static CmdReturn Utiliser(Player player, object[] argv)
+        {
+            Item item = (Item)argv[0];
+            if (item.Use(player) == 1) return new CmdReturn("Vous ne pouvez pas utiliser ceci.");
+            Alt.Log("Utilisation item");
+            return new CmdReturn("Vous avez utilisé un objet");
         }
         [Command(Command.CommandType.INVENTORY)]
         public static CmdReturn Argent(Player player, object[] argv)
@@ -101,31 +113,15 @@ namespace Lambda.Commands
             _ = player.Inventory.ClearAsync();
             return new CmdReturn("Vous avez vidé votre inventaire.");
         }
-        [Command(Command.CommandType.INVENTORY, 2)]
-        [Syntax("Objet", "Nombre")]
-        [SyntaxType(typeof(uint), typeof(uint))]
-        public static CmdReturn Objet_Jeter(Player player, object[] argv)
-        {
-            uint slot = (uint)argv[0];
-            uint amount = (uint)argv[1];
-            if (player.Inventory.Items.Count <= slot) return new CmdReturn("Index incorrect");
-            player.Inventory.RemoveItem(slot, amount);
-            return new CmdReturn($"Vous avez jeté un objet");
-        }
         [Command(Command.CommandType.INVENTORY, 1)]
         [Syntax("Objet")]
         [SyntaxType(typeof(Item))]
-        public static CmdReturn Utiliser(Player player, object[] argv)
+        public static CmdReturn Objet_Jeter(Player player, object[] argv)
         {
             Item item = (Item)argv[0];
+            _ = player.Inventory.RemoveItemAsync(item);
             return new CmdReturn($"Vous avez jeté un objet");
         }
-        [Command(Command.CommandType.INVENTORY)]
-        public static CmdReturn Deshabiller(Player player, object[] argv)
-        {
-            player.Inventory.AddItem(Enums.Items.Clothes, 1, player.Skin.Clothes.ToString());
-            //player.Skin.Clothes.Set("");
-            return new CmdReturn($"Vous vous êtes déshabillé");
-        }
+
     }
 }

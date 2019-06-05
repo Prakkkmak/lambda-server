@@ -10,14 +10,15 @@ namespace Lambda.Commands
     class LeaderCommands
     {
         [Permission("LEADER_INVITE")]
-        [Command(Command.CommandType.ORGANIZATION, 3)]
-        [Syntax("Organisation", "Rang", "Joueur")]
-        [SyntaxType(typeof(Organization), typeof(Rank), typeof(Player))]
+        [Command(Command.CommandType.ORGANIZATION, 2)]
+        [Syntax("Organisation", "Rang")]
+        [SyntaxType(typeof(Organization), typeof(Rank))]
         public static CmdReturn Leader_Inviter(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             Rank rank = (Rank)argv[1];
-            Player target = (Player)argv[2];
+            Player target = player.PlayerSelected;
+            if (target == null) return CmdReturn.NoSelected;
             if (!player.IsAllowedTo(org, "LEADER_INVITE")) return new CmdReturn("Vous n'etes pas autorisés a faire cela");
             Request request = new Request(target, "Invitation", $"{player.FullName} veux vous vous inviter dans son organisation {org.Name}", player);
             request.AddAnswer("Accepter", (sender, receiver) =>
@@ -34,7 +35,7 @@ namespace Lambda.Commands
                 return true;
             };
             target.SendRequest(request);
-            return new CmdReturn($"Vous avez ajouté {target.FullName} à l'organisation {org.Name} au rang de {rank.Name}.", CmdReturn.CmdReturnType.SUCCESS);
+            return new CmdReturn($"Vous invité {target.FullName} à l'organisation {org.Name} au rang de {rank.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Permission("LEADER_FIRE")]
         [Command(Command.CommandType.ORGANIZATION, 2)]

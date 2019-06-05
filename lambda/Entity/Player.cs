@@ -59,6 +59,7 @@ namespace Lambda.Entity
         public Position FeetPosition => new Position(Position.X, Position.Y, Position.Z - 1);
 
         public Player PlayerSelected = null;
+        public Vehicle VehicleSelected = null;
 
         private uint deathCount;
         private uint id; // The id in the database
@@ -283,7 +284,6 @@ namespace Lambda.Entity
             {
                 if (type == skill.Type) return skill;
             }
-
             return null;
         }
         public void AddExperience(Skill.SkillType type, long xp)
@@ -347,6 +347,26 @@ namespace Lambda.Entity
             if (closeVehicle != null && closeVehicle.Position.Distance(this.Position) < distance) return closeVehicle;
 
             return null;
+        }
+
+        public void GenerateContext()
+        {
+            Context context = new Context();
+            if (PlayerSelected != null)
+            {
+                context.Name = "Intéragir avec " + PlayerSelected.FullName;
+                context.Children.Add(new Context("Menotter", "police menotter"));
+                context.Children.Add(new Context("Menotter2", "police menotter"));
+            }
+            else
+            {
+                context.Name = "Blah";
+                context.Children.Add(new Context("Créer un véhicule", "vehicule sultan"));
+                context.Children.Add(new Context("Créer un véhicule2", "vehicule police"));
+                context.Children.Add(new Context("Déshabiller", "vet enl hab"));
+            }
+            Alt.Log("CONTEXTE" + context);
+            Emit("setContextAction", "[" + context + "]");
         }
 
 

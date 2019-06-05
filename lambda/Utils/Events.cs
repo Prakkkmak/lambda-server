@@ -36,6 +36,7 @@ namespace Lambda
             Alt.OnClient("setfacefeatures", OnClientSetFeatures);
             Alt.OnClient("setheadoverlays", OnClientSetOverlays);
             Alt.OnClient("setprops", OnClientSetProps);
+            Alt.OnClient("chatConsole", OnClientSendChatConsole);
             Alt.OnClient("changeSelectedPlayer", OnClientChangePlayerSelected);
             Alt.Log("[EVENT] OnVehicleEnter registered");
             Alt.OnPlayerEnterVehicle += OnVehicleEnter;
@@ -103,7 +104,7 @@ namespace Lambda
             }
             Alt.Log($"[{player.ServerId}]{player.FullName} s'est connecté.");
             Player.AddPlayer(player);
-
+            player.Emit("playerLoaded");
             //player.Skin.SendModel(player);
             //player.GetSkin().SendSkin(player);
         }
@@ -175,6 +176,10 @@ namespace Lambda
             }
 
 
+        }
+        public static void OnClientSendChatConsole(IPlayer altPlayer, object[] args)
+        {
+            Alt.Log(args[0] + "");
         }
 
 

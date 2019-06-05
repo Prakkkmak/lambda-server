@@ -7,9 +7,9 @@ namespace Lambda.Clothing
 {
     public class Cosmetic : ISkinPart
     {
-        public Overlay Makeup = new Overlay(36); // 4 0 - 74
-        public Overlay Blush = new Overlay(33); // 5 0 - 32
-        public Overlay Lipstick = new Overlay(6); // 8 0 - 9 NORMAL = 6
+        public Overlay Makeup = new Overlay(36, 1); // 4 0 - 74
+        public Overlay Blush = new Overlay(33, 1); // 5 0 - 32
+        public Overlay Lipstick = new Overlay(6, 1); // 8 0 - 9 NORMAL = 6
 
 
 
