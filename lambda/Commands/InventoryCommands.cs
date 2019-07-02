@@ -41,45 +41,45 @@ namespace Lambda.Commands
         {
             return new CmdReturn($"Vous avez {player.Inventory.Money} $");
         }
-        [Command(Command.CommandType.INVENTORY, 3)]
-        [Syntax("Joueur", "Item", "Nombre")]
-        [SyntaxType(typeof(Player), typeof(Item), typeof(uint))]
+        [Command(Command.CommandType.INVENTORY, 2)]
+        [Syntax("Item", "Nombre")]
+        [SyntaxType(typeof(Item), typeof(uint))]
         public static CmdReturn Donner(Player player, object[] argv)
         {
-            Player p = (Player)argv[0];
+            Player target = player.PlayerSelected;
+            if (target == null) return CmdReturn.NoSelected;
             Item item = (Item)argv[1];
             uint amount = (uint)argv[2];
-            if (p == player) return new CmdReturn("Vous ne pouvez pas vous cibler vous meme", CmdReturn.CmdReturnType.WARNING);
-            if (p.GetRequest() != null) return CmdReturn.RequestBusy;
+            if (target.GetRequest() != null) return CmdReturn.RequestBusy;
             if (item.Amount < amount) return new CmdReturn("Vous n'avez pas assez d'objets", CmdReturn.CmdReturnType.WARNING);
-            Request request = new Request(p, "Don", $"{player.FullName} veux vous donner un objet", player);
-            request.AddAnswer("Accepter", (sender, receiver) =>
+            Request request = new Request(target, "Don", $"{player.FullName} veux vous donner un objet", player);
+            request.AddAnswer("Accepter", () =>
             {
-                sender.SendMessage($"{receiver.FullName} a accepté votre demande");
-                sender.Inventory.RemoveItem(item.GetBaseItem().Id, amount);
-                receiver.Inventory.AddItem(item.GetBaseItem().Id, amount);
+                player.SendMessage($"{target.FullName} a accepté votre demande");
+                player.Inventory.RemoveItem(item.GetBaseItem().Id, amount);
+                target.Inventory.AddItem(item.GetBaseItem().Id, amount);
             });
-            request.AddAnswer("Refuser", (sender, receiver) =>
+            request.AddAnswer("Refuser", () =>
             {
-                sender.SendMessage($"{receiver.FullName} a refusé votre demande");
+                player.SendMessage($"{target.FullName} a refusé votre demande");
             });
-            request.Condition = (sender, receiver) =>
+            request.Condition = () =>
             {
-                if (sender.Inventory.GetItem(item.GetBaseItem().Id).Amount < amount)
+                if (player.Inventory.GetItem(item.GetBaseItem().Id).Amount < amount)
                 {
-                    sender.SendMessage($"Vous n avez pas assez d'objets");
-                    receiver.SendMessage($"L'envoyeur n a pas assez d'objets");
+                    player.SendMessage($"Vous n avez pas assez d'objets");
+                    target.SendMessage($"L'envoyeur n a pas assez d'objets");
                     return false;
                 }
-                if (sender.Position.Distance(receiver.Position) > 3)
+                if (player.Position.Distance(target.Position) > 3)
                 {
-                    sender.SendMessage($"Vous être trop loin");
-                    receiver.SendMessage($"Vous être trop loin");
+                    player.SendMessage($"Vous être trop loin");
+                    target.SendMessage($"Vous être trop loin");
                     return false;
                 }
                 return true;
             };
-            p.SendRequest(request);
+            target.SendRequest(request);
             return new CmdReturn("Vous avez fait une demande.", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.INVENTORY)]
@@ -121,6 +121,21 @@ namespace Lambda.Commands
             Item item = (Item)argv[0];
             _ = player.Inventory.RemoveItemAsync(item);
             return new CmdReturn($"Vous avez jeté un objet");
+        }
+
+        [Command(Command.CommandType.INVENTORY, 1)]
+        [Syntax("Prix")]
+        [SyntaxType(typeof(uint))]
+        public static CmdReturn Payer(Player player, object[] argv)
+        {
+            Player target = player.PlayerSelected;
+            if (target == null) return CmdReturn.NoSelected;
+            uint money = (uint)argv[0];
+            if (player.Inventory.Money < money) return new CmdReturn("Vous n'avez pas assez d'argent");
+            player.Inventory.Money -= money;
+            target.Inventory.Money += money;
+            target.SendMessage("Vous avez reçu " + money);
+            return new CmdReturn($"Vous avez donné " + money);
         }
 
     }

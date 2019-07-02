@@ -24,7 +24,7 @@ namespace Lambda.Commands
                 player.Skin.Clothes.Torso.Drawable = 15;
                 player.Skin.Clothes.Undershirt.Drawable = 15;
                 player.Skin.Clothes.Top.Drawable = 15;
-                player.Skin.Send(player, false);
+
             }
             else if (player.Skin.Model == (uint)PedModel.FreemodeFemale01)
             {
@@ -35,9 +35,8 @@ namespace Lambda.Commands
                 player.Skin.Clothes.Torso.Drawable = 15;
                 player.Skin.Clothes.Undershirt.Drawable = 15;
                 player.Skin.Clothes.Top.Drawable = 15;
-                player.Skin.Send(player, false);
             }
-
+            player.Skin.Send(player, false);
             return new CmdReturn($"Vous vous êtes déshabillé");
         }
         [Status(Command.CommandStatus.NEW)]
@@ -98,13 +97,13 @@ namespace Lambda.Commands
         {
             if (player.Skin.Model == (uint)PedModel.FreemodeMale01)
             {
-                player.Inventory.AddItem(Enums.Items.WatchMale, 1, player.Skin.Accessory.Bracelet.ToString());
-                player.Skin.Accessory.Bracelet.Drawable = 0;
+                player.Inventory.AddItem(Enums.Items.WatchMale, 1, player.Skin.Accessory.Watch.ToString());
+                player.Skin.Accessory.Watch.Drawable = 2;
             }
             else if (player.Skin.Model == (uint)PedModel.FreemodeFemale01)
             {
                 player.Inventory.AddItem(Enums.Items.WatchFemale, 1, player.Skin.Accessory.Watch.ToString());
-                player.Skin.Accessory.Bracelet.Drawable = 1;
+                player.Skin.Accessory.Watch.Drawable = 1;
             }
             player.Skin.Send(player, false);
             return new CmdReturn($"Vous vous avez enlevé vos boucles d'oreille");

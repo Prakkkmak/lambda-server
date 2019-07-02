@@ -40,6 +40,9 @@ namespace Lambda.Entity
         public Position SpawnPosition { get; set; } = Position.Zero;
         public Rotation SpawnRotation { get; set; } = Rotation.Zero;
 
+        public DateTime TaxiMeter = default;
+        public uint TaxiPrice = 0;
+
         public Vehicle(IntPtr nativePointer, ushort id) : base(nativePointer, id)
         {
             this.Inventory = new Inventory(this);

@@ -19,6 +19,8 @@ namespace Lambda.Organizations
 
         public Permissions Permissions = new Permissions();
 
+        public uint BankMoney = 0;
+
         private List<Rank> ranks = new List<Rank>();
         private List<Member> members = new List<Member>();
 

@@ -12,7 +12,7 @@ namespace Lambda.Utils
         public string Text { get; set; }
         public Player Sender { get; set; }
         public List<Answer> Answers { get; }
-        public Func<Player, Player, bool> Condition;
+        public Func<bool> Condition;
         public Request(Player player, string name, string text, Player sender)
         {
             Player = player;
@@ -22,7 +22,7 @@ namespace Lambda.Utils
             Answers = new List<Answer>();
         }
 
-        public void AddAnswer(string text, Action<Player, Player> action)
+        public void AddAnswer(string text, Action action)
         {
             Answer answer = new Answer(this, text, action);
             Answers.Add(answer);

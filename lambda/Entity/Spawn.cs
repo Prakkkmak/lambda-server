@@ -14,7 +14,7 @@ namespace Lambda
         {
             Position = pos;
         }
-        public static Spawn NewSpawn = new Spawn(new Position(427.1736f, -977.644f, 30.69519f));
+        public static Spawn NewSpawn = new Spawn(new Position(160, 6634f, 31f));
 
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AltV.Net.Data;
 using Lambda.Entity;
+using Lambda.Housing;
 using Lambda.Utils;
 
 namespace Lambda.Commands
@@ -11,23 +13,32 @@ namespace Lambda.Commands
         [Command(Command.CommandType.HOUSE)]
         public static CmdReturn Maison_Creer(Player player, object[] argv)
         {
-            House house = new House();
-            Area.AddArea(house);
-            house.Spawn(player.FeetPosition);
+            House house = new House(player.Position);
             _ = house.SaveAsync();
             return new CmdReturn("Vous avez créé une maison !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.HOUSE, 1)]
-        [Syntax("Interieur")]
-        [SyntaxType(typeof(Interior))]
+        [Syntax("IPL1,IPL2,...")]
+        [SyntaxType(typeof(string))]
         public static CmdReturn Maison_Interieur(Player player, object[] argv)
         {
-            Interior interior = (Interior)argv[0];
-            House house = (House)Area.GetArea(player.FeetPosition, Area.AreaType.HOUSE);
-            if (house == null) return new CmdReturn("Aucune maison n a ete trouvée", CmdReturn.CmdReturnType.LOCATION);
-            house.SetLocations(interior, (short)house.Id);
-            _ = house.SaveAsync();
-            return new CmdReturn("Vous avez changé l'interieur!", CmdReturn.CmdReturnType.SUCCESS);
+            string ipls = (string)argv[0];
+            House house = player.GetHouse();
+            if (house == null) return new CmdReturn("Pas de maison ici", CmdReturn.CmdReturnType.WARNING);
+            house.SetIpls(ipls);
+            return new CmdReturn("Vous avez créé une maison !", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Command(Command.CommandType.HOUSE, 3)]
+        [Syntax("x", "y", "z")]
+        [SyntaxType(typeof(int), typeof(int), typeof(int))]
+        public static CmdReturn Maison_Position(Player player, object[] argv)
+        {
+            Position pos = new Position((int)argv[0], (int)argv[1], (int)argv[2]);
+            House house = player.GetHouse();
+            if (house == null) return new CmdReturn("Pas de maison ici", CmdReturn.CmdReturnType.WARNING);
+            house.SetInterior(pos);
+            house.SetExterior(house.Exterior.Position);
+            return new CmdReturn("Vous avez créé une maison !", CmdReturn.CmdReturnType.SUCCESS);
         }
     }
 }

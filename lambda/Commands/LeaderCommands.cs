@@ -21,16 +21,16 @@ namespace Lambda.Commands
             if (target == null) return CmdReturn.NoSelected;
             if (!player.IsAllowedTo(org, "LEADER_INVITE")) return new CmdReturn("Vous n'etes pas autorisés a faire cela");
             Request request = new Request(target, "Invitation", $"{player.FullName} veux vous vous inviter dans son organisation {org.Name}", player);
-            request.AddAnswer("Accepter", (sender, receiver) =>
+            request.AddAnswer("Accepter", () =>
             {
-                sender.SendMessage($"{receiver.FullName} a accepté votre demande");
-                org.AddMember(receiver, rank);
+                player.SendMessage($"{target.FullName} a accepté votre demande");
+                org.AddMember(target, rank);
             });
-            request.AddAnswer("Refuser", (sender, receiver) =>
+            request.AddAnswer("Refuser", () =>
             {
-                sender.SendMessage($"{receiver.FullName} a refusé votre demande");
+                player.SendMessage($"{target.FullName} a refusé votre demande");
             });
-            request.Condition = (sender, receiver) =>
+            request.Condition = () =>
             {
                 return true;
             };
@@ -75,6 +75,16 @@ namespace Lambda.Commands
             if (!player.IsAllowedTo(org, "LEADER_SALARY")) return new CmdReturn("Vous n'etes pas autorisés a faire cela");
             rank.Salary = salary;
             return new CmdReturn($"Vous avez changé le salaire du rang {rank.Name} à {salary}$.", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Permission("LEADER_ACCOUNT")]
+        [Command(Command.CommandType.ORGANIZATION, 1)]
+        [Syntax("Organisation")]
+        [SyntaxType(typeof(Organization))]
+        public static CmdReturn Leader_Compte(Player player, object[] argv)
+        {
+            Organization org = (Organization)argv[0];
+            if (!player.IsAllowedTo(org, "LEADER_ACCOUNT")) return new CmdReturn("Vous n'etes pas autorisés a faire cela");
+            return new CmdReturn($"L'organisation a {org.BankMoney} en banque.", CmdReturn.CmdReturnType.SUCCESS);
         }
     }
 }

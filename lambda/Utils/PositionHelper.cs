@@ -19,5 +19,16 @@ namespace Lambda.Utils
             y += distance * (float)Math.Cos(angle.Yaw);
             return new Position(x, y, pos.Z);
         }
+
+        public static Position PositionFromString(string strPos)
+        {
+            string[] coords = strPos.Split(",");
+            return coords.Length < 3 ? Position.Zero : new Position(Convert.ToSingle(coords[0]), Convert.ToSingle(coords[1]), Convert.ToSingle(coords[2]));
+        }
+
+        public static string StringFromPosition(Position position)
+        {
+            return position.X + "," + position.Y + "," + position.Z;
+        }
     }
 }

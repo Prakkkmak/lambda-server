@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Lambda.Entity;
 using Lambda.Organizations;
+using Lambda.Telephony;
 using Lambda.Utils;
 
 namespace Lambda.Commands
@@ -38,6 +39,12 @@ namespace Lambda.Commands
             if (players.Length < 1) return new CmdReturn("Aucun joueur trouvé", CmdReturnType.WARNING);
             return new CmdReturn("Player trouvé", CmdReturnType.SUCCESS);
         }
+        public static CmdReturn OnlyOneContact(Contact[] contacts)
+        {
+            if (contacts.Length > 1) return new CmdReturn("Plusieurs contacts ont le même nom; specifiez", CmdReturnType.WARNING);
+            if (contacts.Length < 1) return new CmdReturn("Aucun contact trouvé", CmdReturnType.WARNING);
+            return new CmdReturn("Contact trouvé", CmdReturnType.SUCCESS);
+        }
         public static CmdReturn OnlyOneMember(Member[] members)
         {
             if (members.Length > 1) return new CmdReturn("Plusieurs membres ont le même nom; specifiez", CmdReturnType.WARNING);
@@ -55,12 +62,6 @@ namespace Lambda.Commands
             if (ranks.Length > 1) return new CmdReturn("Plusieurs rangs ont le même nom; specifiez", CmdReturnType.WARNING);
             if (ranks.Length < 1) return new CmdReturn("Aucun rang trouvé", CmdReturnType.WARNING);
             return new CmdReturn("Rank trouvée", CmdReturnType.SUCCESS);
-        }
-        public static CmdReturn OnlyOneInterior(Interior[] interiors)
-        {
-            if (interiors.Length > 1) return new CmdReturn("Plusieurs interieurs ont le même nom; specifiez", CmdReturnType.WARNING);
-            if (interiors.Length < 1) return new CmdReturn("Aucun interieur trouvé", CmdReturnType.WARNING);
-            return new CmdReturn("Interior trouvée", CmdReturnType.SUCCESS);
         }
         public static CmdReturn Success = new CmdReturn("Success", CmdReturnType.SUCCESS);
         public static CmdReturn ObjectNotExist = new CmdReturn("Cet objet n existe pas.", CmdReturnType.WARNING);

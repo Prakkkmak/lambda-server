@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using AltV.Net;
@@ -15,9 +16,11 @@ using Lambda.Administration;
 using Lambda.Clothing;
 using Lambda.Commands;
 using Lambda.Database;
+using Lambda.Housing;
 using Lambda.Items;
 using Lambda.Organizations;
 using Lambda.Skills;
+using Lambda.Telephony;
 using Lambda.Utils;
 using MoreLinq;
 
@@ -27,6 +30,7 @@ namespace Lambda.Entity
     public class Player : AltV.Net.Elements.Entities.Player, IDBElement, IEntity
     {
 
+        public Phone Phone;
         public List<Skill> Skills;
         public Permissions Permissions = new Permissions();
 
@@ -45,6 +49,8 @@ namespace Lambda.Entity
             set;
         }
 
+        public long BankMoney;
+
         public short Food { get; set; }
 
         public ushort ServerId => base.Id;
@@ -53,7 +59,6 @@ namespace Lambda.Entity
 
         public Inventory Inventory { get; set; }
 
-        public Interior Interior { get; set; }
 
 
         public Position FeetPosition => new Position(Position.X, Position.Y, Position.Z - 1);
@@ -61,10 +66,12 @@ namespace Lambda.Entity
         public Player PlayerSelected = null;
         public Vehicle VehicleSelected = null;
 
+        public DateTime BanTime = default;
+
         private uint deathCount;
         private uint id; // The id in the database
 
-        private long bankMoney;
+
 
         public Skin Skin = new Skin();
 
@@ -74,6 +81,7 @@ namespace Lambda.Entity
 
         public Player(IntPtr nativePointer, ushort id) : base(nativePointer, id)
         {
+
             Skills = new List<Skill>();
             deathCount = 0;
             id = 0;
@@ -88,7 +96,9 @@ namespace Lambda.Entity
 
         public void Spawn(Position pos)
         {
-            GotoLocation(new Location(pos, null, 0));
+            //GotoLocation(new Location(pos, null, 0));
+            Position = pos;
+            Dimension = 0;
             Freeze(false);
         }
 
@@ -119,12 +129,12 @@ namespace Lambda.Entity
         }
         public void Goto(Player player)
         {
-            GotoLocation(player.GetLocation());
+            //GotoLocation(player.GetLocation());  // TODO
         }
-        public void Goto(Interior interior)
-        {
-            this.GotoLocation(new Location(interior.Position, interior, (short)interior.Id));
-        }
+        /*public void Goto(Interior interior)
+         {
+             this.GotoLocation(new Location(interior.Position, interior, (short)interior.Id));
+         }*/
 
         public void SendRequest(Request r)
         {
@@ -132,6 +142,7 @@ namespace Lambda.Entity
             SendMessage(r.Text);
             SendMessage("Vous pouvez accepté ou refuser.");
             SetRequest(r);
+            Emit("setInteraction", "test", r.Text, "Accepter", "Refuser");
         }
 
         public void SetRequest(Request r)
@@ -161,7 +172,7 @@ namespace Lambda.Entity
             return member != null && member.Rank.Permissions.Contains(perm);
         }
 
-        public void LoadInterior(Interior interior)
+        /*public void LoadInterior(Interior interior)
         {
             foreach (string ipl in interior.GetIPLs())
             {
@@ -169,55 +180,95 @@ namespace Lambda.Entity
             }
 
         }
+
         public void UnloadInterior(Interior interior)
         {
             foreach (string ipl in interior.GetIPLs())
             {
                 Emit("unloadIpl", ipl);
             }
-        }
-
-        public Location GetLocation()
+        }*/
+        public void LoadIpl(string ipl)
         {
-            return new Location(Position, Interior, Dimension);
-        }
+            Emit("loadIpl", ipl);
 
-        public void GotoLocation(Location location)
+        }
+        public void LoadIpl(string[] ipls)
         {
-            if (Interior != null) UnloadInterior(Interior);
-            if (location.Interior != null)
+            foreach (string ipl in ipls)
             {
-                LoadInterior(location.Interior);
-                Interior = location.Interior.Clone();
+                LoadIpl(ipl);
             }
-            Dimension = location.Dimension;
-            Position = location.Position;
         }
-        public void ExitInterior()
+        public void LoadIpl(List<string> ipls)
         {
-            if (Interior == null) return;
-            GotoLocation(new Location(Interior.Area.Position, null, 0));
+            foreach (string ipl in ipls)
+            {
+                LoadIpl(ipl);
+            }
+        }
+        public void UnloadIpl(string ipl)
+        {
+            Emit("unloadIpl", ipl);
+
+        }
+        public void UnloadIpl(string[] ipls)
+        {
+            foreach (string ipl in ipls)
+            {
+                UnloadIpl(ipl);
+            }
+        }
+        public void UnloadIpl(List<string> ipls)
+        {
+            foreach (string ipl in ipls)
+            {
+                UnloadIpl(ipl);
+            }
+        }
+
+        public void Goto(Checkpoint checkpoint)
+        {
+            Dimension = checkpoint.Dimension;
+            Position = checkpoint.Position;
         }
 
         public void Withdraw(long amount)
         {
             Inventory.Deposit(amount);
-            bankMoney -= amount;
+            BankMoney -= amount;
         }
 
         public void Deposit(long amount)
         {
             Inventory.Withdraw(amount);
-            bankMoney += amount;
+            BankMoney += amount;
         }
 
         public long GetBankMoney()
         {
-            return bankMoney;
+            return BankMoney;
         }
         public void SetBankMoney(long money)
         {
-            bankMoney = money;
+            BankMoney = money;
+        }
+
+        public House GetHouse()
+        {
+            foreach (House h in House.Houses)
+            {
+                if (h.Interior != null && h.Interior.Position.Distance(Position) < h.Interior.Range)
+                {
+                    return h;
+                }
+                if (h.Exterior != null && h.Exterior.Position.Distance(Position) < h.Exterior.Range)
+                {
+                    return h;
+                }
+            }
+
+            return null;
         }
 
         public Organization[] GetOrganizations()
@@ -351,22 +402,22 @@ namespace Lambda.Entity
 
         public void GenerateContext()
         {
-            Context context = new Context();
+            List<Context> contexts = new List<Context>();
             if (PlayerSelected != null)
             {
-                context.Name = "Intéragir avec " + PlayerSelected.FullName;
-                context.Children.Add(new Context("Menotter", "police menotter"));
-                context.Children.Add(new Context("Menotter2", "police menotter"));
+                contexts.Add(new Context("Menotter", "police menotter"));
+                contexts.Add(new Context("Menotter2", "police menotter"));
             }
             else
             {
-                context.Name = "Blah";
-                context.Children.Add(new Context("Créer un véhicule", "vehicule sultan"));
-                context.Children.Add(new Context("Créer un véhicule2", "vehicule police"));
-                context.Children.Add(new Context("Déshabiller", "vet enl hab"));
+                contexts.Add(new Context("Créer un véhicule", "vehicule sultan"));
+                contexts.Add(new Context("Créer un véhicule2", "vehicule police"));
+                contexts.Add(new Context("Déshabiller", "vet enl hab"));
             }
-            Alt.Log("CONTEXTE" + context);
-            Emit("setContextAction", "[" + context + "]");
+
+            string str = string.Join(',', contexts);
+            Alt.Log("CONTEXTE" + str);
+            Emit("setContextActions", "[" + str + "]");
         }
 
 
@@ -394,6 +445,7 @@ namespace Lambda.Entity
             data["cha_hairiness"] = Skin.Hairiness.ToString();
             data["cha_cosmetic"] = Skin.Cosmetic.ToString();
             data["cha_clothes"] = Skin.Clothes.ToString();
+            if (Phone != null) data["pho_id"] = Phone.Id.ToString();
             return data;
 
         }
@@ -420,10 +472,26 @@ namespace Lambda.Entity
             TimeOnline = ulong.Parse(data["cha_timeonline"]);
             TotalTimeOnline = ulong.Parse(data["cha_totaltimeonline"]);
             Skin.Model = Convert.ToUInt32(data["cha_model"]);
-            if (data["cha_face"].Length == Skin.Face.ToString().Length) Skin.Face.Set(data["cha_face"]);
-            if (data["cha_hairiness"].Length == Skin.Hairiness.ToString().Length) Skin.Hairiness.Set(data["cha_hairiness"]);
-            if (data["cha_cosmetic"].Length == Skin.Cosmetic.ToString().Length) Skin.Cosmetic.Set(data["cha_cosmetic"]);
-            if (data["cha_clothes"].Length == Skin.Clothes.ToString().Length) Skin.Clothes.Set(data["cha_clothes"]);
+            if (data["pho_id"] != null) Phone = Phone.GetPhone(Convert.ToUInt32(data["pho_id"]));
+            if (data["cha_face"].Split(',').Length == Skin.Face.ToString().Split(',').Length)
+            {
+                Skin.Face.Set(data["cha_face"]);
+            }
+            if (data["cha_hairiness"].Split(',').Length == Skin.Hairiness.ToString().Split(',').Length)
+            {
+                Skin.Hairiness.Set(data["cha_hairiness"]);
+            }
+            if (data["cha_cosmetic"].Split(',').Length == Skin.Cosmetic.ToString().Split(',').Length)
+            {
+                Skin.Cosmetic.Set(data["cha_cosmetic"]);
+            }
+            Alt.Log(data["cha_clothes"].Split(',').Length + " " + Skin.Clothes.ToString().Split(',').Length);
+            Alt.Log(data["cha_clothes"]);
+            Alt.Log(Skin.Clothes.ToString());
+            if (data["cha_clothes"].Split(',').Length == Skin.Clothes.ToString().Split(',').Length)
+            {
+                Skin.Clothes.Set(data["cha_clothes"]);
+            }
             Skin.Send(this);
             _ = SaveAsync();
         }
@@ -462,7 +530,8 @@ namespace Lambda.Entity
             {
                 await playerSkill.SaveAsync();
             }
-            DatabaseElement.Save(this);
+            Alt.Log("Start save player");
+            await DatabaseElement.SaveAsync(this);
             Alt.Log("Player Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }
 
@@ -473,9 +542,13 @@ namespace Lambda.Entity
 
         public static void AddPlayer(Player player)
         {
+            Alt.Log("t1");
             Players.Add(player);
+            Alt.Log("t2");
             VoiceChannel.AddPlayer(player);
+            Alt.Log("t3");
             Alt.EmitAllClients("chatmessage", null, $"{player.FullName} s'est connecté!");
+            Alt.Log("t4");
         }
         public static Player GetPlayerByDbId(uint id)
         {

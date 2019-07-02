@@ -78,6 +78,7 @@ namespace Lambda.Commands
             player.Spawn(Spawn.NewSpawn.Position);
             return new CmdReturn("Vous vous avez respawn!", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_PERMISSION_ADD")]
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("Permission")]
         [SyntaxType(typeof(string))]
@@ -86,6 +87,7 @@ namespace Lambda.Commands
             player.Permissions.Add((string)argv[0]);
             return new CmdReturn("Vous avez ajouté une permission", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_PERMISSION_REMOVE")]
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("Permission")]
         [SyntaxType(typeof(string))]
@@ -94,7 +96,8 @@ namespace Lambda.Commands
             player.Permissions.Add((string)argv[0]);
             return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Command(Command.CommandType.INVENTORY, 3)]
+        [Permission("ADMIN_GIVE_OBJECT")]
+        [Command(Command.CommandType.ADMIN, 3)]
         [Syntax("Joueur", "Objet", "Quantité")]
         [SyntaxType(typeof(Player), typeof(BaseItem), typeof(uint))]
         public static CmdReturn Give(Player player, object[] argv)
@@ -106,6 +109,31 @@ namespace Lambda.Commands
             if (amount > 10) return new CmdReturn("Ne te donne pas trop d'objets stp");
             target.Inventory.AddItem(baseItem.Id, amount);
             return new CmdReturn("Vous avez donné des objets", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Permission("MODERATOR_KICK")]
+        [Command(Command.CommandType.ADMIN, 1)]
+        [Syntax("Joueur")]
+        [SyntaxType(typeof(Player))]
+        public static CmdReturn Kick(Player player, object[] argv)
+        {
+            Player target = (Player)argv[0];
+            string reason = (string)argv[1];
+            target.Kick(reason);
+            return new CmdReturn("Vous avez kick " + player.FullName, CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Permission("ADMIN_BAN")]
+        [Command(Command.CommandType.ADMIN, 2)]
+        [Syntax("Joueur", "Temps")]
+        [SyntaxType(typeof(Player), typeof(int))]
+        public static CmdReturn Ban(Player player, object[] argv)
+        {
+
+            Player target = (Player)argv[0];
+            int time = (int)argv[1];
+            string reason = (string)argv[2];
+            target.Account.Ban(time, reason);
+            target.Kick("Ban de: " + time + " heures :" + reason);
+            return new CmdReturn("Vous avez ban " + player.FullName, CmdReturn.CmdReturnType.SUCCESS);
         }
     }
 }

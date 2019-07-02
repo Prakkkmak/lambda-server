@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AltV.Net;
 
 namespace Lambda.Utils
 {
@@ -29,9 +30,9 @@ namespace Lambda.Utils
             }
 
             string str = "{" +
-                         "'label:'" + Name + "'," +
-                         "'cmd':'!" + CommandName + "'," +
-                         "'children':["
+                         "\"label\":\"" + Name + "\"," +
+                         "\"cmd\":\"/" + CommandName + "\"," +
+                         "\"children\":["
                          + others
                          + "]}";
             return str;

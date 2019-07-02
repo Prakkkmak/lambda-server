@@ -256,9 +256,11 @@ namespace Lambda.Items
             Alt.Log("Inventory Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }
 
-        public Task DeleteAsync()
+        public async Task DeleteAsync()
         {
-            throw new NotImplementedException();
+            long t = DateTime.Now.Ticks;
+            await DatabaseElement.DeleteAsync(this);
+            Alt.Log("Item deleted en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }
 
 

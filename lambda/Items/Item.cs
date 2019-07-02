@@ -34,8 +34,6 @@ namespace Lambda.Items
             Amount = amount;
         }
 
-
-
         public BaseItem GetBaseItem()
         {
             return baseItem;
@@ -58,76 +56,77 @@ namespace Lambda.Items
 
         public int Use(Player player)
         {
-            uint baseId = GetBaseItem().Id;
-            switch (baseId)
+            Enums.Items baseItem = (Enums.Items)GetBaseItem().Id;
+            switch (baseItem)
             {
-                case 50:
+                case Enums.Items.ClothesMale:
                     if (player.Skin.Model == (uint)PedModel.FreemodeFemale01) return 1;
                     player.Skin.Clothes.Set(MetaData);
                     player.Skin.Send(player, false);
                     _ = inventory.RemoveItemAsync(this);
                     break;
-                case 51:
+                case Enums.Items.HatMale:
                     if (player.Skin.Model == (uint)PedModel.FreemodeFemale01) return 1;
                     player.Skin.Accessory.Hat.Set(MetaData);
                     player.Skin.Send(player, false);
                     _ = inventory.RemoveItemAsync(this);
                     break;
-                case 52:
+                case Enums.Items.GlassesMale:
                     if (player.Skin.Model == (uint)PedModel.FreemodeFemale01) return 1;
                     player.Skin.Accessory.Glasses.Set(MetaData);
+                    Alt.Log("Metadataz " + MetaData);
                     player.Skin.Send(player, false);
                     _ = inventory.RemoveItemAsync(this);
                     break;
-                case 53:
+                case Enums.Items.EarsMale:
                     if (player.Skin.Model == (uint)PedModel.FreemodeFemale01) return 1;
                     player.Skin.Accessory.Ears.Set(MetaData);
                     player.Skin.Send(player, false);
                     _ = inventory.RemoveItemAsync(this);
                     break;
-                case 54:
+                case Enums.Items.WatchMale:
                     if (player.Skin.Model == (uint)PedModel.FreemodeFemale01) return 1;
                     player.Skin.Accessory.Watch.Set(MetaData);
                     player.Skin.Send(player, false);
                     _ = inventory.RemoveItemAsync(this);
                     break;
-                case 55:
+                case Enums.Items.BraceletMale:
                     if (player.Skin.Model == (uint)PedModel.FreemodeFemale01) return 1;
                     player.Skin.Accessory.Bracelet.Set(MetaData);
                     player.Skin.Send(player, false);
                     _ = inventory.RemoveItemAsync(this);
                     break;
-                case 56:
+                case Enums.Items.ClothesFemale:
                     if (player.Skin.Model == (uint)PedModel.FreemodeMale01) return 1;
                     player.Skin.Clothes.Set(MetaData);
                     player.Skin.Send(player, false);
                     _ = inventory.RemoveItemAsync(this);
                     break;
-                case 57:
+                case Enums.Items.HatFemale:
                     if (player.Skin.Model == (uint)PedModel.FreemodeMale01) return 1;
                     player.Skin.Accessory.Hat.Set(MetaData);
                     player.Skin.Send(player, false);
                     _ = inventory.RemoveItemAsync(this);
                     break;
-                case 58:
+                case Enums.Items.GlassesFemale:
                     if (player.Skin.Model == (uint)PedModel.FreemodeMale01) return 1;
                     player.Skin.Accessory.Glasses.Set(MetaData);
                     player.Skin.Send(player, false);
                     _ = inventory.RemoveItemAsync(this);
                     break;
-                case 59:
+                case Enums.Items.EarsFemale:
                     if (player.Skin.Model == (uint)PedModel.FreemodeMale01) return 1;
                     player.Skin.Accessory.Ears.Set(MetaData);
                     player.Skin.Send(player, false);
                     _ = inventory.RemoveItemAsync(this);
                     break;
-                case 60:
+                case Enums.Items.WatchFemale:
                     if (player.Skin.Model == (uint)PedModel.FreemodeMale01) return 1;
                     player.Skin.Accessory.Watch.Set(MetaData);
                     player.Skin.Send(player, false);
                     _ = inventory.RemoveItemAsync(this);
                     break;
-                case 61:
+                case Enums.Items.BraceletFemale:
                     if (player.Skin.Model == (uint)PedModel.FreemodeMale01) return 1;
                     player.Skin.Accessory.Bracelet.Set(MetaData);
                     player.Skin.Send(player, false);

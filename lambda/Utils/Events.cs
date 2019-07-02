@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using AltV.Net;
 using AltV.Net.Elements.Entities;
@@ -38,14 +39,23 @@ namespace Lambda
             Alt.OnClient("setprops", OnClientSetProps);
             Alt.OnClient("chatConsole", OnClientSendChatConsole);
             Alt.OnClient("changeSelectedPlayer", OnClientChangePlayerSelected);
+            Alt.OnClient("save", OnClientSave);
             Alt.Log("[EVENT] OnVehicleEnter registered");
             Alt.OnPlayerEnterVehicle += OnVehicleEnter;
             Alt.OnPlayerLeaveVehicle += OnVehicleLeave;
         }
+        public static void OnClientSave(IPlayer altPlayer, object[] args)
+        {
+            Player player = (Player)altPlayer;
+            _ = player.SaveAsync();
+        }
+
 
         public static void OnPlayerConnect(IPlayer altPlayer, string reason)
         {
+            Alt.Log("Player connect");
             Player pl = (Player)altPlayer;
+            Alt.Log("Player connected");
         }
 
         private static void OnPlayerDisconnect(IPlayer altPlayer, string reason)
@@ -93,13 +103,17 @@ namespace Lambda
             account = DatabaseElement.Get<Account>(account, "acc_license", license);
             if (account != null)
             {
+                if (account.BanTime > DateTime.Now)
+                {
+                    altPlayer.Kick("Vous ête banni jusqu'a " + account.BanTime);
+                }
                 DatabaseElement.Get<Player>(player, "acc_id", account.Id.ToString());
                 player.Account = account;
             }
             else
             {
                 player.Account = new Account(player.License);
-                _ = player.SaveAsync();
+                //_ = player.SaveAsync();
 
             }
             Alt.Log($"[{player.ServerId}]{player.FullName} s'est connecté.");
@@ -113,8 +127,13 @@ namespace Lambda
         {
             Player player = (Player)altPlayer;
             object[] test = (object[])args[0];
-            int[] converted = Array.ConvertAll(test, item => (int)(long)item);
-            player.Skin.SetComponents(converted);
+            List<int> converted = new List<int>();
+            foreach (object o in test)
+            {
+                converted.Add((int)(long)o);
+            }
+
+            player.Skin.SetComponents(converted.ToArray());
             _ = player.SaveAsync();
         }
         public static void OnClientSetHeadData(IPlayer altPlayer, object[] args)
@@ -122,29 +141,25 @@ namespace Lambda
             Player player = (Player)altPlayer;
             string[] converted = Array.ConvertAll(args, item => item + "");
             player.Skin.SetHeadData(converted);
-            //_ = player.SaveAsync();
         }
         public static void OnClientSetHairColor(IPlayer altPlayer, object[] args)
         {
             Player player = (Player)altPlayer;
             player.Skin.Hairiness.HairColor = (uint)(long)args[0];
             player.Skin.Hairiness.HairColor2 = (uint)(long)args[1];
-            //_ = player.SaveAsync();
         }
         public static void OnClientSetEyeColor(IPlayer altPlayer, object[] args)
         {
             Player player = (Player)altPlayer;
             player.Skin.Face.EyeColor = (uint)(long)args[0];
-            //_ = player.SaveAsync();
         }
         public static void OnClientSetFeatures(IPlayer altPlayer, object[] args)
         {
             Player player = (Player)altPlayer;
             string str = "";
             object[] test = (object[])args[0];
-            int[] converted = Array.ConvertAll(test, item => (int)(long)item);
+            int[] converted = Array.ConvertAll(test, item => (int)(long)item); // TODO
             player.Skin.SetFeatures(converted);
-            //_ = player.SaveAsync();
         }
         public static void OnClientSetProps(IPlayer altPlayer, object[] args)
         {
@@ -153,7 +168,6 @@ namespace Lambda
             object[] test = (object[])args[0];
             int[] converted = Array.ConvertAll(test, item => (int)(long)item);
             player.Skin.SetProps(converted);
-            //_ = player.SaveAsync();
         }
         public static void OnClientSetOverlays(IPlayer altPlayer, object[] args)
         {
@@ -162,7 +176,6 @@ namespace Lambda
             object[] test = (object[])args[0];
             int[] converted = Array.ConvertAll(test, item => (int)(long)item);
             player.Skin.SetOverlays(converted);
-            //_ = player.SaveAsync();
         }
         public static void OnClientChangePlayerSelected(IPlayer altPlayer, object[] args)
         {

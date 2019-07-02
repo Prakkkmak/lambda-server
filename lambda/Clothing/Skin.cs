@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Mail;
 using System.Text;
+using AltV.Net;
 using AltV.Net.Enums;
 using Lambda.Entity;
 
@@ -30,33 +31,39 @@ namespace Lambda.Clothing
 
         public void SetComponents(int[] args)
         {
+            string str = "";
+            foreach (int i1 in args)
+            {
+                str += i1 + ",";
+            }
+            Alt.Log(str);
             int i = 0;
             i += 3; // Face
             Accessory.Mask.Drawable = (ushort)args[i++];
-            Accessory.Mask.Palette = (ushort)args[i++];
             Accessory.Mask.Texture = (ushort)args[i++];
+            Accessory.Mask.Palette = (ushort)args[i++];
             Hairiness.Head.Drawable = (ushort)args[i++];
-            Hairiness.Head.Palette = (ushort)args[i++];
             Hairiness.Head.Texture = (ushort)args[i++];
+            Hairiness.Head.Palette = (ushort)args[i++];
             Clothes.Torso.Drawable = (ushort)args[i++];
-            Clothes.Torso.Palette = (ushort)args[i++];
             Clothes.Torso.Texture = (ushort)args[i++];
-            Clothes.Leg.Palette = (ushort)args[i++];
+            Clothes.Torso.Palette = (ushort)args[i++];
+            Clothes.Leg.Drawable = (ushort)args[i++];
             Clothes.Leg.Texture = (ushort)args[i++];
             Clothes.Leg.Palette = (ushort)args[i++];
             i += 3; // bag
-            Clothes.Shoe.Palette = (ushort)args[i++];
+            Clothes.Shoe.Drawable = (ushort)args[i++];
             Clothes.Shoe.Texture = (ushort)args[i++];
             Clothes.Shoe.Palette = (ushort)args[i++];
-            Clothes.Accessories.Palette = (ushort)args[i++];
+            Clothes.Accessories.Drawable = (ushort)args[i++];
             Clothes.Accessories.Texture = (ushort)args[i++];
             Clothes.Accessories.Palette = (ushort)args[i++];
-            Clothes.Undershirt.Palette = (ushort)args[i++];
+            Clothes.Undershirt.Drawable = (ushort)args[i++];
             Clothes.Undershirt.Texture = (ushort)args[i++];
             Clothes.Undershirt.Palette = (ushort)args[i++];
             i += 3; //Body armor
             i += 3; //Decal
-            Clothes.Top.Palette = (ushort)args[i++];
+            Clothes.Top.Drawable = (ushort)args[i++];
             Clothes.Top.Texture = (ushort)args[i++];
             Clothes.Top.Palette = (ushort)args[i++];
         }

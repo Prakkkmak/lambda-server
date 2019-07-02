@@ -1,23 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AltV.Net;
 using Lambda.Entity;
 
 namespace Lambda.Clothing
 {
     public class Clothes : ISkinPart
     {
-        public Component Torso = new Component(); //3
-        public Component Leg = new Component(); // 4
-        public Component Shoe = new Component(); // 6
-        public Component Accessories = new Component(); // 7
-        public Component Undershirt = new Component(); // 8
-        public Component Top = new Component(); // 11
+        public Component Torso = new Component(0); //3
+        public Component Leg = new Component(0); // 4
+        public Component Shoe = new Component(0); // 6
+        public Component Accessories = new Component(0); // 7
+        public Component Undershirt = new Component(0); // 8
+        public Component Top = new Component(0); // 11
 
 
 
         public void Set(string str)
         {
+
             string[] infos = str.Split(',');
             int i = 0;
             Torso.Drawable = Convert.ToUInt32(infos[i++]);

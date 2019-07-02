@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using AltV.Net;
 using AltV.Net.Elements.Entities;
-using Checkpoint = Lambda.Entity.Area;
 
 namespace Lambda.FactoryStuff
 {

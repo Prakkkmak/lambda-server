@@ -20,16 +20,16 @@ namespace Lambda.Commands
             if (target == null) return new CmdReturn("Vous ne selectionnez personne");
             uint amount = (uint)argv[0];
             Request request = new Request(target, "Don", $"{player.FullName} vous a donné une amende.", player);
-            request.AddAnswer("Accepter", (sender, receiver) =>
+            request.AddAnswer("Accepter", () =>
             {
-                sender.SendMessage($"{receiver.FullName} a accepté votre demande");
-                receiver.Inventory.Withdraw(amount);
+                player.SendMessage($"{target.FullName} a accepté votre demande");
+                target.Inventory.Withdraw(amount);
             });
-            request.AddAnswer("Refuser", (sender, receiver) =>
+            request.AddAnswer("Refuser", () =>
             {
-                sender.SendMessage($"{receiver.FullName} a refusé votre demande");
+                player.SendMessage($"{target.FullName} a refusé votre demande");
             });
-            request.Condition = (sender, receiver) => true;
+            request.Condition = () => true;
             target.SendRequest(request);
             return new CmdReturn("Vous avez posé une amende à quelqu'un !", CmdReturn.CmdReturnType.SUCCESS);
         }

@@ -18,10 +18,21 @@ namespace Lambda.Administration
         public string Mail = "";
         public string License = "";
 
+        public DateTime BanTime = default;
+
         public Account(string license)
         {
             Id = 0;
             License = license;
+        }
+
+        public void Ban(int hours, string reason)
+        {
+            DateTime date = DateTime.Now;
+            date = date.AddHours(hours);
+            BanTime = date;
+            _ = SaveAsync();
+
         }
 
         public Dictionary<string, string> GetData()
@@ -32,6 +43,8 @@ namespace Lambda.Administration
             data["acc_note"] = note.ToString();
             data["acc_admin"] = admin.ToString();
             data["acc_license"] = License;
+            if (BanTime != default)
+                data["acc_ban"] = BanTime.ToString("yyyy-MM-dd HH:mm:ss.fff");
             return data;
         }
 
@@ -43,7 +56,10 @@ namespace Lambda.Administration
             note = short.Parse(data["acc_note"]);
             admin = short.Parse(data["acc_admin"]);
             License = data["acc_license"];
+            if (!string.IsNullOrEmpty(data["acc_ban"])) BanTime = Convert.ToDateTime(data["acc_ban"]);
         }
+
+
 
         public async void Save()
         {
@@ -61,7 +77,7 @@ namespace Lambda.Administration
         {
             long t = DateTime.Now.Ticks;
             await DatabaseElement.SaveAsync(this);
-            Alt.Log("Skill Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
+            Alt.Log("Account Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }
 
         public Task DeleteAsync()

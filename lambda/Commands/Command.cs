@@ -10,6 +10,7 @@ using Lambda.Administration;
 using Lambda.Entity;
 using Lambda.Items;
 using Lambda.Organizations;
+using Lambda.Telephony;
 using Lambda.Utils;
 using MoreLinq;
 
@@ -38,6 +39,7 @@ namespace Lambda.Commands
             SKIN,
             ADMIN,
             POLICE,
+            TAXI,
             TEST,
         }
 
@@ -80,15 +82,20 @@ namespace Lambda.Commands
             parametersString = RemoveCommandName(parametersString);
             CmdReturn result = ConvertParamameters(player, parametersString, out object[] parameters);
             if (result.Type != CmdReturn.CmdReturnType.SUCCESS) return result;
+
             if (!string.IsNullOrWhiteSpace(permission) && !player.IsAllowedTo(permission)) return new CmdReturn("Vous n'avez pas la permission de faire ceci", CmdReturn.CmdReturnType.WARNING);
-            _ = player.SaveAsync();
+            if (string.IsNullOrWhiteSpace(player.FullName) && Name == "personnage_nom")
+            {
+                _ = player.SaveAsync();
+            }
+            if (!string.IsNullOrWhiteSpace(player.FullName)) _ = player.SaveAsync();
             CmdReturn cmdReturn = action(player, parameters); // Launch the command
             return cmdReturn;
         }
 
         public CmdReturn ConvertParamameters(Player player, string[] parameters, out object[] result)
         {
-            result = new object[parameters.Length];
+            result = new object[parameters.Length + 1]; // Last param is text " + 1 "
             if (parameters.Length < syntax.Length) return new CmdReturn(Syntax(), CmdReturn.CmdReturnType.SYNTAX);
             int i = 0;
             for (; i < syntax.Length; i++)
@@ -172,28 +179,51 @@ namespace Lambda.Commands
                     if (cmdReturn.Type != CmdReturn.CmdReturnType.SUCCESS) return cmdReturn;
                     result[i] = members[0];
                 }
-                else if (syntaxTypes[i] == typeof(Interior))
-                {
-                    Interior[] interiors = Interior.GetInteriors(parameters[i]);
-                    CmdReturn cmdReturn = CmdReturn.OnlyOneInterior(interiors);
-                    if (cmdReturn.Type != CmdReturn.CmdReturnType.SUCCESS) return cmdReturn;
-                    result[i] = interiors[0];
-                }
                 else if (syntaxTypes[i] == typeof(Permissions))
                 {
                     if (!Permissions.PermissionExist(parameters[i])) return new CmdReturn("Permissions n'existe pas", CmdReturn.CmdReturnType.WARNING);
                     result[i] = parameters[i];
+                }
+                else if (syntaxTypes[i] == typeof(Contact))
+                {
+                    string contactName = parameters[i];
+                    if (player.Phone == null) return new CmdReturn("Vous n'avez pas de téléphone");
+                    Contact[] contacts = player.Phone.GetContacts(contactName);
+                    CmdReturn cmdReturn = CmdReturn.OnlyOneContact(contacts);
+                    if (cmdReturn.Type != CmdReturn.CmdReturnType.SUCCESS)
+                    {
+                        if (contactName.Length == 7)
+                        {
+                            for (int j = 0; j < 7; j++)
+                            {
+                                if (!"0123456789".Contains(contactName[j]))
+                                {
+                                    return cmdReturn;
+                                }
+                            }
+
+                            result[i] = new Contact(0, null, "", contactName);
+                        }
+                        else
+                        {
+                            return cmdReturn;
+                        }
+                    }
+                    result[i] = contacts[0];
                 }
                 else
                 {
                     result[i] = parameters[i];
                 }
             }
-
+            // Add the end of the command to the stuff
+            string text = "";
             for (; i < parameters.Length; i++)
             {
-                result[i] = parameters[i];
+                text += parameters[i];
             }
+
+            result[syntax.Length] = text;
             return CmdReturn.Success;
         }
 

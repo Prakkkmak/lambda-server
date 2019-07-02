@@ -112,12 +112,12 @@ namespace Lambda.Commands
         {
             Request request = player.GetRequest();
             if (request == null) return new CmdReturn("Vous n'avez pas de requete en attente");
-            if (!request.Condition(request.Sender, player))
+            if (!request.Condition())
             {
                 player.SetRequest(null);
                 return CmdReturn.NotImplemented;
             }
-            request.Answers[0].Action(request.Sender, player);
+            request.Answers[0].Action();
             player.SetRequest(null);
             return new CmdReturn("Vous avez accepté la demande !", CmdReturn.CmdReturnType.SUCCESS);
         }
@@ -126,25 +126,19 @@ namespace Lambda.Commands
         {
             Request request = player.GetRequest();
             if (request == null) return new CmdReturn("Vous n'avez pas de requete en attente");
-            if (!request.Condition(request.Sender, player))
+            if (!request.Condition())
             {
                 player.SetRequest(null);
                 return CmdReturn.NotImplemented;
             }
-            request.Answers[1].Action(request.Sender, player);
+            request.Answers[1].Action();
             player.SetRequest(null);
             return new CmdReturn("Vous avez refusé la demande !", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn TP(Player player, object[] argv)
         {
-            Location location = Area.GetDestination(player.Position, player.Dimension);
-            //if (area == null) return new CmdReturn("Aucune zone a ete trouvé", CmdReturn.CmdReturnType.LOCATION);
-            if (player.Vehicle != null) return new CmdReturn("");
-            if (location.Equals(default(Location))) return new CmdReturn("");
-            if (location.Position.Equals(new Position())) return new CmdReturn("Il n'y a pas d'interieur");
-            player.GotoLocation(location);
-            return new CmdReturn("Vous vous êtes téléporté", CmdReturn.CmdReturnType.SUCCESS);
+            return CmdReturn.NotImplemented;
         }
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Clear(Player player, object[] argv)

@@ -12,6 +12,7 @@ using Lambda.Database;
 using Lambda.Entity;
 using Lambda.Items;
 using Lambda.Organizations;
+using Lambda.Telephony;
 using Lambda.Utils;
 using IEntity = AltV.Net.Elements.Entities.IEntity;
 using Player = Lambda.Entity.Player;
@@ -37,6 +38,7 @@ namespace Lambda
         private DateTime lastTime = DateTime.Now;
         public override void OnTick()
         {
+
             base.OnTick();
             long delta = DateTime.Now.Ticks - lastTime.Ticks;
             if ((DateTime.Now.Ticks - startTicks) / TimeSpan.TicksPerMinute > minutes)
@@ -54,10 +56,6 @@ namespace Lambda
         public override void OnStart()
         {
             Alt.Log("LAMBDA BUILD #5 pre1");
-            Alt.Log("<br>");
-            Alt.Log("<br>");
-            Alt.Log("<br>");
-            Alt.Log("<br>");
             //DatabaseElement.DbConnect = new DBConnect();
             Alt.Log("=== Register events... ===");
             Events.RegisterEvents();
@@ -72,14 +70,13 @@ namespace Lambda
             Command.GetAllCommands();
             Alt.Log("=== Commands are registered ===");
             Alt.Log("=== Load in database... ===");
-            Interior.LoadInteriors();
-            Alt.Log(">All interiors loaded");
             BaseItem.LoadBaseItems();
             Alt.Log(">Base items created");
             Vehicle.LoadVehicles();
+
             Alt.Log(">Vehicles spawned");
-            Area.LoadAreas();
-            Alt.Log(">All areas loaded");
+            Phone.LoadPhones();
+            Alt.Log(">All phones loaded");
             Organization.LoadOrganizations();
             Alt.Log(">All organizations loaded");
             Anim.RegisterAnims();

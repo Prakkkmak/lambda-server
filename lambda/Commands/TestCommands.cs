@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using AltV.Net;
 using AltV.Net.Data;
+using AltV.Net.Elements.Entities;
 using AltV.Net.Enums;
 using Lambda.Administration;
 using Lambda.Entity;
@@ -10,6 +12,8 @@ using Lambda.Items;
 using Lambda.Organizations;
 using Lambda.Skills;
 using Lambda.Utils;
+using Player = Lambda.Entity.Player;
+using Vehicle = Lambda.Entity.Vehicle;
 
 namespace Lambda.Commands
 {
@@ -90,6 +94,7 @@ namespace Lambda.Commands
         {
             return new CmdReturn("C 2 sECR3t 0+0+4+23");
         }
+
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Vehicules_Respawn(Player player, object[] argv)
         {
@@ -98,6 +103,7 @@ namespace Lambda.Commands
 
                 veh.Respawn();
             }
+
             return new CmdReturn("Les veh devraient avoir respawn");
         }
 
@@ -122,6 +128,7 @@ namespace Lambda.Commands
             if (skill == null) return new CmdReturn("Vous n'avez pas la competence");
             return new CmdReturn("Vous etes level " + skill.GetLevel());
         }
+
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Levels(Player player, object[] argv)
         {
@@ -130,8 +137,10 @@ namespace Lambda.Commands
             {
                 txt += "" + playerSkill.GetLevel() + "<br>";
             }
+
             return new CmdReturn(txt);
         }
+
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 2)]
         [Syntax("dict", "anim")]
@@ -154,6 +163,7 @@ namespace Lambda.Commands
             player.Emit("playAnim", anim.Dictionary, anim.Animation);
             return new CmdReturn(anim.Dictionary + " " + anim.Animation);
         }
+
         [Permission("LEADER")]
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST)]
@@ -161,6 +171,7 @@ namespace Lambda.Commands
         {
             return new CmdReturn("Ca marche");
         }
+
         [Permission("TEST")]
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST)]
@@ -170,8 +181,10 @@ namespace Lambda.Commands
             {
 
             }
+
             return new CmdReturn("Ca marche");
         }
+
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 2)]
         [Syntax("1", "2")]
@@ -193,6 +206,7 @@ namespace Lambda.Commands
             Alt.Log("ici3");
             return new CmdReturn("Ca marche");
         }
+
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST)]
         public static CmdReturn kouki(Player player, object[] argv)
@@ -202,6 +216,7 @@ namespace Lambda.Commands
             Alt.Log("pr32");
             return new CmdReturn("ok");
         }
+
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 1)]
         [Syntax("Joueur")]
@@ -211,6 +226,7 @@ namespace Lambda.Commands
             Player target = (Player)argv[0];
             return new CmdReturn(target.Permissions.ToString());
         }
+
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 1)]
         [Syntax("Joueur")]
@@ -222,6 +238,7 @@ namespace Lambda.Commands
             target.SendMessage("Vous avez été menotté/démenotté");
             return new CmdReturn("Vous avez menotté/démenotté quelqu'un");
         }
+
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 1)]
         [Syntax("Nom")]
@@ -242,6 +259,7 @@ namespace Lambda.Commands
             player.Emit("setHairColor", (uint)argv[0], (uint)argv[1]);
             return new CmdReturn("Vous avez changé la couleur de vos cheveux");
         }
+
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 1)]
         [Syntax("1")]
@@ -251,6 +269,7 @@ namespace Lambda.Commands
             player.Emit("setEyeColor", (uint)argv[0]);
             return new CmdReturn("Vous avez changé la couleur de vos yeux");
         }
+
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 3)]
         [Syntax("Maman", "Papa", "Mix")]
@@ -263,6 +282,7 @@ namespace Lambda.Commands
             player.Emit("setShape", mother, father, mix);
             return new CmdReturn("Vous avez changé la forme");
         }
+
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.TEST, 3)]
         [Syntax("Maman", "Papa", "Mix")]
@@ -275,11 +295,13 @@ namespace Lambda.Commands
             player.Emit("setSkin", mother, father, mix);
             return new CmdReturn("Vous avez changé la peau");
         }
+
         [Command(Command.CommandType.TEST)]
         public static CmdReturn front_pos(Player player, object[] argv)
         {
             Position pos = PositionHelper.PositionInAngle(player.Position, player.Rotation, 0.25f);
             Alt.CreateCheckpoint(1, pos, 0.30f, 0.5f, new Rgba(0, 0, 0, 255));
+
             return new CmdReturn("Vous avez changé la peau");
         }
 
@@ -294,6 +316,7 @@ namespace Lambda.Commands
             veh.SetOwner(org.Id, Vehicle.OwnerType.ORGANIZATION);
             return new CmdReturn("Vous avez changé le proprio du véhicule");
         }
+
         [Command(Command.CommandType.TEST, 1)]
         [Syntax("Serrure")]
         [SyntaxType(typeof(string))]
@@ -304,6 +327,7 @@ namespace Lambda.Commands
             veh.Lock.Code = (string)argv[0];
             return new CmdReturn("Vous avez changé le proprio du véhicule");
         }
+
         [Command(Command.CommandType.TEST, 1)]
         [Syntax("Joueur")]
         [SyntaxType(typeof(Player))]
@@ -313,6 +337,7 @@ namespace Lambda.Commands
             target.Emit("attachBeaconToPlayer", target);
             return new CmdReturn("Vous avez changé le proprio du véhicule");
         }
+
         [Permission("POLICE_BEACON")]
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Osseccour(Player player, object[] argv)
@@ -324,8 +349,10 @@ namespace Lambda.Commands
                     target.Emit("attachBeaconToPlayer", player);
                 }
             }
+
             return new CmdReturn("Vous avez envoyé une balise");
         }
+
         [Permission("POLICE_BEACON")]
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Enfaitcava(Player player, object[] argv)
@@ -337,6 +364,7 @@ namespace Lambda.Commands
                     target.Emit("detachBeaconToPlayer", player);
                 }
             }
+
             return new CmdReturn("Vous avez retiré une balise");
         }
 
@@ -345,7 +373,7 @@ namespace Lambda.Commands
         {
             Alt.EmitAllClients("closeDoortest");
 
-            return new CmdReturn("Vous avez fermé bla   h");
+            return new CmdReturn("Vous avez fermé bla h");
         }
 
         [Command(Command.CommandType.TEST)]
@@ -355,40 +383,82 @@ namespace Lambda.Commands
 
             return new CmdReturn("Vous avez open bla   h");
         }
+
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Invisible(Player player, object[] argv)
         {
             player.Emit("toggleInvisibility");
             return new CmdReturn("Vous avez changé votre invisibilité.");
         }
+
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Dieu(Player player, object[] argv)
         {
             player.Emit("toggleInvincibility");
             return new CmdReturn("Vous avez changé votre invinsibilité.");
         }
+
         [Command(Command.CommandType.TEST, 1)]
         [Syntax("Joueur")]
         [SyntaxType(typeof(Player))]
         public static CmdReturn Spec_Joueur(Player player, object[] argv)
         {
             Player target = (Player)argv[0];
+            player.Goto(target);
             player.Emit("setSpecTarget", target, true);
             return new CmdReturn("Vous spequez quelqu'un.");
         }
+
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Spec_Stop(Player player, object[] argv)
         {
             player.Emit("stopSpecTarget");
             return new CmdReturn("Vous arrêtez de spequer quelqu'un.");
         }
+
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Context(Player player, object[] argv)
         {
             player.GenerateContext();
+
             return new CmdReturn("Vous générez un contexte");
+        }
+
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn PlaceProp(Player player, object[] argv)
+        {
+            Alt.Log("place prop .. ?");
+            player.Emit("placeProp", "prop_mp_cone_01");
+
+            return new CmdReturn("Vous placez un prop ?");
+        }
+
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Secret(Player player, object[] argv)
+        {
+            player.Emit("creatorTest");
+
+            return new CmdReturn("Vous placez un prop ?");
+        }
+
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("Temps")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Meteo(Player player, object[] argv)
+        {
+
+            Alt.EmitAllClients("weather", ((string)argv[0]).ToUpper());
+            return new CmdReturn("Vous avez changé la météo ?");
+        }
+
+        [Command(Command.CommandType.TEST, 2)]
+        [Syntax("Heures", "Minutes")]
+        [SyntaxType(typeof(uint), typeof(uint))]
+        public static CmdReturn Heure(Player player, object[] argv)
+        {
+            Alt.EmitAllClients("setTime", (uint)argv[0], (uint)argv[1], 0);
+            return new CmdReturn("Vous avez changé la montre ?");
         }
     }
 }
-
 

@@ -33,6 +33,7 @@ namespace Lambda.Database
             port = "3306";
             password = "";
             connectionString = $"server={server}; database={database}; uid={uid}; pwd='{password}'; port={port}";
+            connectionString = $"server=localhost; database=lambda; uid=root; port=3307;Convert Zero Datetime=True";
             connectionString = $"server=149.91.90.131; database=lambda; uid=server; pwd=MaZmPcs7nt; port=3306;Convert Zero Datetime=True";
         }
         /// <summary>
@@ -112,7 +113,12 @@ namespace Lambda.Database
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Alt.Log("Error in querry:");
+                Alt.Log(query);
+                Alt.Log(ex.Message);
                 //await DoCleanupAsync();
+                Console.ResetColor();
                 throw ex;
             }
             long last = cmd.LastInsertedId;
@@ -142,7 +148,21 @@ namespace Lambda.Database
             MySqlConnection connection = OpenConnection();
             string query = DataToUpdateQuery(table, datas, wheres);
             MySqlCommand cmd = new MySqlCommand(query, connection);
-            int rowsAffected = await cmd.ExecuteNonQueryAsync();
+            int rowsAffected;
+            try
+            {
+                rowsAffected = await cmd.ExecuteNonQueryAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Alt.Log("Error in querry:");
+                Alt.Log(query);
+                Alt.Log(ex.Message);
+                //await DoCleanupAsync();
+                Console.ResetColor();
+                throw ex;
+            }
             CloseConnection(connection);
             return rowsAffected;
         }

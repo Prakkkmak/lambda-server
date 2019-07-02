@@ -13,6 +13,7 @@ using Lambda.Entity;
 using Lambda.Items;
 using Lambda.Organizations;
 using Lambda.Skills;
+using Lambda.Telephony;
 using Lambda.Utils;
 
 namespace Lambda.Database
@@ -26,17 +27,18 @@ namespace Lambda.Database
             {typeof(Player), "t_character_cha" },
             {typeof(Vehicle), "t_vehicle_veh" },
             {typeof(BaseItem), "t_itemdata_itd" },
-            {typeof(Area), "t_area_are" },
             {typeof(Account), "t_account_acc" },
             {typeof(Skin), "t_skin_ski" },
-            {typeof(Interior), "t_interior_int" },
             {typeof(Organization), "t_organization_org" },
             {typeof(Rank), "t_rank_ran" },
             {typeof(Link), "t_link_lin" },
             {typeof(Inventory), "t_inventory_inv" },
             {typeof(Item), "t_item_ite" },
             {typeof(Skill), "t_skill_skl" },
-            {typeof(Member), "t_member_mem" }
+            {typeof(Member), "t_member_mem" },
+            {typeof(Phone), "t_phone_pho" },
+            {typeof(Message), "t_phonemessage_pme" },
+            {typeof(Contact), "t_phonecontact_pco" }
         };
 
         public static string GetPrefix(string str)
@@ -109,7 +111,8 @@ namespace Lambda.Database
             entity.SetData(result);
             return entity;
         }
-        public static T Get<T>(T entity, string where1, string param1) where T : IDBElement
+        public static T
+            Get<T>(T entity, string where1, string param1) where T : IDBElement
         {
             string tableName = GetTableName(typeof(T));
             Dictionary<string, string> where = new Dictionary<string, string>();
@@ -188,49 +191,59 @@ namespace Lambda.Database
 
             return entities.ToArray();
         }
-
-        public static Interior[] GetAllInteriors()
+        public static Phone[] GetAllPhones()
         {
-            string tableName = GetTableName(typeof(Interior));
-            List<Interior> entities = new List<Interior>();
+            string tableName = GetTableName(typeof(Phone));
+            List<Phone> entities = new List<Phone>();
             List<Dictionary<string, string>> results = DbConnect.Select(tableName, new Dictionary<string, string>());
             foreach (Dictionary<string, string> result in results)
             {
-                Interior entity = new Interior();
-                entity.SetData(result);
-                entity.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
-                entities.Add(entity);
+                Phone phone = new Phone();
+                phone.SetData(result);
+                phone.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
+                entities.Add(phone);
             }
 
             return entities.ToArray();
         }
 
-        public static Area[] GetAllAreas()
+        public static Message[] GetAllMessages(Phone phone)
         {
-            string tableName = GetTableName(typeof(Area));
-            List<Area> entities = new List<Area>();
-            List<Dictionary<string, string>> results = DbConnect.Select(tableName, new Dictionary<string, string>());
+            string tableName = GetTableName(typeof(Message));
+            List<Message> messages = new List<Message>();
+            Dictionary<string, string> where = new Dictionary<string, string>();
+            string index = "pho_id";
+            where[index] = phone.Id.ToString();
+            List<Dictionary<string, string>> results = DbConnect.Select(tableName, where);
             foreach (Dictionary<string, string> result in results)
             {
-                Area area;
-                if (result["are_type"] == "SHOP")
-                {
-                    area = new Shop();
-                }
-                else if (result["are_type"] == "HOUSE")
-                {
-                    area = new House();
-                }
-                else
-                {
-                    area = new Area();
-                }
-                area.SetData(result);
-                area.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
-                entities.Add(area);
+                Message message = new Message(0, phone, "", "", "");
+                message.SetData(result);
+                message.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
+                messages.Add(message);
             }
-            return entities.ToArray();
+
+            return messages.ToArray();
         }
+        public static Contact[] GetAllContacts(Phone phone)
+        {
+            string tableName = GetTableName(typeof(Contact));
+            List<Contact> contacts = new List<Contact>();
+            Dictionary<string, string> where = new Dictionary<string, string>();
+            string index = "pho_id";
+            where[index] = phone.Id.ToString();
+            List<Dictionary<string, string>> results = DbConnect.Select(tableName, where);
+            foreach (Dictionary<string, string> result in results)
+            {
+                Contact contact = new Contact(0, phone, "", "");
+                contact.SetData(result);
+                contact.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
+                contacts.Add(contact);
+            }
+
+            return contacts.ToArray();
+        }
+
         public static Item[] GetAllItems(Inventory inventory)
         {
             string tableName = GetTableName(typeof(Item));
@@ -265,7 +278,10 @@ namespace Lambda.Database
                 member.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
                 member.Rank = rank;
                 Dictionary<string, string> playerdata = Get<Player>(member.PlayerId);
-                member.Name = playerdata["cha_firstname"] + " " + playerdata["cha_lastname"];
+                if (playerdata.ContainsKey("cha_firstname") && playerdata.ContainsKey("cha_lastname"))
+                    member.Name = playerdata["cha_firstname"] + " " + playerdata["cha_lastname"];
+                else
+                    member.Name = "Inconnu";
                 members.Add(member);
             }
 
