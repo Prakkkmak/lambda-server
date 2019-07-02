@@ -35,16 +35,18 @@ namespace Lambda.Housing
         }
         public void SetInterior(Position position)
         {
+            Interior?.AltCheckpoint.Remove();
             Interior = new Checkpoint(position, (short)Id, player =>
-           {
-               if (Exterior == null) return;
-               player.Goto(Exterior);
-               player.UnloadIpl(Ipls);
-           });
+            {
+                if (Exterior == null) return;
+                player.Goto(Exterior);
+                player.UnloadIpl(Ipls);
+            });
         }
 
         public void SetExterior(Position position)
         {
+            Exterior?.AltCheckpoint.Remove();
             Exterior = new Checkpoint(position, 0, player =>
             {
                 if (Interior == null) return;

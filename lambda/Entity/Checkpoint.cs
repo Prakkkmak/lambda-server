@@ -14,6 +14,7 @@ namespace Lambda.Entity
         public Rotation Rotation { get; set; }
         public uint Range = 0;
         public Action<Player> Action = null;
+        public ICheckpoint AltCheckpoint;
 
         public Checkpoint(Position position, short dim, Action<Player> action, CheckpointType type = CheckpointType.Cyclinder, uint range = 1, short height = 1, Rgba color = default)
         {
@@ -21,7 +22,7 @@ namespace Lambda.Entity
             Dimension = dim;
             Range = range;
             Action = action;
-            Alt.CreateCheckpoint(type, position, range, height, new Rgba(0, 0, 0, 255));
+            AltCheckpoint = Alt.CreateCheckpoint(type, position, range, height, new Rgba(0, 0, 0, 255));
             Checkpoints.Add(this);
         }
 
