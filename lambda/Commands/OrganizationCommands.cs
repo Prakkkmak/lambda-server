@@ -10,7 +10,7 @@ namespace Lambda.Commands
 {
     class OrganizationCommands
     {
-        [Permission("ORGANIZATION_FACTURE")]
+        [Permission("ORGANISATION_FACTURE")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Prix")]
         [SyntaxType(typeof(Organization), typeof(uint))]

@@ -7,7 +7,7 @@ namespace Lambda.Commands
 {
     class TaxiCommands
     {
-        [Permission("TAXI_DUTY")]
+        [Permission("TAXI_SERVICE")]
         [Command(Command.CommandType.TAXI)]
         public static CmdReturn Taxi_Service(Player player, object[] argv)
         {
@@ -19,7 +19,7 @@ namespace Lambda.Commands
             }
             return new CmdReturn("Vous vous êtes mis en service!");
         }
-        [Permission("TAXI_TAXIMETER_BEGIN")]
+        [Permission("TAXI_COMPTEUR_DEMARRER")]
         [Command(Command.CommandType.TAXI)]
         public static CmdReturn Taxi_Compteur_Demarrer(Player player, object[] argv)
         {
@@ -28,7 +28,7 @@ namespace Lambda.Commands
             vehicle.TaxiMeter = DateTime.Now; // 16:51
             return new CmdReturn("Vous avez démarré votre compteur.");
         }
-        [Permission("TAXI_TAXIMETER_SHOW")]
+        [Permission("TAXI_COMPTEUR_VOIR")]
         [Command(Command.CommandType.TAXI)]
         public static CmdReturn Taxi_Compteur_Voir(Player player, object[] argv)
         {
@@ -41,7 +41,7 @@ namespace Lambda.Commands
             long seconds = spend % 60;
             return new CmdReturn("Vous avez passé " + minutes + "m" + seconds + "s avec le compteur allumé. Prix: " + (minutes * vehicle.TaxiPrice) + "$.");
         }
-        [Permission("TAXI_TAXIMETER_PRICE")]
+        [Permission("TAXI_COMPTEUR_PRIX")]
         [Command(Command.CommandType.TAXI, 1)]
         [Syntax("Prix")]
         [SyntaxType(typeof(uint))]
@@ -53,7 +53,7 @@ namespace Lambda.Commands
             vehicle.TaxiPrice = price;
             return new CmdReturn("Vous avez passé le prix à " + price + ".");
         }
-        [Permission("TAXI_TAXIMETER_STOP")]
+        [Permission("TAXI_COMPTEUR_ARRETER")]
         [Command(Command.CommandType.TAXI)]
         public static CmdReturn Taxi_Compteur_Arreter(Player player, object[] argv)
         {

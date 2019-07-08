@@ -11,10 +11,11 @@ namespace Lambda.Commands
 {
     class AdminOrganizationCommands
     {
+        [Permission("ADMIN_ORGANISATION_CREER")]
         [Command(Command.CommandType.ORGANIZATION, 1)]
         [Syntax("Nom")]
         [SyntaxType(typeof(string))]
-        public static CmdReturn Admin_Organisation_Creer(Player player, object[] argv)
+        public static CmdReturn Organisation_Creer(Player player, object[] argv)
         {
             string str = argv.Aggregate("", (current, o) => current + (o + " "));
             str = str.Substring(0, str.Length - 1);
@@ -25,10 +26,11 @@ namespace Lambda.Commands
             Organization org = Organization.CreateOrganization(str);
             return new CmdReturn($"Vous avez créé l'organisation {org.Name} !", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_NOM")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Nom")]
         [SyntaxType(typeof(Organization), typeof(string))]
-        public static CmdReturn Admin_Organisation_Nom(Player player, object[] argv)
+        public static CmdReturn Organisation_Nom(Player player, object[] argv)
         {
             Organization organization = (Organization)argv[0];
             string str = "";
@@ -44,20 +46,22 @@ namespace Lambda.Commands
             organization.Rename(str);
             return new CmdReturn($"Vous avez renommé l'organisation en {str}!", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_SUPPRIMER")]
         [Command(Command.CommandType.ORGANIZATION, 1)]
         [Syntax("Organisation")]
         [SyntaxType(typeof(Organization))]
-        public static CmdReturn Admin_Organisation_Supprimer(Player player, object[] argv)
+        public static CmdReturn Organisation_Supprimer(Player player, object[] argv)
         {
             Organization organization = (Organization)argv[0];
             organization.Remove();
             _ = organization.DeleteAsync();
             return new CmdReturn($"Vous avez supprimé l'organisation {organization.Name}!", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_RANG_CREER")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Nom")]
         [SyntaxType(typeof(Organization), typeof(string))]
-        public static CmdReturn Admin_Organisation_Rang_Creer(Player player, object[] argv)
+        public static CmdReturn Organisation_Rang_Creer(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             string str = "";
@@ -73,10 +77,11 @@ namespace Lambda.Commands
             Rank rank = org.AddRank((string)argv[1]);
             return new CmdReturn($"Vous avez créé le rang {rank.Name}", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_RANG_SUPPRIMER")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Rang")]
         [SyntaxType(typeof(Organization), typeof(Rank))]
-        public static CmdReturn Admin_Organisation_Rang_Supprimer(Player player, object[] argv)
+        public static CmdReturn Organisation_Rang_Supprimer(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             Rank rank = (Rank)argv[1];
@@ -87,10 +92,11 @@ namespace Lambda.Commands
             org.RemoveRank(rank);
             return new CmdReturn($"Vous avez supprimé le rang {rank.Name}", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_RANG_RENOMMER")]
         [Command(Command.CommandType.ORGANIZATION, 3)]
         [Syntax("Organisation", "Rang", "Nom")]
         [SyntaxType(typeof(Organization), typeof(Rank), typeof(string))]
-        public static CmdReturn Admin_Organisation_Rang_Renommer(Player player, object[] argv)
+        public static CmdReturn Organisation_Rang_Renommer(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             Rank rank = (Rank)argv[1];
@@ -107,8 +113,9 @@ namespace Lambda.Commands
             rank.Rename(str);
             return new CmdReturn($"Vous avez renommé le rang en {rank.Name}", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("MODERATEUR_ORGANISATION_LISTE")]
         [Command(Command.CommandType.ORGANIZATION)]
-        public static CmdReturn Admin_Organisation_Liste(Player player, object[] argv)
+        public static CmdReturn Organisation_Liste(Player player, object[] argv)
         {
             string str = "Organisations existantes: <br>";
             foreach (Organization organization in Organization.Organizations)
@@ -117,10 +124,11 @@ namespace Lambda.Commands
             }
             return new CmdReturn(str, CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("MODERATEUR_ORGANISATION_MEMBRES")]
         [Command(Command.CommandType.ORGANIZATION, 1)]
         [Syntax("Organisation")]
         [SyntaxType(typeof(Organization))]
-        public static CmdReturn Admin_Organisation_Membres_Liste(Player player, object[] argv)
+        public static CmdReturn Organisation_Membres(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             string str = "Membres de l'organisation: <br>";
@@ -138,10 +146,11 @@ namespace Lambda.Commands
             }
             return new CmdReturn(str, CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_RANGS")]
         [Command(Command.CommandType.ORGANIZATION, 1)]
         [Syntax("Organisation")]
         [SyntaxType(typeof(Organization))]
-        public static CmdReturn Admin_Organisation_Rangs_Liste(Player player, object[] argv)
+        public static CmdReturn Organisation_Rangs(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             string str = "Rangs de l'organisation: <br>";
@@ -151,10 +160,11 @@ namespace Lambda.Commands
             }
             return new CmdReturn(str, CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_AJOUTER")]
         [Command(Command.CommandType.ORGANIZATION, 3)]
         [Syntax("Organisation", "Rang", "Joueur")]
         [SyntaxType(typeof(Organization), typeof(Rank), typeof(Player))]
-        public static CmdReturn Admin_Organisation_Ajouter(Player player, object[] argv)
+        public static CmdReturn Organisation_Ajouter(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             Rank rank = (Rank)argv[1];
@@ -164,10 +174,11 @@ namespace Lambda.Commands
             target.SendMessage("Vous avez été invité à l'organisation " + org.Name + " au rang de " + rank.Name + ".");
             return new CmdReturn($"Vous avez ajouté {target.FullName} à l'organisation {org.Name} au rang de {rank.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_RANG_NOM")]
         [Command(Command.CommandType.ORGANIZATION, 4)]
         [Syntax("Organisation", "Membre", "Organisation", "Rang")]
         [SyntaxType(typeof(Organization), typeof(Member), typeof(Organization), typeof(Rank))]
-        public static CmdReturn Admin_Organisation_Rang_Nom(Player player, object[] argv)
+        public static CmdReturn Organisation_Rang_Nom(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             Member member = (Member)argv[1];
@@ -176,10 +187,11 @@ namespace Lambda.Commands
             org.ChangeMemberRank(member, rank);
             return new CmdReturn($"Vous avez changé le rang de {member.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_RANG_SALAIRE")]
         [Command(Command.CommandType.ORGANIZATION, 3)]
         [Syntax("Organisation", "Rang", "Salaire")]
         [SyntaxType(typeof(Organization), typeof(Rank), typeof(uint))]
-        public static CmdReturn Admin_Organisation_Salaire(Player player, object[] argv)
+        public static CmdReturn Organisation_Salaire(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             Rank rank = (Rank)argv[1];
@@ -187,29 +199,36 @@ namespace Lambda.Commands
             rank.ChangeSalary(salary);
             return new CmdReturn($"Vous avez changé le salaire de {rank.Name} à {salary}$.", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_PERMISSION_AJOUTER")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Permission")]
         [SyntaxType(typeof(Organization), typeof(Permissions))]
-        public static CmdReturn Admin_Organisation_Permission_Ajouter(Player player, object[] argv)
+        public static CmdReturn Organisation_Permission_Ajouter(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             string perm = (string)argv[1];
+            if(perm.StartsWith("ADMIN") ||perm.StartsWith("MODERATEUR") || perm.StartsWith("FONDATEUR"))
+            {
+                return new CmdReturn("Vous ne pouvez pas donner une permission administrative");
+            }
             org.Permissions.Add(perm);
             _ = org.SaveAsync(); //TODO deplacer le save
             return new CmdReturn($"Vous avez ajouté la permission {perm} à {org.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("MODERATEUR_ORGANISATION_PERMISSION_VOIR")]
         [Command(Command.CommandType.ORGANIZATION, 1)]
         [Syntax("Organisation")]
         [SyntaxType(typeof(Organization))]
-        public static CmdReturn Admin_Organisation_Permission_Voir(Player player, object[] argv)
+        public static CmdReturn Organisation_Permission_Voir(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             return new CmdReturn($"{org.Permissions.ToString()}", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_PERMISSION_SUPPRIMER")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Permission")]
         [SyntaxType(typeof(Organization), typeof(Permissions))]
-        public static CmdReturn Admin_Organisation_Permission_Supprimer(Player player, object[] argv)
+        public static CmdReturn Organisation_Permission_Supprimer(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             string perm = (string)argv[1];
@@ -217,10 +236,11 @@ namespace Lambda.Commands
             _ = org.SaveAsync(); //TODO deplacer le save
             return new CmdReturn($"Vous avez supprimé la permission {perm} à {org.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_RANG_PERMISSION_AJOUTER")]
         [Command(Command.CommandType.ORGANIZATION, 3)]
         [Syntax("Organisation", "Rang", "Permission")]
         [SyntaxType(typeof(Organization), typeof(Rank), typeof(Permissions))]
-        public static CmdReturn Admin_Organisation_Permission_Rang_Ajouter(Player player, object[] argv)
+        public static CmdReturn Organisation_Permission_Rang_Ajouter(Player player, object[] argv)
         {
             Organization org = (Organization)argv[0];
             Rank rank = (Rank)argv[1];
@@ -229,6 +249,7 @@ namespace Lambda.Commands
             _ = rank.SaveAsync(); //TODO deplacer le save
             return new CmdReturn($"Vous avez ajouté la permission {perm} à {rank.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_RANG_PERMISSION_SUPPRIMER")]
         [Command(Command.CommandType.ORGANIZATION, 3)]
         [Syntax("Organisation", "Rang", "Permission")]
         [SyntaxType(typeof(Organization), typeof(Rank), typeof(Permissions))]
@@ -241,6 +262,7 @@ namespace Lambda.Commands
             _ = rank.SaveAsync(); //TODO deplacer le save
             return new CmdReturn($"Vous avez supprimé la permission {perm} à {rank.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_ORGANISATION_RANG_PERMISSION_SUPPRIMER")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Membre")]
         [SyntaxType(typeof(Organization), typeof(Member))]
@@ -251,7 +273,7 @@ namespace Lambda.Commands
             org.RemoveMember(member);
             return new CmdReturn($"Vous avez viré quelqu'un d'une organisation.", CmdReturn.CmdReturnType.SUCCESS);
         }
-
+        [Permission("MODERATEUR_ORGANISATION_RANG_PERMISSION_VOIR")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Rang")]
         [SyntaxType(typeof(Organization), typeof(Rank))]

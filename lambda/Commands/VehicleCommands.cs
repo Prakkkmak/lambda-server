@@ -14,6 +14,7 @@ namespace Lambda.Commands
 {
     class VehicleCommands
     {
+        [Permission("ADMIN_VEHICULE_CREER")]
         [Command(Command.CommandType.VEHICLE, 1)]
         [Syntax("Modele")]
         [SyntaxType(typeof(string))]
@@ -37,7 +38,7 @@ namespace Lambda.Commands
             player.Inventory.AddItem(Enums.Items.CarKey, 1, vehicle.Lock.Code);
             return new CmdReturn("Vous avez fait apparaitre un véhicule", CmdReturn.CmdReturnType.SUCCESS);
         }
-
+        [Permission("ADMIN_VEHICULE_PARK")]
         [Command(Command.CommandType.VEHICLE)]
         public static CmdReturn Vehicule_Park(Player player, object[] argv)
         {
@@ -46,7 +47,7 @@ namespace Lambda.Commands
             veh.Park();
             return new CmdReturn("Vous avez sauvegardé un véhicule", CmdReturn.CmdReturnType.SUCCESS);
         }
-
+        [Permission("ADMIN_VEHICULE_COULEUR")]
         [Command(Command.CommandType.VEHICLE, 3)]
         [Syntax("R", "G", "B")]
         [SyntaxType(typeof(byte), typeof(byte), typeof(byte))]
@@ -57,7 +58,7 @@ namespace Lambda.Commands
             veh.PrimaryColorRgb = new Rgba((byte)argv[0], (byte)argv[1], (byte)argv[2], 255);
             return new CmdReturn("Vous avez changé la couleur de votre véhicule ! ", CmdReturn.CmdReturnType.SUCCESS);
         }
-
+        [Permission("ADMIN_VEHICULE_COULEUR2")]
         [Command(Command.CommandType.VEHICLE, 3)]
         [Syntax("R", "G", "B")]
         [SyntaxType(typeof(byte), typeof(byte), typeof(byte))]
@@ -68,7 +69,7 @@ namespace Lambda.Commands
             veh.SecondaryColorRgb = new Rgba((byte)argv[0], (byte)argv[1], (byte)argv[2], 255);
             return new CmdReturn("Vous avez changé la couleur de votre véhicule ! ", CmdReturn.CmdReturnType.SUCCESS);
         }
-
+        [Permission("ADMIN_VEHICULE_SUPPRIMER")]
         [Command(Command.CommandType.VEHICLE)]
         public static CmdReturn Vehicule_Supprimer(Player player, object[] argv)
         {
@@ -78,6 +79,7 @@ namespace Lambda.Commands
             if (veh.Id != 0) veh.Delete();
             return new CmdReturn("Vous avez supprimé un véhicule", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("CIVIL_VEHICULE_CLEF")]
         [Command(Command.CommandType.VEHICLE)]
         public static CmdReturn Vehicule_Clef(Player player, object[] argv)
         {
@@ -98,6 +100,7 @@ namespace Lambda.Commands
 
 
         }
+        [Permission("CIVIL_VEHICULE_FERMER")]
         [Command(Command.CommandType.VEHICLE)]
         public static CmdReturn Vehicule_Fermer(Player player, object[] argv)
         {
@@ -107,6 +110,8 @@ namespace Lambda.Commands
             vehicle.LockState = VehicleLockState.Locked;
             return new CmdReturn("Vous avez fermé le véhicule");
         }
+
+        [Permission("CIVIL_VEHICULE_OUVRIR")]
         [Command(Command.CommandType.VEHICLE)]
         public static CmdReturn Vehicule_Ouvrir(Player player, object[] argv)
         {
@@ -116,6 +121,7 @@ namespace Lambda.Commands
             vehicle.LockState = VehicleLockState.None;
             return new CmdReturn("Vous avez ouvert le véhicule");
         }
+        [Permission("ADMIN_VEHICULE_PLAQUE")]
         [Command(Command.CommandType.VEHICLE, 1)]
         [Syntax("Plaque")]
         [SyntaxType(typeof(string))]
@@ -127,6 +133,7 @@ namespace Lambda.Commands
             vehicle.NumberplateText = text;
             return new CmdReturn("Vous avez changé la plaque du véhicule");
         }
+        [Permission("ADMIN_VEHICULE_CLEF_OBTENIR")]
         [Command(Command.CommandType.VEHICLE)]
         public static CmdReturn Vehicule_Obtenir_Clef(Player player, object[] argv)
         {
@@ -135,6 +142,7 @@ namespace Lambda.Commands
             player.Inventory.AddItem(Enums.Items.CarKey, 1, vehicle.Lock.Code);
             return new CmdReturn(vehicle.Lock.Code);
         }
+        [Permission("ADMIN_VEHICULE_PROPRIETAIRE_MODIFIER")]
         [Command(Command.CommandType.VEHICLE, 1)]
         [Syntax("Joueur")]
         [SyntaxType(typeof(Player))]
@@ -145,6 +153,7 @@ namespace Lambda.Commands
             vehicle.SetOwner(player);
             return new CmdReturn("Vous avez changé le propriétaire du véhicule");
         }
+        [Permission("MODERATEUR_VEHICULE_INFO")]
         [Command(Command.CommandType.VEHICLE)]
         public static CmdReturn Vehicule_Info(Player player, object[] argv)
         {

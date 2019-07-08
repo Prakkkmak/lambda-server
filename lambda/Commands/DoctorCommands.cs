@@ -7,8 +7,8 @@ namespace Lambda.Commands
 {
     class DoctorCommands
     {
-        [Permission("DOCTOR_HEAL")]
-        [Command(Command.CommandType.POLICE)]
+        [Permission("DOCTEUR_SOIGNER")]
+        [Command(Command.CommandType.HEALTHCARE)]
         public static CmdReturn Hopital_Soigner(Player player, object[] argv)
         {
             Player target = player.PlayerSelected;

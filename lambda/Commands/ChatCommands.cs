@@ -9,6 +9,7 @@ namespace Lambda.Commands
 {
     class ChatCommands
     {
+        [Permission("BASE_CHAT_OOC")]
         [Command(Command.CommandType.CHAT, 1)]
         [Syntax("Texte")]
         [SyntaxType(typeof(string))]
@@ -18,6 +19,7 @@ namespace Lambda.Commands
             Alt.EmitAllClients("chatmessage", player.FullName, "((" + str + "))");
             return new CmdReturn("", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("BASE_CHAT_DO")]
         [Command(Command.CommandType.CHAT, 1)]
         [Syntax("Texte")]
         [SyntaxType(typeof(string))]
@@ -29,6 +31,7 @@ namespace Lambda.Commands
             Chat.SendInRange(player, 20, str, false);
             return new CmdReturn("", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("BASE_CHAT_ME")]
         [Command(Command.CommandType.CHAT, 1)]
         [Syntax("Texte")]
         [SyntaxType(typeof(string))]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -39,6 +40,7 @@ namespace Lambda.Commands
             SKIN,
             ADMIN,
             POLICE,
+            HEALTHCARE,
             TAXI,
             TEST,
         }
@@ -280,7 +282,6 @@ namespace Lambda.Commands
                     commands.Add(command);
                 }
             }
-
             Commands = commands;
             return commands.ToArray();
         }
@@ -344,7 +345,30 @@ namespace Lambda.Commands
             return true;
         }
 
-
+        public static void CommandsToTextfile()
+        {
+            string path = @"./commands.txt";
+            try
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+                using(StreamWriter sw = File.CreateText(path))
+                {
+                    foreach(Command cmd in Commands)
+                    {
+                        sw.WriteLine("[" + cmd.permission + "]");
+                        sw.WriteLine(cmd.Syntax());
+                        sw.WriteLine("");
+                    }
+                }
+            }
+            catch (Exception Ex)
+            {
+                Console.WriteLine(Ex.ToString());
+            }
+        }
 
         public static List<Command> Commands = new List<Command>();
     }

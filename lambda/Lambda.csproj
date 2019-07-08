@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -73,7 +73,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cp -r $(ProjectDir)\bin\Release\netcoreapp2.2\publish\* E:/Lambda/serv/resources/lambda &#xD;&#xA;cp -r $(TargetPath) E:/Lambda/serv/resources/lambda&#xD;&#xA;" />
+    <Exec Command="cd $(ProjectDir)&#xD;&#xA;copy /y &quot;$(TargetPath)&quot; &quot;E:/Lambda/server/resources/lambda&quot;&#xD;&#xA;" />
   </Target>
 
 </Project>

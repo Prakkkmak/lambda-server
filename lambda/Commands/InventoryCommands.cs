@@ -12,6 +12,7 @@ namespace Lambda.Commands
 {
     class InventoryCommands
     {
+        [Permission("CIVIL_INVENTAIRE")]
         [Command(Command.CommandType.INVENTORY)]
         public static CmdReturn Inventaire(Player player, object[] argv)
         {
@@ -25,7 +26,7 @@ namespace Lambda.Commands
 
             return new CmdReturn(str);
         }
-        [Status(Command.CommandStatus.NEW)]
+        [Permission("CIVIL_OBJET_UTILISER")]
         [Command(Command.CommandType.INVENTORY, 1)]
         [Syntax("Objet")]
         [SyntaxType(typeof(Item))]
@@ -41,6 +42,7 @@ namespace Lambda.Commands
         {
             return new CmdReturn($"Vous avez {player.Inventory.Money} $");
         }
+        [Permission("CIVIL_OBJET_DONNER")]
         [Command(Command.CommandType.INVENTORY, 2)]
         [Syntax("Item", "Nombre")]
         [SyntaxType(typeof(Item), typeof(uint))]
@@ -82,6 +84,7 @@ namespace Lambda.Commands
             target.SendRequest(request);
             return new CmdReturn("Vous avez fait une demande.", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("TESTEUR_OBJETS")]
         [Command(Command.CommandType.INVENTORY)]
         public static CmdReturn Objets(Player player, object[] argv)
         {
@@ -89,7 +92,7 @@ namespace Lambda.Commands
             str += BaseItem.BaseItems.Aggregate("", (current, item) => current + $"[{item.Id}]{item.Name} ");
             return new CmdReturn(str);
         }
-
+        [Permission("TESTEUR_OBJET_INFO")]
         [Command(Command.CommandType.INVENTORY, 1)]
         [Syntax("Objet")]
         [SyntaxType(typeof(Item))]
@@ -98,6 +101,7 @@ namespace Lambda.Commands
             Item item = (Item)argv[0];
             return new CmdReturn($"{item.GetBaseItem().Id} {item.GetBaseItem().Name} ({item.Amount}) : {item.MetaData}");
         }
+        [Permission("ADMIN_OBJET_DATA_MODIFIER")]
         [Command(Command.CommandType.INVENTORY, 2)]
         [Syntax("Objet", "Valeur")]
         [SyntaxType(typeof(Item), typeof(string))]
@@ -107,12 +111,14 @@ namespace Lambda.Commands
             item.MetaData = argv[1] + "";
             return new CmdReturn("Vous avez changé le metadata de l'objet.");
         }
+        [Permission("TESTEUR_INVENTAIRE_VIDER")]
         [Command(Command.CommandType.INVENTORY)]
         public static CmdReturn Inventaire_Vider(Player player, object[] argv)
         {
             _ = player.Inventory.ClearAsync();
             return new CmdReturn("Vous avez vidé votre inventaire.");
         }
+        [Permission("CIVIL_OBJET_JETER")]
         [Command(Command.CommandType.INVENTORY, 1)]
         [Syntax("Objet")]
         [SyntaxType(typeof(Item))]
@@ -122,7 +128,7 @@ namespace Lambda.Commands
             _ = player.Inventory.RemoveItemAsync(item);
             return new CmdReturn($"Vous avez jeté un objet");
         }
-
+        [Permission("CIVIL_PAYER")]
         [Command(Command.CommandType.INVENTORY, 1)]
         [Syntax("Prix")]
         [SyntaxType(typeof(uint))]

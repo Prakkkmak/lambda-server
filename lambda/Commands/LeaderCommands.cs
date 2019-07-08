@@ -9,7 +9,7 @@ namespace Lambda.Commands
 {
     class LeaderCommands
     {
-        [Permission("LEADER_INVITE")]
+        [Permission("LEADER_INVITER")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Rang")]
         [SyntaxType(typeof(Organization), typeof(Rank))]
@@ -37,7 +37,7 @@ namespace Lambda.Commands
             target.SendRequest(request);
             return new CmdReturn($"Vous invité {target.FullName} à l'organisation {org.Name} au rang de {rank.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("LEADER_FIRE")]
+        [Permission("LEADER_VIRER")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Membre")]
         [SyntaxType(typeof(Organization), typeof(Member))]
@@ -49,7 +49,7 @@ namespace Lambda.Commands
             org.RemoveMember(member);
             return new CmdReturn($"Vous avez viré quelqu'un de votre organisation.", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("LEADER_PROMOTE")]
+        [Permission("LEADER_PROUMEVOIR")]
         [Command(Command.CommandType.ORGANIZATION, 4)]
         [Syntax("Organisation", "Membre", "Organisation", "Rang")]
         [SyntaxType(typeof(Organization), typeof(Member), typeof(Organization), typeof(Rank))]
@@ -63,7 +63,7 @@ namespace Lambda.Commands
             org.ChangeMemberRank(member, rank);
             return new CmdReturn($"Vous avez changé le rang de {member.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("LEADER_PROMOTE")]
+        [Permission("LEADER_RANG_SALAIRE")]
         [Command(Command.CommandType.ORGANIZATION, 3)]
         [Syntax("Organisation", "Rang", "Salaire")]
         [SyntaxType(typeof(Organization), typeof(Rank), typeof(uint))]
@@ -76,7 +76,7 @@ namespace Lambda.Commands
             rank.Salary = salary;
             return new CmdReturn($"Vous avez changé le salaire du rang {rank.Name} à {salary}$.", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("LEADER_ACCOUNT")]
+        [Permission("LEADER_COMPTE")]
         [Command(Command.CommandType.ORGANIZATION, 1)]
         [Syntax("Organisation")]
         [SyntaxType(typeof(Organization))]

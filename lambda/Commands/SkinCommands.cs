@@ -11,6 +11,7 @@ namespace Lambda.Commands
 {
     class SkinCommands
     {
+        [Permission("CIVIL_VETEMENTS_ENLEVER_HABITS")]
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.SKIN)]
         public static CmdReturn Vetement_Enlever_Habits(Player player, object[] argv)
@@ -39,6 +40,7 @@ namespace Lambda.Commands
             player.Skin.Send(player, false);
             return new CmdReturn($"Vous vous êtes déshabillé");
         }
+        [Permission("CIVIL_VETEMENTS_ENLEVER_CHAPEAU")]
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.SKIN)]
         public static CmdReturn Vetement_Enlever_Chapeau(Player player, object[] argv)
@@ -57,6 +59,7 @@ namespace Lambda.Commands
             player.Skin.Send(player, false);
             return new CmdReturn($"Vous vous avez enlevé votre chapeau");
         }
+        [Permission("CIVIL_VETEMENTS_ENLEVER_LUNETTES")]
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.SKIN)]
         public static CmdReturn Vetement_Enlever_Lunettes(Player player, object[] argv)
@@ -74,6 +77,7 @@ namespace Lambda.Commands
             player.Skin.Send(player, false);
             return new CmdReturn($"Vous vous avez enlevé vos lunettes");
         }
+        [Permission("CIVIL_VETEMENTS_ENLEVER_OREILLES")]
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.SKIN)]
         public static CmdReturn Vetement_Enlever_Oreilles(Player player, object[] argv)
@@ -91,6 +95,7 @@ namespace Lambda.Commands
             player.Skin.Send(player, false);
             return new CmdReturn($"Vous vous avez enlevé vos boucles d'oreille");
         }
+        [Permission("CIVIL_VETEMENTS_ENLEVER_MONTRE")]
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.SKIN)]
         public static CmdReturn Vetement_Enlever_Montre(Player player, object[] argv)
@@ -108,6 +113,7 @@ namespace Lambda.Commands
             player.Skin.Send(player, false);
             return new CmdReturn($"Vous vous avez enlevé vos boucles d'oreille");
         }
+        [Permission("CIVIL_VETEMENTS_ENLEVER_BRACELET")]
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.SKIN)]
         public static CmdReturn Vetement_Enlever_Bracelet(Player player, object[] argv)

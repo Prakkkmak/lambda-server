@@ -9,6 +9,7 @@ namespace Lambda.Commands
 {
     class CheckpointCommands
     {
+        [Permission("BASE_ACTION")]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Action(Player player, object[] argv)
         {

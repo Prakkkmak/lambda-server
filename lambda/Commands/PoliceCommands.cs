@@ -10,7 +10,7 @@ namespace Lambda.Commands
 {
     class PoliceCommands
     {
-        [Permission("POLICE_FINE")]
+        [Permission("POLICE_AMENDE")]
         [Command(Command.CommandType.POLICE, 1)]
         [Syntax("Montant")]
         [SyntaxType(typeof(uint))]
@@ -33,7 +33,7 @@ namespace Lambda.Commands
             target.SendRequest(request);
             return new CmdReturn("Vous avez posé une amende à quelqu'un !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("POLICE_EQUIP")]
+        [Permission("POLICE_SERVICE")]
         [Command(Command.CommandType.POLICE)]
         public static CmdReturn Police_Duty(Player player, object[] argv)
         {
@@ -44,7 +44,7 @@ namespace Lambda.Commands
             player.GiveWeapon(Alt.Hash("WEAPON_STUNGUN"), 15, false);
             return new CmdReturn("Vous vous êtes équippé.", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("POLICE_HANDCUFF")]
+        [Permission("POLICE_MENOTTES")]
         [Command(Command.CommandType.POLICE)]
         public static CmdReturn Police_Menotter(Player player, object[] argv)
         {

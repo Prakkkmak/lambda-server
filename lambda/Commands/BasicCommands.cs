@@ -9,7 +9,7 @@ namespace Lambda.Commands
 {
     class BasicCommands
     {
-
+        [Permission("BASE_AIDE")]
         [Command(Command.CommandType.DEFAULT, 1)]
         [Syntax("Page")]
         [SyntaxType(typeof(uint))]
@@ -50,7 +50,7 @@ namespace Lambda.Commands
             }
             return new CmdReturn(text);
         }
-
+        [Permission("BASE_BUG")]
         [Command(Command.CommandType.DEFAULT, 1)]
         [Syntax("Texte")]
         [SyntaxType(typeof(string))]
@@ -76,6 +76,7 @@ namespace Lambda.Commands
             bug.SendAsync(); // Send the bugg
             return new CmdReturn("Vous avez envoyé votre bug !", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("TESTEUR_PERSONNAGE_NOM")]
         [Command(Command.CommandType.DEFAULT, 2)]
         [Syntax("Prenom", "nom")]
         [SyntaxType(typeof(string), typeof(string))]
@@ -90,7 +91,7 @@ namespace Lambda.Commands
             player.LastName = lastName;
             return new CmdReturn("Vous avez changé de nom !", CmdReturn.CmdReturnType.SUCCESS);
         }
-
+        [Permission("BASE_LISTE")]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Liste(Player player, object[] argv)
         {
@@ -99,7 +100,7 @@ namespace Lambda.Commands
             str = Player.Players.Aggregate(str, (current, p) => current + $"[{p.ServerId}]{p.FirstName} {p.LastName} <br>");
             return new CmdReturn(str);
         }
-
+        [Permission("BASE_POSITION")]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Position(Player player, object[] argv)
         {
@@ -107,6 +108,7 @@ namespace Lambda.Commands
             CmdReturn cmdReturn = new CmdReturn($"Votre position ( X:{pos.X} | Y:{pos.Y} | Z:{pos.Z} ) Dim : {player.Dimension}");
             return cmdReturn;
         }
+        [Permission("BASE_ACCEPTER")]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Accepter(Player player, object[] argv)
         {
@@ -121,6 +123,7 @@ namespace Lambda.Commands
             player.SetRequest(null);
             return new CmdReturn("Vous avez accepté la demande !", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("BASE_REFUSER")]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Refuser(Player player, object[] argv)
         {
@@ -135,11 +138,7 @@ namespace Lambda.Commands
             player.SetRequest(null);
             return new CmdReturn("Vous avez refusé la demande !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Command(Command.CommandType.DEFAULT)]
-        public static CmdReturn TP(Player player, object[] argv)
-        {
-            return CmdReturn.NotImplemented;
-        }
+        [Permission("BASE_CLEAR")]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Clear(Player player, object[] argv)
         {

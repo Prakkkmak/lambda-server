@@ -10,6 +10,7 @@ namespace Lambda.Commands
 {
     class HouseCommands
     {
+        [Permission("ADMIN_MAISON_CREER")]
         [Command(Command.CommandType.HOUSE)]
         public static CmdReturn Maison_Creer(Player player, object[] argv)
         {
@@ -17,6 +18,7 @@ namespace Lambda.Commands
             _ = house.SaveAsync();
             return new CmdReturn("Vous avez créé une maison !", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_MAISON_INTERIEUR")]
         [Command(Command.CommandType.HOUSE, 1)]
         [Syntax("IPL1,IPL2,...")]
         [SyntaxType(typeof(string))]
@@ -28,6 +30,7 @@ namespace Lambda.Commands
             house.SetIpls(ipls);
             return new CmdReturn("Vous avez créé une maison !", CmdReturn.CmdReturnType.SUCCESS);
         }
+        [Permission("ADMIN_MAISON_POSITION")]
         [Command(Command.CommandType.HOUSE, 3)]
         [Syntax("x", "y", "z")]
         [SyntaxType(typeof(int), typeof(int), typeof(int))]

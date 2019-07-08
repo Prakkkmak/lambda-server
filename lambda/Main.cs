@@ -84,6 +84,7 @@ namespace Lambda
             //Game = new Game();
             //Game.Init();
             //Game.BaseGame = Game;
+            Command.CommandsToTextfile();
         }
         public override void OnStop()
         {
