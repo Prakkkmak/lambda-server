@@ -84,7 +84,6 @@ namespace Lambda.Items
                 if (weightElement != null) baseItem.Weight = Convert.ToInt32(weightElement.Value);
                 XElement maxStack = item.Element("Maxstack");
                 if (maxStack != null) baseItem.MaxStack = Convert.ToUInt32(maxStack.Value);
-                Alt.Log($"ajout aux items : {baseItem.Id} - {baseItem.Name}");
                 BaseItems.Add(baseItem);
             }
 

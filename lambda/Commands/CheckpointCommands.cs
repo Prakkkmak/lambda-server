@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using AltV.Net.Data;
 using Lambda.Entity;
-using Lambda.Housing;
+using Lambda.Buildings;
 
 namespace Lambda.Commands
 {

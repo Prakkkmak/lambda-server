@@ -16,7 +16,7 @@ using Lambda.Administration;
 using Lambda.Clothing;
 using Lambda.Commands;
 using Lambda.Database;
-using Lambda.Housing;
+using Lambda.Buildings;
 using Lambda.Items;
 using Lambda.Organizations;
 using Lambda.Skills;
@@ -43,11 +43,15 @@ namespace Lambda.Entity
         public ulong TimeOnline = 0;
         public ulong TotalTimeOnline = 0;
 
+
+        public uint TicketLevel = 0;
         public new uint Id
         {
             get;
             set;
         }
+
+        
 
         public long BankMoney;
 
@@ -68,12 +72,12 @@ namespace Lambda.Entity
 
         public DateTime BanTime = default;
 
+        public Skin Skin = new Skin();
+
         private uint deathCount;
         private uint id; // The id in the database
+        
 
-
-
-        public Skin Skin = new Skin();
 
         private Request request;
 
@@ -97,8 +101,11 @@ namespace Lambda.Entity
         public void Spawn(Position pos)
         {
             //GotoLocation(new Location(pos, null, 0));
+            Spawn(pos, 1000);
             Position = pos;
             Dimension = 0;
+            Health = 100;
+            
             Freeze(false);
         }
 
@@ -129,6 +136,7 @@ namespace Lambda.Entity
         }
         public void Goto(Player player)
         {
+            Position = player.Position;
             //GotoLocation(player.GetLocation());  // TODO
         }
         /*public void Goto(Interior interior)
@@ -253,16 +261,27 @@ namespace Lambda.Entity
         {
             BankMoney = money;
         }
+        public T GetBuildings<T>(List<T> buildings) where T : Building
+        {
+            foreach (T b in buildings)
+            {
+                if (b.Checkpoint != null && b.Checkpoint.Position.Distance(Position) < b.Checkpoint.Range)
+                {
+                    return b;
+                }
+            }
 
+            return null;
+        }
         public House GetHouse()
         {
             foreach (House h in House.Houses)
             {
-                if (h.Interior != null && h.Interior.Position.Distance(Position) < h.Interior.Range)
+                if (h.InteriorCheckpoint != null && h.InteriorCheckpoint.Position.Distance(Position) < h.InteriorCheckpoint.Range)
                 {
                     return h;
                 }
-                if (h.Exterior != null && h.Exterior.Position.Distance(Position) < h.Exterior.Range)
+                if (h.Checkpoint != null && h.Checkpoint.Position.Distance(Position) < h.Checkpoint.Range)
                 {
                     return h;
                 }

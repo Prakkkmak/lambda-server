@@ -22,13 +22,9 @@ namespace Lambda
         public static void RegisterEvents()
         {
             Alt.OnPlayerConnect += OnPlayerConnect;
-            Alt.Log("[EVENT] OnPlayerConnect registered");
             Alt.OnPlayerDisconnect += OnPlayerDisconnect;
-            Alt.Log("[EVENT] OnPlayerDisconnect registered");
             Alt.OnPlayerDead += OnPlayerDead;
-            Alt.Log("[EVENT] OnPlayerDead registered");
             Alt.OnVehicleRemove += OnVehicleRemove;
-            Alt.Log("[EVENT] OnPlayerDisconnect registered");
             Alt.OnClient("setlicense", OnPlayerSetLicenseHash);
             Alt.OnClient("setskin", OnClientSetSkin);
             Alt.OnClient("setheaddata", OnClientSetHeadData);
@@ -40,7 +36,6 @@ namespace Lambda
             Alt.OnClient("chatConsole", OnClientSendChatConsole);
             Alt.OnClient("changeSelectedPlayer", OnClientChangePlayerSelected);
             Alt.OnClient("save", OnClientSave);
-            Alt.Log("[EVENT] OnVehicleEnter registered");
             Alt.OnPlayerEnterVehicle += OnVehicleEnter;
             Alt.OnPlayerLeaveVehicle += OnVehicleLeave;
         }
@@ -79,6 +74,8 @@ namespace Lambda
         public static void OnVehicleEnter(IVehicle altVehicle, IPlayer altPlayer, byte seat)
         {
             Vehicle vehicle = (Vehicle)altVehicle;
+            Player player = (Player)altPlayer;
+            if (vehicle.SellPrice > 0) player.SendMessage("Ce véhicule est en vente à " + vehicle.SellPrice + "$.");
             Player.VoiceChannel.RemovePlayer(altPlayer);
             vehicle.VoiceChannel.AddPlayer(altPlayer);
         }

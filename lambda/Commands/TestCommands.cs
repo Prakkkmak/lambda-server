@@ -391,12 +391,7 @@ namespace Lambda.Commands
             return new CmdReturn("Vous avez changé votre invisibilité.");
         }
 
-        [Command(Command.CommandType.TEST)]
-        public static CmdReturn Dieu(Player player, object[] argv)
-        {
-            player.Emit("toggleInvincibility");
-            return new CmdReturn("Vous avez changé votre invinsibilité.");
-        }
+        
 
         [Command(Command.CommandType.TEST, 1)]
         [Syntax("Joueur")]

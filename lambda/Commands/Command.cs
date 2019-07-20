@@ -41,6 +41,7 @@ namespace Lambda.Commands
             ADMIN,
             POLICE,
             HEALTHCARE,
+            INSTRUCTOR,
             TAXI,
             TEST,
         }
@@ -49,7 +50,7 @@ namespace Lambda.Commands
         private Func<Player, object[], CmdReturn> action;
         private string[] syntax;
         private Type[] syntaxTypes;
-        private string permission;
+        public string Permission;
         public CommandType Type;
         public CommandStatus Status;
 
@@ -64,7 +65,7 @@ namespace Lambda.Commands
             this.syntax = syntax;
             this.syntaxTypes = syntaxTypes;
             this.Type = type;
-            this.permission = permission;
+            this.Permission = permission;
         }
 
         public string Syntax()
@@ -85,7 +86,7 @@ namespace Lambda.Commands
             CmdReturn result = ConvertParamameters(player, parametersString, out object[] parameters);
             if (result.Type != CmdReturn.CmdReturnType.SUCCESS) return result;
 
-            if (!string.IsNullOrWhiteSpace(permission) && !player.IsAllowedTo(permission)) return new CmdReturn("Vous n'avez pas la permission de faire ceci", CmdReturn.CmdReturnType.WARNING);
+            if (!string.IsNullOrWhiteSpace(Permission) && !player.IsAllowedTo(Permission)) return new CmdReturn("Vous n'avez pas la permission de faire ceci", CmdReturn.CmdReturnType.WARNING);
             if (string.IsNullOrWhiteSpace(player.FullName) && Name == "personnage_nom")
             {
                 _ = player.SaveAsync();
@@ -241,7 +242,6 @@ namespace Lambda.Commands
             if (namespaceName.Length == 0) namespaceName = typeof(Command).Namespace; //If no namespace is specified
             if (assembly == null) assembly = Assembly.GetExecutingAssembly();
             Type[] types = GetTypesInNamespace(assembly, namespaceName); // Get all classes in this namespace
-            Alt.Log($"Nombre de types dans le namespace {namespaceName}: " + types.Length);
             List<Command> commands = new List<Command>();
             foreach (Type type in types)
             {
@@ -275,10 +275,9 @@ namespace Lambda.Commands
                     PermissionAttribute[] permissionsAttributes = (PermissionAttribute[])method.GetCustomAttributes(typeof(PermissionAttribute), false);
                     if (permissionsAttributes.Length > 0)
                     {
-                        command.permission = permissionsAttributes[0].Permission;
+                        command.Permission = permissionsAttributes[0].Permission;
                         Permissions.CommandsPermissions.Add(permissionsAttributes[0].Permission);
                     }
-                    Alt.Log($"-{command.Name} registered");
                     commands.Add(command);
                 }
             }
@@ -358,7 +357,7 @@ namespace Lambda.Commands
                 {
                     foreach(Command cmd in Commands)
                     {
-                        sw.WriteLine("[" + cmd.permission + "]");
+                        sw.WriteLine("[" + cmd.Permission + "]");
                         sw.WriteLine(cmd.Syntax());
                         sw.WriteLine("");
                     }

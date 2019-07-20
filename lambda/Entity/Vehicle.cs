@@ -41,7 +41,9 @@ namespace Lambda.Entity
         public Rotation SpawnRotation { get; set; } = Rotation.Zero;
 
         public DateTime TaxiMeter = default;
+
         public uint TaxiPrice = 0;
+        public uint SellPrice = 0;
 
         public Vehicle(IntPtr nativePointer, ushort id) : base(nativePointer, id)
         {
@@ -149,6 +151,7 @@ namespace Lambda.Entity
             data["veh_lock"] = Lock.Code;
             data["veh_plate"] = NumberplateText;
             data["veh_mods"] = ModToString();
+            data["veh_sellprice"] = SellPrice.ToString();
             if (OwnerId == 0) return data;
             if (GetOwnerType() == Vehicle.OwnerType.CHARACTER) data["cha_id"] = OwnerId.ToString();
             else if (GetOwnerType() == Vehicle.OwnerType.ORGANIZATION) data["org_id"] = OwnerId.ToString();
@@ -182,6 +185,7 @@ namespace Lambda.Entity
             PrimaryColorRgb = color;
             SecondaryColorRgb = secondaryColor;
             SetModString(data["veh_mods"]);
+            SellPrice = Convert.ToUInt32(data["veh_sellprice"]);
             if (data.ContainsKey("cha_id"))
             {
                 SetOwnerType(Vehicle.OwnerType.CHARACTER);

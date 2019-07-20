@@ -24,5 +24,14 @@ namespace Lambda.Enums
         BraceletFemale = 61,
         CarKey = 100,
         HouseKey = 101,
+        DrivingLicense = 200,
+        BikeLicense = 201,
+        HeavyLicense = 202,
+        FlyingLicense = 203,
+        BoatLicense = 204,
+        WeaponLicense = 205,
+        TaxiLicense = 206,
+        InstructorLicense = 220
+
     }
 }

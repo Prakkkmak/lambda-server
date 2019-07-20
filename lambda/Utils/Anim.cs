@@ -36,7 +36,6 @@ namespace Lambda.Utils
             }
 
             Anims = anims.ToArray();
-            Alt.Log(Anims.Length + " anims charged ");
         }
         public static Anim[] Anims = new Anim[0];
     }

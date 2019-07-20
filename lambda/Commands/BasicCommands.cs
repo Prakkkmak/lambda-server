@@ -43,6 +43,7 @@ namespace Lambda.Commands
             string text = $"Voici la liste des commandes ({pagename}) {page}/{maxpage}:<br>";
             foreach (Command command in commands)
             {
+                if (!player.IsAllowedTo(command.Permission)) continue;
                 if (command.Status == Command.CommandStatus.NEW) text += "{2980b9}";
                 if (command.Status == Command.CommandStatus.TOTEST) text += "{e67e22}";
                 text += "/" + command.Name + ", ";

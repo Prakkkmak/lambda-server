@@ -132,6 +132,14 @@ namespace Lambda.Items
                     player.Skin.Send(player, false);
                     _ = inventory.RemoveItemAsync(this);
                     break;
+                case Enums.Items.DrivingLicense:
+                    if (player.PlayerSelected == null) break;
+                    player.PlayerSelected.SendMessage("Voici le permis de conduire de: " + MetaData);
+                    break;
+                case Enums.Items.BikeLicense:
+                    if (player.PlayerSelected == null) break;
+                    player.PlayerSelected.SendMessage("Voici le permis moto de: " + MetaData);
+                    break;
                 default:
                     return 1;
                     break;

@@ -8,6 +8,7 @@ using AltV.Net.Data;
 using AltV.Net.Enums;
 using Items;
 using Lambda.Administration;
+using Lambda.Buildings;
 using Lambda.Clothing;
 using Lambda.Entity;
 using Lambda.Items;
@@ -38,7 +39,9 @@ namespace Lambda.Database
             {typeof(Member), "t_member_mem" },
             {typeof(Phone), "t_phone_pho" },
             {typeof(Message), "t_phonemessage_pme" },
-            {typeof(Contact), "t_phonecontact_pco" }
+            {typeof(Contact), "t_phonecontact_pco" },
+            {typeof(Building), "t_building_bui" },
+            {typeof(House), "t_house_hou" }
         };
 
         public static string GetPrefix(string str)
@@ -48,7 +51,7 @@ namespace Lambda.Database
 
         public static string GetTableName(Type type)
         {
-            if (!TableNames.ContainsKey(type)) throw new Exception();
+            if (!TableNames.ContainsKey(type)) throw new Exception("Table pas trouvé");
             return TableNames[type];
         }
 
@@ -72,24 +75,83 @@ namespace Lambda.Database
         }
         public static async Task SaveAsync<T>(T entity) where T : IDBElement
         {
+            long t = DateTime.Now.Ticks;
+            Alt.Log("Start save " + typeof(T).Name);
             string tableName = GetTableName(typeof(T));
             Dictionary<string, string> datas = entity.GetData();
-            if (entity.Id == 0)
-            {
 
-                entity.Id = (uint)await DbConnect.InsertAsync(tableName, datas);
-            }
-            else
+
+            try
             {
-                Dictionary<string, string> where = new Dictionary<string, string>();
-                where[GetPrefix(tableName) + "_id"] = entity.Id.ToString();
-                int rows = (int)await DbConnect.UpdateAsync(tableName, datas, where);
-                if (rows == 0)
+                if (entity.Id == 0)
                 {
-                    entity.Id = 0;
-                    Save(entity);
+                    Alt.Log("Entity " + typeof(T).Name + " have id 0; saving new instance");
+                    if (typeof(Building).IsAssignableFrom(typeof(T)))
+                    {
+                        Dictionary<string, string> buildingData = new Dictionary<string, string>();
+                        Dictionary<string, string> otherData = new Dictionary<string, string>();
+                        foreach(KeyValuePair<string, string> data in datas)
+                        {
+                            if (data.Key.StartsWith("bui_"))
+                            {
+                                buildingData.Add(data.Key, data.Value);
+                            }
+                            else
+                            {
+                                otherData.Add(data.Key, data.Value);
+                            }
+                        }
+                        entity.Id = (uint)await DbConnect.InsertAsync("t_building_bui", buildingData);
+                        otherData.Add("bui_id", entity.Id.ToString());
+                        datas = otherData;
+                        await DbConnect.InsertAsync(tableName, datas);
+                    }
+                    else
+                    {
+                        entity.Id = (uint)await DbConnect.InsertAsync(tableName, datas);
+                    }
+                    
+                    
+                }
+                else
+                {
+                    Alt.Log("Entity " + typeof(T).Name + " have id " + entity.Id + "; update instance");
+                    Dictionary<string, string> where = new Dictionary<string, string>();
+                    where[GetPrefix(tableName) + "_id"] = entity.Id.ToString();
+                    if (typeof(Building).IsAssignableFrom(typeof(T)))
+                    {
+                        where = new Dictionary<string, string>();
+                        where["bui_id"] = entity.Id.ToString();
+                        Dictionary<string, string> buildingData = new Dictionary<string, string>();
+                        Dictionary<string, string> otherData = new Dictionary<string, string>();
+                        foreach (KeyValuePair<string, string> data in datas)
+                        {
+                            if (data.Key.StartsWith("bui_"))
+                            {
+                                buildingData.Add(data.Key, data.Value);
+                            }
+                            else
+                            {
+                                otherData.Add(data.Key, data.Value);
+                            }
+                        }
+                        await DbConnect.UpdateAsync("t_building_bui", buildingData, where);
+                        otherData.Add("bui_id", entity.Id.ToString());
+                        datas = otherData;
+                    }
+                    int rows = (int)await DbConnect.UpdateAsync(tableName, datas, where);
+                    if (rows == 0)
+                    {
+                        entity.Id = 0;
+                        Save(entity);
+                    }
                 }
             }
+            catch(Exception ex)
+            {
+                Alt.Log(ex.Message);
+            }
+            Alt.Log(typeof(T).Name + " Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }
         public static Dictionary<string, string> Get<T>(uint id) where T : IDBElement
         {
@@ -183,7 +245,6 @@ namespace Lambda.Database
                 rotation.Pitch = float.Parse(result["veh_rotation_p"]);
                 rotation.Yaw = float.Parse(result["veh_rotation_y"]);
                 Vehicle entity = (Vehicle)Alt.CreateVehicle(model, position, rotation);
-                Alt.Log(entity.Rotation.Pitch + " " + entity.Rotation.Roll + " " + entity.Rotation.Yaw);
                 entity.SetData(result);
                 entity.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
                 entities.Add(entity);
@@ -338,6 +399,33 @@ namespace Lambda.Database
             }
 
             return items.ToArray();
+        }
+        public static House[] GetAllHouses()
+        {
+            string tableName = GetTableName(typeof(House));
+            List<House> houses = new List<House>();
+            
+            List<Dictionary<string, string>> results = DbConnect.Select(tableName, new Dictionary<string, string>());
+            
+            foreach (Dictionary<string, string> result in results)
+            {
+
+                Dictionary<string, string> where = new Dictionary<string, string>();
+                where["bui_id"] = result["bui_id"];
+                Dictionary<string, string> buildingResult = DbConnect.Select("t_building_bui", where)[0];
+                foreach (var r in buildingResult)
+                {
+                    result[r.Key] = r.Value;
+                }
+                Position position = new Position();
+                position = PositionHelper.PositionFromString(result["bui_position"]);
+                House house = new House(position);
+                house.SetData(result);
+                house.Id = uint.Parse(result["bui_id"]);
+                houses.Add(house);
+            }
+
+            return houses.ToArray();
         }
         /*
         public void SaveAll(T[] entities)

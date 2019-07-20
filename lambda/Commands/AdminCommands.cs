@@ -82,21 +82,23 @@ namespace Lambda.Commands
             return new CmdReturn("Vous vous avez respawn!", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Permission("FONDATEUR_PERMISSION_AJOUTER")]
-        [Command(Command.CommandType.ADMIN, 1)]
-        [Syntax("Permission")]
-        [SyntaxType(typeof(string))]
+        [Command(Command.CommandType.ADMIN, 2)]
+        [Syntax("Joueur", "Permission")]
+        [SyntaxType(typeof(Player),typeof(string))]
         public static CmdReturn Permission_Ajouter(Player player, object[] argv)
         {
-            player.Permissions.Add((string)argv[0]);
+            Player target = (Player)argv[0];
+            target.Permissions.Add((string)argv[1]);
             return new CmdReturn("Vous avez ajouté une permission", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Permission("FONDATEUR_PERMISSION_RETIRER")]
-        [Command(Command.CommandType.ADMIN, 1)]
-        [Syntax("Permission")]
-        [SyntaxType(typeof(string))]
+        [Command(Command.CommandType.ADMIN, 2)]
+        [Syntax("Joueur", "Permission")]
+        [SyntaxType(typeof(Player), typeof(string))]
         public static CmdReturn Permission_Retirer(Player player, object[] argv)
         {
-            player.Permissions.Add((string)argv[0]);
+            Player target = (Player)argv[0];
+            player.Permissions.Remove((string)argv[1]);
             return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Permission("ADMIN_GIVE_OBJET")]
@@ -151,6 +153,13 @@ namespace Lambda.Commands
                 return new CmdReturn("Vous vous êtes mis fondateur", CmdReturn.CmdReturnType.SUCCESS);
             }
             return new CmdReturn("ERROR", CmdReturn.CmdReturnType.ERROR);
+        }
+        [Permission("ADMIN_DIEU")]
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Dieu(Player player, object[] argv)
+        {
+            player.Emit("toggleInvincibility");
+            return new CmdReturn("Vous avez changé votre invincibilité.");
         }
 
     }

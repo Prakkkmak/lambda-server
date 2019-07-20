@@ -181,5 +181,94 @@
       <Metadata>Code</Metadata>
     </metaMetadatasdatas>
   </Item>
+  <Item>
+    <Id>200</Id>
+    <Name>Permis de conduire</Name>
+    <Description>Un permis de conduire</Description>
+    <Weight>0</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>7</Type>
+    <Metadatas>
+      <Metadata>Propriétaire</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>201</Id>
+    <Name>Permis de moto</Name>
+    <Description>Un permis de moto</Description>
+    <Weight>0</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>7</Type>
+    <Metadatas>
+      <Metadata>Propriétaire</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>202</Id>
+    <Name>Permis de poids lourd</Name>
+    <Description>Un permis de poids lourd</Description>
+    <Weight>0</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>7</Type>
+    <Metadatas>
+      <Metadata>Propriétaire</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>203</Id>
+    <Name>Permis de vol</Name>
+    <Description>Un permis d'avion</Description>
+    <Weight>0</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>7</Type>
+    <Metadatas>
+      <Metadata>Propriétaire</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>204</Id>
+    <Name>Permis de bateau</Name>
+    <Description>Un permis de bateau</Description>
+    <Weight>0</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>7</Type>
+    <Metadatas>
+      <Metadata>Propriétaire</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>205</Id>
+    <Name>Permis d'armes</Name>
+    <Description>Un permis d'armes</Description>
+    <Weight>0</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>7</Type>
+    <Metadatas>
+      <Metadata>Propriétaire</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>206</Id>
+    <Name>Permis de taxi</Name>
+    <Description>Ce permis vous permet d'exercer le métier de taxi</Description>
+    <Weight>0</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>7</Type>
+    <Metadatas>
+      <Metadata>Propriétaire</Metadata>
+    </Metadatas>
+  </Item>
+  <Item>
+    <Id>220</Id>
+    <Name>Permis d'instructeur</Name>
+    <Description>Ce permis vous permet de délivrer des permis</Description>
+    <Weight>0</Weight>
+    <Maxstack>1</Maxstack>
+    <Type>7</Type>
+    <Metadatas>
+      <Metadata>Propriétaire</Metadata>
+    </Metadatas>
+  </Item>
+  
 
 </Items>

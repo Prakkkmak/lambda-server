@@ -165,5 +165,32 @@ namespace Lambda.Commands
             else return new CmdReturn($"[{vehicle.OwnerId}]{pla.FullName} est le proprietaire du véhicule. Serrure : {vehicle.Lock.Code}");
         }
 
+        [Permission("ADMIN_VEHICULE_VENDRE")]
+        [Command(Command.CommandType.VEHICLE, 1)]
+        [Syntax("Prix")]
+        [SyntaxType(typeof(uint))]
+        public static CmdReturn Vehicule_Concession(Player player, object[] argv)
+        {
+            uint price = (uint)argv[0];
+            Vehicle vehicle = (Vehicle)player.Vehicle;
+            if (vehicle == null) return CmdReturn.NotInVehicle;
+            vehicle.SellPrice = price;
+            return new CmdReturn("Vous avez mis en vente le véhicule à " + price + "$.", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Permission("CIVIL_VEHICULE_BUY")]
+        [Command(Command.CommandType.VEHICLE)]
+        public static CmdReturn Vehicule_Acheter(Player player, object[] argv)
+        {
+            Vehicle vehicle = (Vehicle)player.Vehicle;
+            if (vehicle == null) return CmdReturn.NotInVehicle;
+            if (vehicle.SellPrice < 1) return new CmdReturn("Ce véhicule n'est pas en vente");
+            if (player.Inventory.Money < vehicle.SellPrice) return CmdReturn.NoEnoughMoney;
+            player.Inventory.Money -= vehicle.SellPrice;
+            vehicle.SellPrice = 0;
+            vehicle.SetOwner(player);
+            vehicle.SetOwnerType(Vehicle.OwnerType.CHARACTER);
+            return new CmdReturn("Vous avez acheté un véhicle !.", CmdReturn.CmdReturnType.SUCCESS);
+        }
+
     }
 }
