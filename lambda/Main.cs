@@ -20,6 +20,10 @@ using Vehicle = Lambda.Entity.Vehicle;
 using VehicleFactory = Lambda.FactoryStuff.VehicleFactory;
 using PlayerFactory = Lambda.FactoryStuff.PlayerFactory;
 using Lambda.Buildings;
+using System.Net;
+using System.Configuration;
+using System.IO;
+using Lambda.Quests;
 
 namespace Lambda
 {
@@ -39,24 +43,23 @@ namespace Lambda
         private DateTime lastTime = DateTime.Now;
         public override void OnTick()
         {
-
             base.OnTick();
-            long delta = DateTime.Now.Ticks - lastTime.Ticks;
             if ((DateTime.Now.Ticks - startTicks) / TimeSpan.TicksPerMinute > minutes)
             {
                 minutes++;
-                Alt.Log(minutes + "");
                 foreach (Player player in Player.Players)
                 {
-                    player.TimeOnline++;
-                    player.TotalTimeOnline++;
+                    player.OnMinutePass();
                 }
             }
             lastTime = DateTime.Now;
+
+            //Prop.Props.ForEach((elem) => elem.Update());
+            Prop.SyncProps();
         }
         public override void OnStart()
         {
-
+            Alt.Log("aa");
             Console.ForegroundColor = ConsoleColor.White;
             Console.BackgroundColor = ConsoleColor.Red;
             Console.WriteLine("LAMBDA RP");
@@ -101,7 +104,14 @@ namespace Lambda
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Commands text file created");
             Console.ResetColor();
-           
+            Console.ForegroundColor = ConsoleColor.Green;
+            Whitelist.MainWhitelist.GetWhitelist();
+            Console.WriteLine("Whitelist loaded");
+            Console.ResetColor();
+            Entity.Checkpoint.CreateFarmJobCheckpoints();
+            Quest.GenerateQuests();
+            PlantProp.GeneraField(new Position(2029.53f, 4904.769f, 43), new Position(2006.44f, 4927.266f, 43),
+                new Position(2005.292f, 4880.439f, 43), new Position(1981.883f, 4902.883f, 43), 10, 18) ;
         }
         public override void OnStop()
         {
@@ -117,7 +127,6 @@ namespace Lambda
         {
             return new PlayerFactory();
         }
-
 
 
 

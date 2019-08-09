@@ -18,8 +18,8 @@ namespace Lambda.Utils
 
         public static void OnClientChatMessage(IPlayer altPlayer, object[] args)
         {
-            Alt.Log("TEST");
             string msg = (string)args[0];
+            Alt.Log(msg);
             if (string.IsNullOrWhiteSpace(msg)) return;
             Player player = (Player)altPlayer;
             if (player != null)
@@ -58,7 +58,7 @@ namespace Lambda.Utils
             if (cmd.Length < 1) cmdReturn = new CmdReturn("Commande introuvable.", CmdReturn.CmdReturnType.SYNTAX);
             if (cmd.Length == 1) cmdReturn = cmd[0].Execute(player, parameters);
             string cmdReturnText = string.Copy(SendCmdReturn(cmdReturn));
-            if (returnable) player.SendMessage(cmdReturnText);
+            if (returnable && !string.IsNullOrWhiteSpace(cmdReturnText)) player.SendMessage(cmdReturnText);
             return cmdReturn;
         }
 
@@ -97,7 +97,8 @@ namespace Lambda.Utils
         {
             foreach (Player player2 in Player.Players)
             {
-                if (player.Position.Distance(player2.Position) < range)
+
+                if (player.Position.Distance(player2.Position) < range || range == 0)
                 {
                     player2.Emit("chatmessage", named ? player.FullName : null, msg);
                 }

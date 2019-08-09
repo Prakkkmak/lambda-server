@@ -10,6 +10,7 @@ using Lambda.Administration;
 using Lambda.Entity;
 using Lambda.Items;
 using Lambda.Organizations;
+using Lambda.Quests;
 using Lambda.Skills;
 using Lambda.Utils;
 using Player = Lambda.Entity.Player;
@@ -20,6 +21,162 @@ namespace Lambda.Commands
 
     class TestCommands
     {
+        [Permission("TESTEUR")]
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Licenses(Player player, object[] argv)
+        {
+            return new CmdReturn(player.Licenses.ToString());
+        }
+        [Permission("TESTEUR")]
+        [Command(Command.CommandType.TEST, 2)]
+        [Syntax("Slot", "Valeur")]
+        [SyntaxType(typeof(int), typeof(uint))]
+        public static CmdReturn SetLicense(Player player, object[] argv)
+        {
+            int license = (int)argv[0];
+            uint value = (uint)argv[1];
+            if (license < 0 || license > player.Licenses.Values.Length) return new CmdReturn("Slot incorrect");
+            player.Licenses.Values[license] = value;
+            return new CmdReturn(player.Licenses.ToString());
+        }
+        [Permission("TESTEUR")]
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn License_Info(Player player, object[] argv)
+        {
+            string str = "";
+            if (player.IsInCheckpoint("farm"))
+            {
+                str += "Licence 1 : 100$<br>";
+                str += "Licence 2 : 1 200$<br>";
+                str += "Licence 3 : 9 800$<br>";
+                str += "Licence 4 : 45 800$<br>";
+            }
+            if (player.IsInCheckpoint("fish"))
+            {
+                str += "Licence 1 : 1 200$<br>";
+                str += "Licence 2 : 12 000$<br>";
+                str += "Licence 3 : 35 000$<br>";
+                str += "Licence 4 : 230 000$<br>";
+            }
+                if (str.Equals("")) str = "Aucune licence n'est disponible ici";
+            return new CmdReturn(str);
+        }
+        [Permission("TESTEUR")]
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn License_Acheter(Player player, object[] argv)
+        {
+            if (player.IsInCheckpoint("farm"))
+            {
+                uint value = player.Licenses.GetValue(Enums.LicenseType.Farming);
+                if(value == 0 && player.Inventory.Money >= 100)
+                {
+                    player.Licenses.SetValue(Enums.LicenseType.Farming, 1);
+                    player.Inventory.Withdraw(100);
+                    return new CmdReturn("Vous avez acheté la licence de niveau 1 en fermier pour 100$ !");
+                }
+            }
+
+            return new CmdReturn(player.Licenses.ToString());
+        }
+        [Permission("TESTEUR")]
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Fermier_Job_Tomattes(Player player, object[] argv)
+        {
+            if (player.Licenses.GetValue(Enums.LicenseType.Farming) < 1)
+                return new CmdReturn("Vous n'avez pas la license adéquate.");
+            player.StartQuest("farming_tomato_01");
+            return new CmdReturn("");
+        }
+        [Permission("TESTEUR")]
+        [Command(Command.CommandType.TEST,2)]
+        [Syntax("Joueur", "Quete")]
+        [SyntaxType(typeof(Player), typeof(string))]
+        public static CmdReturn Quete_Demarrer(Player player, object[] argv)
+        {
+            Player target = (Player)argv[0];
+            string quest = (string)argv[1];
+            if (player.Quest != null) return new CmdReturn("Il y a déjà une quete en cours", CmdReturn.CmdReturnType.WARNING);
+            player.StartQuest(quest);
+            if(player.Quest == null) return new CmdReturn("Aucune quete trouvée", CmdReturn.CmdReturnType.WARNING);
+            return new CmdReturn("Votre quête est lancée!");
+        }
+        [Permission("TESTEUR")]
+        [Command(Command.CommandType.TEST,1)]
+        [Syntax("Quete")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Quete_Chercher(Player player, object[] argv)
+        {
+            string st = (string)argv[0];
+            string str = "";
+            foreach(Quest quest in Quest.Quests)
+            {
+                if (quest.Name.StartsWith(st)) str += quest.Name + "  ";
+            }
+            if (str.Length == 0) str = "Aucune quete trouvée;";
+            return new CmdReturn(str);
+        }
+        [Permission("TESTEUR")]
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("Joueur")]
+        [SyntaxType(typeof(Player))]
+        public static CmdReturn Quete_Inspecter(Player player, object[] argv)
+        {
+            Player target = (Player)argv[0];
+            if (target.Quest == null) return new CmdReturn("Ce joueur n'a aucune quete en cours");
+            else return new CmdReturn("Quete en cours : " + target.Quest.Name);
+        }
+        [Permission("TESTEUR")]
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("Joueur")]
+        [SyntaxType(typeof(Player))]
+        public static CmdReturn Quete_Completer(Player player, object[] argv)
+        {
+            Player target = (Player)argv[0];
+            if (target.Quest == null) return new CmdReturn("Ce joueur n'a aucune quete en cours");
+            else
+            {
+                target.Quest.Complete(target);
+                return new CmdReturn("Vous avez complété votre quête.");
+            }
+        }
+        [Permission("TESTEUR")]
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("a")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Prop(Player player, object[] argv)
+        {
+            string name = (string)argv[0];
+            Prop prop = new TestProp(player.Position, player.Rotation, player.Dimension, name);
+            
+            return new CmdReturn("Prop placé");
+        }
+        [Permission("TESTEUR")]
+        [Command(Command.CommandType.TEST, 2)]
+        [Syntax("a", "temps")]
+        [SyntaxType(typeof(string), typeof(uint))]
+        public static CmdReturn Fermier_Planter(Player player, object[] argv)
+        {
+            string name = (string)argv[0];
+            uint sec = (uint)argv[1];
+            Prop prop = new PlantProp(player.Position, player.Rotation, player.Dimension, name, player.Position.Z - 4, player.Position.Z - 2, (int)sec);
+            return new CmdReturn("Prop planté");
+        }
+
+
+        [Permission("TESTEUR")]
+        [Command(Command.CommandType.TEST)]
+        public static CmdReturn Fermier_Recolter(Player player, object[] argv)
+        {
+            PlantProp plant = player.GetClosePlant(3);
+            if (plant == null) return new CmdReturn("Il n'y a aucune plante ici");
+            Item harvest = plant.Harvrest();
+            if (harvest == null) return new CmdReturn("La plante n'est pas assez mure.");
+            player.Inventory.AddItem(harvest);
+            player.AddExperience(Skill.SkillType.FARMING, 5);
+            if (player.Quest != null) if(player.Quest.Condition(player))player.Quest.Complete(player);
+            return new CmdReturn("Vous avez récolté la plante.");
+        }
+        /*
         [Command(Command.CommandType.TEST, 1)]
         [Syntax("Modele")]
         [SyntaxType(typeof(string))]
@@ -71,14 +228,6 @@ namespace Lambda.Commands
             return new CmdReturn("oui");
         }
 
-        [Command(Command.CommandType.TEST)]
-        public static CmdReturn Payday(Player player, object[] argv)
-        {
-            if (player.TimeOnline < 5) return new CmdReturn("Pas assez co");
-            player.TimeOnline = 0;
-            player.SetBankMoney(player.GetBankMoney() + 10000);
-            return new CmdReturn("Vous avez recu le payday");
-        }
 
         [Command(Command.CommandType.TEST, 1)]
         [Syntax("Temps")]
@@ -433,7 +582,7 @@ namespace Lambda.Commands
         {
             player.Emit("creatorTest");
 
-            return new CmdReturn("Vous placez un prop ?");
+            return new CmdReturn("Fonctionalité bêta: Vous êtes en test de la création de perso.");
         }
 
         [Command(Command.CommandType.TEST, 1)]
@@ -454,6 +603,7 @@ namespace Lambda.Commands
             Alt.EmitAllClients("setTime", (uint)argv[0], (uint)argv[1], 0);
             return new CmdReturn("Vous avez changé la montre ?");
         }
+        */
     }
 }
 

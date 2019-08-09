@@ -28,6 +28,15 @@
     <Nutrition>5</Nutrition>
   </Item>
   <Item>
+    <Id>4</Id>
+    <Name>Tomate</Name>
+    <Description>Une tomate</Description>
+    <Weight>1</Weight>
+    <Maxstack>100</Maxstack>
+    <Type>1</Type>
+    <Nutrition>5</Nutrition>
+  </Item>
+  <Item>
     <Id>50</Id>
     <Name>Vetements Homme</Name>
     <Description>Une tenue</Description>

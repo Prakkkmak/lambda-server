@@ -50,9 +50,11 @@ namespace Lambda.Entity
             this.Inventory = new Inventory(this);
             this.VoiceChannel = Alt.CreateVoiceChannel(true, 10);
             this.Lock = new Lock(10, Lock.Complexity.NUMERICAL, Lock.Complexity.ALPHAMAJ);
+            this.NumberplateText = "LAMBDA";
             ModKit = 1;
             PrimaryColorRgb = new Rgba(0, 0, 0, 255);
             SecondaryColorRgb = new Rgba(0, 0, 0, 255);
+            SetEngine(false);
         }
 
         public void Respawn()
@@ -62,6 +64,7 @@ namespace Lambda.Entity
 
         public void Repair()
         {
+         
             BodyHealth = 100;
             EngineHealth = 100;
             BodyAdditionalHealth = 100;
@@ -198,11 +201,16 @@ namespace Lambda.Entity
             }
         }
 
+        public new void Remove()
+        {
+            Vehicles.Remove(this);
+            if (Id != 0) _ = DeleteAsync();
+            base.Remove();
+        }
+
         public void Save()
         {
-            long t = DateTime.Now.Ticks;
             DatabaseElement.Save(this);
-            Alt.Log("Vehicle Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }
 
         public void Delete()
@@ -212,14 +220,12 @@ namespace Lambda.Entity
 
         public async Task SaveAsync()
         {
-            long t = DateTime.Now.Ticks;
             await DatabaseElement.SaveAsync(this);
-            Alt.Log("Vehicle Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }
 
-        public Task DeleteAsync()
+        public async Task DeleteAsync()
         {
-            throw new NotImplementedException();
+            await DatabaseElement.DeleteAsync(this);
         }
 
         public static void AddVehicle(Vehicle vehicle)

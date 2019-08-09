@@ -4,19 +4,19 @@ using System.Text;
 using AltV.Net.Data;
 using Lambda.Entity;
 using Lambda.Buildings;
+using AltV.Net;
 
 namespace Lambda.Commands
 {
     class CheckpointCommands
     {
-        [Permission("BASE_ACTION")]
+        [Permission("CIVIL_ACTION")]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Action(Player player, object[] argv)
         {
             Checkpoint checkpoint = null;
             foreach (Checkpoint c in Checkpoint.Checkpoints)
             {
-
                 if (c.Position.Distance(player.Position) < c.Range) checkpoint = c;
             }
             if (checkpoint == null) return new CmdReturn("Il n'y a rien ici", CmdReturn.CmdReturnType.WARNING);

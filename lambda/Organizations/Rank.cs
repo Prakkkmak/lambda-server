@@ -86,5 +86,17 @@ namespace Lambda.Organizations
         {
             await DatabaseElement.DeleteAsync(this);
         }
+
+        public static Rank GetRank(uint id)
+        {
+            foreach(Organization o in Organization.Organizations)
+            {
+                foreach(Rank r in o.GetRanks())
+                {
+                    if (r.Id == id) return r;
+                }
+            }
+            return null;
+        }
     }
 }

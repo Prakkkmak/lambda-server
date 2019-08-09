@@ -120,39 +120,45 @@ namespace Lambda.Clothing
             Hairiness.Chest.Color2 = (ushort)args[i++];
 
         }
-        public void SetFeatures(int[] args)
+        public void SetFeatures(float[] args)
         {
             int i = 0;
-            Face.NoseWidth = (ushort)args[i++];
-            Face.NoseHeight = (ushort)args[i++];
-            Face.NoseLength = (ushort)args[i++];
-            Face.NoseBridge = (ushort)args[i++];
-            Face.NoseTip = (ushort)args[i++];
-            Face.NoseBridgeShift = (ushort)args[i++];
-            Face.BrowHeight = (ushort)args[i++];
-            Face.BrowWidth = (ushort)args[i++];
-            Face.CheekboneHeight = (ushort)args[i++];
-            Face.CheekboneWidth = (ushort)args[i++];
-            Face.CheecksWidth = (ushort)args[i++];
-            Face.Eyes = (ushort)args[i++];
-            Face.Lips = (ushort)args[i++];
-            Face.JawWidth = (ushort)args[i++];
-            Face.JawHeight = (ushort)args[i++];
-            Face.ChinLength = (ushort)args[i++];
-            Face.ChinPosition = (ushort)args[i++];
-            Face.ChinWidth = (ushort)args[i++];
-            Face.ChinShape = (ushort)args[i++];
-            Face.NeckWidth = (ushort)args[i++];
+            Face.NoseWidth = (float)args[i++];
+            Face.NoseHeight = (float)args[i++];
+            Face.NoseLength = (float)args[i++];
+            Face.NoseBridge = (float)args[i++];
+            Face.NoseTip = (float)args[i++];
+            Face.NoseBridgeShift = (float)args[i++];
+            Face.BrowHeight = (float)args[i++];
+            Face.BrowWidth = (float)args[i++];
+            Face.CheekboneHeight = (float)args[i++];
+            Face.CheekboneWidth = (float)args[i++];
+            Face.CheecksWidth = (float)args[i++];
+            Face.Eyes = (float)args[i++];
+            Face.Lips = (float)args[i++];
+            Face.JawWidth = (float)args[i++];
+            Face.JawHeight = (float)args[i++];
+            Face.ChinLength = (float)args[i++];
+            Face.ChinPosition = (float)args[i++];
+            Face.ChinWidth = (float)args[i++];
+            Face.ChinShape = (float)args[i++];
+            Face.NeckWidth = (float)args[i++];
         }
         public void SetHeadData(string[] args)
         {
             int i = 0;
-            Face.ShapeMother = Convert.ToUInt32(args[i++]);
-            Face.ShapeFather = Convert.ToUInt32(args[i++]);
-            Face.SkinMother = Convert.ToUInt32(args[i++]);
-            Face.SkinFather = Convert.ToUInt32(args[i++]);
-            Face.ShapeMix = Convert.ToSingle(args[i++]);
-            Face.SkinMix = Convert.ToSingle(args[i++]);
+            uint.TryParse(args[0], out uint shapeMother);
+            Face.ShapeMother = shapeMother;
+            uint.TryParse(args[1], out uint shapeFather);
+            Face.ShapeFather = shapeFather;
+            uint.TryParse(args[2], out uint skinMother);
+            Face.SkinMother = skinMother;
+            uint.TryParse(args[3], out uint skinFather);
+            Face.SkinFather = skinFather;
+            float.TryParse(args[4], out float shapeMix);
+            Face.ShapeMix = shapeMix;
+            float.TryParse(args[5], out float skinMix);
+            Face.SkinMix = skinMix;
         }
 
     }

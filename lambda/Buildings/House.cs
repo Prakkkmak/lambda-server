@@ -26,11 +26,17 @@ namespace Lambda.Buildings
 
         public House(Position position, short dimension = 0) : base(position, dimension)
         {
+            Checkpoint.Color = new Rgba(0, 100, 100, 100);
+            Checkpoint.DrawCheckpoint();
             Houses.Add(this);
         }
         public void SetInterior(Position position)
         {
-            InteriorCheckpoint?.AltCheckpoint.Remove();
+            if (InteriorCheckpoint != null)
+            {
+                Checkpoint.Checkpoints.Remove(InteriorCheckpoint);
+                InteriorCheckpoint.AltCheckpoint.Remove();
+            }
             InteriorCheckpoint = new Checkpoint(position, (short)Id, player =>
             {
                 if (Checkpoint == null) return;
@@ -41,7 +47,12 @@ namespace Lambda.Buildings
 
         public void SetExterior(Position position)
         {
-            Checkpoint?.AltCheckpoint.Remove();
+            if(Checkpoint != null)
+            {
+                Checkpoint.Checkpoints.Remove(Checkpoint);
+                Checkpoint.AltCheckpoint.Remove();
+            }
+
             Checkpoint = new Checkpoint(position, 0, player =>
             {
                 if (InteriorCheckpoint == null) return;
@@ -71,7 +82,7 @@ namespace Lambda.Buildings
             Ipls = data["hou_rent"].Split(',').ToList();
             //Price = Convert.ToUInt32(data["hou_price"]);
             // if (!string.IsNullOrWhiteSpace(data["hou_renter"])) Renter = Convert.ToUInt32(data["hou_renter"]);
-            if (!string.IsNullOrWhiteSpace(data["hou_interior"]))
+            if (data.ContainsKey("hou_interior") && !string.IsNullOrWhiteSpace(data["hou_interior"]))
                 SetInterior(PositionHelper.PositionFromString(data["hou_interior"]));
         }
 

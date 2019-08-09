@@ -12,7 +12,7 @@ namespace Lambda.Skills
     {
         public enum SkillType
         {
-            SKILL1,
+            FARMING,
             SKILL2,
             SKILL3
         }
@@ -41,6 +41,9 @@ namespace Lambda.Skills
 
         public void AddExperience(long xp)
         {
+            int currentLevel = GetLevel();
+            Player.SendMessage("Vous avez gagné " + xp + " xp dans la compétence " + nameof(Type) + ".");
+            if (GetLevel() != currentLevel) Player.SendMessage("Vous avez monté d'un niveau vous êtes niveau " + GetLevel() + ".");
             this.xp += xp;
         }
 

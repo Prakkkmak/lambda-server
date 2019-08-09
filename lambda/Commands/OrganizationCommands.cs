@@ -25,7 +25,7 @@ namespace Lambda.Commands
             request.AddAnswer("Accepter", () =>
             {
                 player.SendMessage($"{target.FullName} a payé la facture!");
-                org.BankMoney += price;
+                org.BankMoney += (int)price;
                 target.BankMoney -= price;
             });
             request.AddAnswer("Refuser", () =>

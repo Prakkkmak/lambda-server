@@ -94,6 +94,11 @@ namespace Lambda.Items
         {
             return BaseItems.FirstOrDefault(baseitem => baseitem.Id == id);
         }
+        public static BaseItem GetBaseItem(Enums.Items item)
+        {
+            return GetBaseItem((uint)item);
+        }
+
 
         public static List<BaseItem> BaseItems = new List<BaseItem>();
     }

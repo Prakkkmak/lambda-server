@@ -23,21 +23,19 @@ using Lambda.Skills;
 using Lambda.Telephony;
 using Lambda.Utils;
 using MoreLinq;
-
+using Lambda.Paydays;
+using Lambda.Quests;
 
 namespace Lambda.Entity
 {
     public class Player : AltV.Net.Elements.Entities.Player, IDBElement, IEntity
     {
-
-        public Phone Phone;
-        public List<Skill> Skills;
-        public Permissions Permissions = new Permissions();
-
-        public string License;
-
+        
         public string FirstName { get; set; }
         public string LastName { get; set; }
+
+        public string GameLicense = "";
+
         public string FullName => $"{FirstName} {LastName}";
 
         public ulong TimeOnline = 0;
@@ -51,19 +49,25 @@ namespace Lambda.Entity
             set;
         }
 
-        
-
-        public long BankMoney;
+        public long BankMoney = 0;
 
         public short Food { get; set; }
 
         public ushort ServerId => base.Id;
 
-        public Account Account { get; set; }
+        public DateTime LastPayday = default;
 
-        public Inventory Inventory { get; set; }
+        public Phone Phone = null;
 
+        public List<Skill> Skills = new List<Skill>();
 
+        public Permissions Permissions = new Permissions();
+
+        public Account Account { get; set; } = null;
+
+        public Inventory Inventory = null;
+
+        public Payday Payday = null;
 
         public Position FeetPosition => new Position(Position.X, Position.Y, Position.Z - 1);
 
@@ -74,18 +78,23 @@ namespace Lambda.Entity
 
         public Skin Skin = new Skin();
 
+        public Rank Duty = null;
+
+        public Licenses Licenses = new Licenses();
+
+        public Quest Quest = null;
+
         private uint deathCount;
         private uint id; // The id in the database
         
-
+        
 
         private Request request;
 
-
+        
 
         public Player(IntPtr nativePointer, ushort id) : base(nativePointer, id)
         {
-
             Skills = new List<Skill>();
             deathCount = 0;
             id = 0;
@@ -94,7 +103,7 @@ namespace Lambda.Entity
             LastName = "";
             Account = null;
             Inventory = new Inventory(this);
-            Inventory.Deposit(100000);
+            Inventory.AddMoney(500);
         }
 
 
@@ -139,10 +148,6 @@ namespace Lambda.Entity
             Position = player.Position;
             //GotoLocation(player.GetLocation());  // TODO
         }
-        /*public void Goto(Interior interior)
-         {
-             this.GotoLocation(new Location(interior.Position, interior, (short)interior.Id));
-         }*/
 
         public void SendRequest(Request r)
         {
@@ -167,10 +172,7 @@ namespace Lambda.Entity
         public bool IsAllowedTo(string perm)
         {
             if (Permissions.Contains(perm)) return true;
-            foreach (Rank rank in GetRanks())
-            {
-                if (rank.Permissions.Contains(perm)) return true;
-            }
+            if(Duty != null && Duty.Permissions.Contains(perm)) return true;
             return false;
         }
 
@@ -180,26 +182,89 @@ namespace Lambda.Entity
             return member != null && member.Rank.Permissions.Contains(perm);
         }
 
-        /*public void LoadInterior(Interior interior)
+        public bool IsInCheckpoint(string name = "")
         {
-            foreach (string ipl in interior.GetIPLs())
+            Checkpoint checkpoint = null;
+            foreach (Checkpoint c in Checkpoint.Checkpoints)
             {
-                Emit("loadIpl", ipl);
+                if (c.Position.Distance(Position) < c.Range)
+                {
+                    if (string.IsNullOrWhiteSpace(name)) checkpoint = c;
+                    else if (name.Equals(c.Name)) checkpoint = c;
+                    
+                }
             }
-
+            return checkpoint != null;
         }
-
-        public void UnloadInterior(Interior interior)
+        public void OnMinutePass(int min = 1)
         {
-            foreach (string ipl in interior.GetIPLs())
+            if (Payday == null)
             {
-                Emit("unloadIpl", ipl);
+                Payday = new Payday();
             }
-        }*/
+            foreach (Transaction tr in Payday.Transactions)
+            {
+                tr.Timer += min;
+            }
+            if (LastPayday.DayOfYear != DateTime.Now.DayOfYear && LastPayday.Year != DateTime.Now.Year)
+            {
+                
+                foreach(Transaction tr in Payday.Transactions)
+                {
+                    SendMessage(tr.ToText());
+                    tr.Resolve(this);
+                }
+                TimeOnline = 0;
+                LastPayday = DateTime.Now;
+                Payday = new Payday();
+            }
+            if(Payday != null)
+            {
+                //Check for base income
+                if (Payday.GetTransaction(Enums.TransactionGroups.Base) == null)
+                {
+                    Transaction trans = new Transaction();
+                    trans.Group = Enums.TransactionGroups.Base;
+                    Payday.Transactions.Add(trans);
+                }
+                if(Duty != null)
+                {
+                    if(Payday.GetTransaction(Enums.TransactionGroups.Rank, Duty.Id.ToString()) == null)
+                    {
+                        Transaction trans = new Transaction();
+                        trans.Group = Enums.TransactionGroups.Rank;
+                        trans.Parameter = Duty.Id.ToString();
+                        Payday.Transactions.Add(trans);
+                    }
+                }
+                //check for duty
+            }
+            TimeOnline += (ulong)min;
+            TotalTimeOnline++;
+        }
         public void LoadIpl(string ipl)
         {
             Emit("loadIpl", ipl);
 
+        }
+
+        public void StartQuest(string questName)
+        {
+            Quest.StartQuest(this, questName);
+        }
+
+        public bool CheckConditionQuest()
+        {
+            if (Quest != null) return Quest.Condition(this);
+            return false;
+        }
+        public void Completequest()
+        {
+            if (Quest != null)
+            {
+                Quest.Complete(this);
+                Quest = null;
+            }
         }
         public void LoadIpl(string[] ipls)
         {
@@ -237,13 +302,15 @@ namespace Lambda.Entity
 
         public void Goto(Checkpoint checkpoint)
         {
+            Alt.Log("Goto triggered");
             Dimension = checkpoint.Dimension;
+            Spawn(checkpoint.Position);
             Position = checkpoint.Position;
         }
 
         public void Withdraw(long amount)
         {
-            Inventory.Deposit(amount);
+            Inventory.AddMoney(amount);
             BankMoney -= amount;
         }
 
@@ -288,6 +355,27 @@ namespace Lambda.Entity
             }
 
             return null;
+        }
+
+        public PlantProp GetClosePlant(int range = 0)
+        {
+            PlantProp plantProp = null;
+            foreach(PlantProp plant in PlantProp.PlantProps)
+            {
+                Alt.Log(plant.Position.Distance(FeetPosition) + "");
+                if(range == 0 || plant.Position.Distance(FeetPosition) < range)
+                {
+                    if(plantProp != null && plant.Position.Distance(FeetPosition) < plantProp.Position.Distance(FeetPosition))
+                    {
+                        plantProp = plant;
+                    }
+                    else if(plantProp == null)
+                    {
+                        plantProp = plant;
+                    }
+                }
+            }
+            return plantProp;
         }
 
         public Organization[] GetOrganizations()
@@ -463,9 +551,13 @@ namespace Lambda.Entity
             data["cha_face"] = Skin.Face.ToString();
             data["cha_hairiness"] = Skin.Hairiness.ToString();
             data["cha_cosmetic"] = Skin.Cosmetic.ToString();
+            data["cha_accessory"] = Skin.Accessory.ToString();
             data["cha_clothes"] = Skin.Clothes.ToString();
+            data["cha_lastpayday"] = LastPayday.ToString("yyyy-MM-dd HH:mm:ss.fff");
+            data["cha_licenses"] = Licenses.ToString();
             if (Phone != null) data["pho_id"] = Phone.Id.ToString();
-            return data;
+            if (Payday != null) data["cha_payday"] = Payday.ToString();
+                return data;
 
         }
 
@@ -481,11 +573,14 @@ namespace Lambda.Entity
             position.X = float.Parse(data["cha_position_x"]);
             position.Y = float.Parse(data["cha_position_y"]);
             position.Z = float.Parse(data["cha_position_z"]);
-            Position = position;
+            Spawn(position); // Test 2
             Dimension = short.Parse(data["cha_world"]);
             Health = ushort.Parse(data["cha_hp"]);
+            Licenses = new Licenses(data["cha_licenses"]);
             if (!string.IsNullOrWhiteSpace(data["cha_permissions"]))
                 Permissions.Set(data["cha_permissions"].Split(',').ToList());
+            if (!string.IsNullOrWhiteSpace(data["cha_lastpayday"]))
+                LastPayday = Convert.ToDateTime(data["cha_lastpayday"]);
             if (data["inv_id"] != null) DatabaseElement.Get<Inventory>(Inventory, uint.Parse(data["inv_id"]));
             else Inventory.Save();
             TimeOnline = ulong.Parse(data["cha_timeonline"]);
@@ -504,15 +599,20 @@ namespace Lambda.Entity
             {
                 Skin.Cosmetic.Set(data["cha_cosmetic"]);
             }
-            Alt.Log(data["cha_clothes"].Split(',').Length + " " + Skin.Clothes.ToString().Split(',').Length);
-            Alt.Log(data["cha_clothes"]);
-            Alt.Log(Skin.Clothes.ToString());
             if (data["cha_clothes"].Split(',').Length == Skin.Clothes.ToString().Split(',').Length)
             {
                 Skin.Clothes.Set(data["cha_clothes"]);
             }
-            Skin.Send(this);
-            _ = SaveAsync();
+            if (data["cha_accessory"].Split(',').Length == Skin.Accessory.ToString().Split(',').Length)
+            {
+                Skin.Accessory.Set(data["cha_accessory"]);
+            }
+            if (data.ContainsKey("cha_payday") && !string.IsNullOrWhiteSpace(data["cha_payday"]))
+            {
+                Payday = new Payday(data["cha_payday"]);
+            }
+            Skin.Send(this, true);
+            //_ = SaveAsync();
         }
 
         public void Save()
@@ -537,7 +637,7 @@ namespace Lambda.Entity
         {
             Players.Remove(this);
             VoiceChannel.RemovePlayer(this);
-            Alt.EmitAllClients("chatmessage", $"{FullName} c'est déconnecté!");
+            Alt.EmitAllClients("chatmessage", $"{FullName} s'est déconnecté!");
         }
 
         public async Task SaveAsync()
@@ -561,13 +661,9 @@ namespace Lambda.Entity
 
         public static void AddPlayer(Player player)
         {
-            Alt.Log("t1");
             Players.Add(player);
-            Alt.Log("t2");
             VoiceChannel.AddPlayer(player);
-            Alt.Log("t3");
             Alt.EmitAllClients("chatmessage", null, $"{player.FullName} s'est connecté!");
-            Alt.Log("t4");
         }
         public static Player GetPlayerByDbId(uint id)
         {

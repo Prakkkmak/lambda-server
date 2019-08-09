@@ -31,18 +31,19 @@ namespace Lambda.Commands
             if (player.Phone == null) return new CmdReturn("Vous n'avez pas de téléphone.");
             if (player.Phone.Calling == null) return new CmdReturn("Personne ne vous appelle");
             player.Phone.PickUp();
-            player.Phone.Calling.Player.SendMessage("Machin a déccrocher");
-            return new CmdReturn("Vous déccrochez");
+            player.Phone.Calling.Player.SendMessage("La personne a déccroché");
+            player.Phone.Calling.Player.SendMessage("/telephone raccrocher pour raccrocher.");
+            return new CmdReturn("Vous déccrochez. /telephone raccrocher pour raccrocher.");
         }
         [Permission("CIVIL_TELEPHONE_RACCROCHER")]
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Telephone_Raccrocher(Player player, object[] argv)
         {
             if (player.Phone == null) return new CmdReturn("Vous n'avez pas de téléphone.");
-            if (player.Phone.VoiceChannel == null) return new CmdReturn("Vous n'etes pas en appel");
-            player.Phone.Calling.Player.SendMessage("Machin a raccroché");
+            if (player.Phone.Calling == null) return new CmdReturn("Vous n'etes pas en appel");
+            player.Phone.Calling.Player.SendMessage("La personne a raccroché");
             player.Phone.PickOff();
-            return new CmdReturn("Vous raccrochez");
+            return new CmdReturn("Vous raccrochez.");
         }
 
         [Permission("TESTEUR_TELEPHONE_OBTENIR")]
@@ -115,13 +116,14 @@ namespace Lambda.Commands
             }
             if (player.Phone == null) return new CmdReturn("Vous n'avez pas de téléphone", CmdReturn.CmdReturnType.WARNING);
             player.Phone.SendTextMessage(new Message(0, player.Phone, player.Phone.Number, number, text));
-            return new CmdReturn(player.Phone.Number);
+            return new CmdReturn("Vous avez envoyé un message.");
         }
         [Permission("CIVIL_TELEPHONE_CONTACTS")]
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Telephone_Contact_Liste(Player player, object[] argv)
         {
             if (player.Phone == null) return new CmdReturn("Vous n'avez pas de téléphone", CmdReturn.CmdReturnType.WARNING);
+            if (player.Phone.Contacts.Count == 0) return new CmdReturn("Vous n'avez pas de contacts.");
             string text = "";
             foreach (Contact phoneContact in player.Phone.Contacts)
             {

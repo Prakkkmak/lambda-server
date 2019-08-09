@@ -11,6 +11,7 @@ namespace Lambda.Commands
 {
     class SkinCommands
     {
+
         [Permission("CIVIL_VETEMENTS_ENLEVER_HABITS")]
         [Status(Command.CommandStatus.NEW)]
         [Command(Command.CommandType.SKIN)]
@@ -72,7 +73,7 @@ namespace Lambda.Commands
             else if (player.Skin.Model == (uint)PedModel.FreemodeFemale01)
             {
                 player.Inventory.AddItem(Enums.Items.GlassesFemale, 1, player.Skin.Accessory.Glasses.ToString());
-                player.Skin.Accessory.Glasses.Drawable = 1;
+                player.Skin.Accessory.Glasses.Drawable = 5;
             }
             player.Skin.Send(player, false);
             return new CmdReturn($"Vous vous avez enlevé vos lunettes");
@@ -90,7 +91,7 @@ namespace Lambda.Commands
             else if (player.Skin.Model == (uint)PedModel.FreemodeFemale01)
             {
                 player.Inventory.AddItem(Enums.Items.EarsFemale, 1, player.Skin.Accessory.Ears.ToString());
-                player.Skin.Accessory.Ears.Drawable = 0;
+                player.Skin.Accessory.Ears.Drawable = 33;
             }
             player.Skin.Send(player, false);
             return new CmdReturn($"Vous vous avez enlevé vos boucles d'oreille");
@@ -102,16 +103,18 @@ namespace Lambda.Commands
         {
             if (player.Skin.Model == (uint)PedModel.FreemodeMale01)
             {
+                if (player.Skin.Accessory.Watch.Drawable == 2) return new CmdReturn("Vous n'avez pas de montre");
                 player.Inventory.AddItem(Enums.Items.WatchMale, 1, player.Skin.Accessory.Watch.ToString());
                 player.Skin.Accessory.Watch.Drawable = 2;
             }
             else if (player.Skin.Model == (uint)PedModel.FreemodeFemale01)
             {
+                if (player.Skin.Accessory.Watch.Drawable == 1) return new CmdReturn("Vous n'avez pas de montre");
                 player.Inventory.AddItem(Enums.Items.WatchFemale, 1, player.Skin.Accessory.Watch.ToString());
                 player.Skin.Accessory.Watch.Drawable = 1;
             }
             player.Skin.Send(player, false);
-            return new CmdReturn($"Vous vous avez enlevé vos boucles d'oreille");
+            return new CmdReturn($"Vous avez enlevé votre montre.");
         }
         [Permission("CIVIL_VETEMENTS_ENLEVER_BRACELET")]
         [Status(Command.CommandStatus.NEW)]
@@ -129,7 +132,48 @@ namespace Lambda.Commands
                 player.Skin.Accessory.Bracelet.Drawable = 0;
             }
             player.Skin.Send(player, false);
-            return new CmdReturn($"Vous vous avez enlevé vos boucles d'oreille");
+            return new CmdReturn($"Vous vous avez enlevé votre bracelet");
+        }
+        [Command(Command.CommandType.SKIN, 3)]
+        [Syntax("Maman", "Papa", "Mix")]
+        [SyntaxType(typeof(uint), typeof(uint), typeof(float))]
+        public static CmdReturn Forme(Player player, object[] argv)
+        {
+            uint mother = (uint)argv[0];
+            uint father = (uint)argv[1];
+            float mix = (float)argv[2];
+            player.Emit("setShape", mother, father, mix);
+            return new CmdReturn("Vous avez changé la forme");
+        }
+        [Command(Command.CommandType.SKIN, 3)]
+        [Syntax("Maman", "Papa", "Mix")]
+        [SyntaxType(typeof(uint), typeof(uint), typeof(float))]
+        public static CmdReturn Peau(Player player, object[] argv)
+        {
+            uint mother = (uint)argv[0];
+            uint father = (uint)argv[1];
+            float mix = (float)argv[2];
+            player.Emit("setSkin", mother, father, mix);
+            return new CmdReturn("Vous avez changé la peau");
+        }
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 2)]
+        [Syntax("1", "2")]
+        [SyntaxType(typeof(uint), typeof(uint))]
+        public static CmdReturn Cheveux(Player player, object[] argv)
+        {
+            player.Emit("setHairColor", (uint)argv[0], (uint)argv[1]);
+            return new CmdReturn("Vous avez changé la couleur de vos cheveux");
+        }
+
+        [Status(Command.CommandStatus.NEW)]
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("1")]
+        [SyntaxType(typeof(uint))]
+        public static CmdReturn Yeux(Player player, object[] argv)
+        {
+            player.Emit("setEyeColor", (uint)argv[0]);
+            return new CmdReturn("Vous avez changé la couleur de vos yeux");
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AltV.Net;
 using MySql.Data.MySqlClient;
+using System.IO;
 
 namespace Lambda.Database
 {
@@ -35,6 +36,12 @@ namespace Lambda.Database
             connectionString = $"server={server}; database={database}; uid={uid}; pwd='{password}'; port={port}";
             connectionString = $"server=localhost; database=lambda; uid=root; port=3307;Convert Zero Datetime=True";
             connectionString = $"server=149.91.90.131; database=lambda; uid=server; pwd=MaZmPcs7nt; port=3306;Convert Zero Datetime=True";
+            /*string path = @"./config.txt";
+            //string[] lines;
+            if (File.Exists(path))
+            {
+                connectionString = File.ReadAllText(path);
+            }*/
         }
         /// <summary>
         /// Open the connection

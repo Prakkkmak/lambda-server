@@ -28,7 +28,18 @@ namespace Lambda.Items
 
         public InventoryType Type { get; }
         public List<Item> Items = new List<Item>();
-        public long Money = 1000;
+        public long Money = 0;
+
+        public Player Player
+        {
+            get {
+                foreach(Player player in Player.Players)
+                {
+                    if (player.Inventory == this) return player;
+                }
+                return null;
+            }
+        }
 
         public Inventory(IEntity entity, InventoryType type = InventoryType.DEFAULT, uint id = 0)
         {
@@ -41,70 +52,53 @@ namespace Lambda.Items
         {
             if (Money < amount) return false;
             Money -= amount;
+            if (Player != null) Player.SendMessage("Vous avez perdu " + amount + "$.");
             return true;
         }
 
-        public bool Deposit(long amount)
+        public bool AddMoney(long amount)
         {
             Money += amount;
+            if (Player != null) Player.SendMessage("Vous avez reçu " + amount + "$.");
             return true;
         }
-
-        public bool AddItem(Enums.Items id, uint amount, string metadata = "")
+        public void AddItem(Enums.Items id, uint amount, string metadata = "")
         {
-            if (id == Enums.Items.Invalid) return false;
-            return AddItem((uint)id, amount, metadata);
+            AddItem((uint)id, amount, metadata);
         }
-        public bool AddItemOld(uint id, uint amount, string metadata = "")
+        public void AddItem(uint id, uint amount, string metadata = "")
         {
-            Item itemWithLessStack = GetItemWithLessStack(id);
-            if (itemWithLessStack != null)
-            {
-                uint nbrToAdd = itemWithLessStack.GetBaseItem().MaxStack - itemWithLessStack.Amount;
-                amount -= nbrToAdd;
-                itemWithLessStack.Amount += nbrToAdd;
-            }
-
-            Item item = new Item(this, BaseItem.GetBaseItem(id), amount);
-            if (item.GetBaseItem().MaxStack < 1) item.Amount = amount;
-            while (item.Amount > item.GetBaseItem().MaxStack && item.GetBaseItem().MaxStack > 0)
-            {
-                item.Amount = item.GetBaseItem().MaxStack;
-                amount -= item.GetBaseItem().MaxStack;
-                Items.Add(item);
-                item = new Item(this, BaseItem.GetBaseItem(id), amount);
-            }
-
+            Item item = new Item(BaseItem.GetBaseItem(id), amount);
             item.MetaData = metadata;
-            Items.Add(item);
-            return true;
+            AddItem(item);
         }
-        public bool AddItem(uint id, uint amount, string metadata = "")
+
+        public void AddItem(Item item)
         {
-            Item itemWithLessStack = GetItemWithLessStack(id);
-            if (itemWithLessStack != null)
+            if (Player != null) Player.SendMessage(item.Amount + " " + item.GetBaseItem().Name + " ont étés ajoutés à votre inventaire.");
+            item.SetInventory(this);
+            if(item.GetBaseItem().MaxStack == 1)
             {
-                uint nbrToAdd = itemWithLessStack.GetBaseItem().MaxStack - itemWithLessStack.Amount;
-                if (amount <= nbrToAdd) itemWithLessStack.Amount += amount;
-                amount -= nbrToAdd;
-                itemWithLessStack.Amount += nbrToAdd;
-            }
-
-            Item item = new Item(this, BaseItem.GetBaseItem(id), amount);
-            if (item.GetBaseItem().MaxStack < 1) item.Amount = amount;
-            while (item.Amount > item.GetBaseItem().MaxStack && item.GetBaseItem().MaxStack > 0)
-            {
-                item.Amount = item.GetBaseItem().MaxStack;
-                amount -= item.GetBaseItem().MaxStack;
                 Items.Add(item);
-                item = new Item(this, BaseItem.GetBaseItem(id), amount);
             }
+            else
+            {
+                foreach(Item it in Items)
+                {
+                    if(it.GetBaseItem().Id == item.GetBaseItem().Id)
+                    {
 
-            item.MetaData = metadata;
-            Items.Add(item);
-            return true;
+                        it.Amount += item.Amount;
+                        return;
+                    }
+                }
+                Items.Add(item);
+            }
         }
-
+        public Item GetItem(Enums.Items item)
+        {
+            return GetItem((uint)item);
+        }
         public Item GetItem(uint id)
         {
             Item item = null;
@@ -119,7 +113,11 @@ namespace Lambda.Items
 
             return item;
         }
+        public void RemoveItem(Enums.Items id, uint amount)
+        {
+            RemoveItem((uint)id, amount);
 
+        }
         public void RemoveItem(uint id, uint amount)
         {
             int slot = (int)id;

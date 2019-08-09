@@ -50,8 +50,8 @@ namespace Lambda.Commands
         {
             Player target = player.PlayerSelected;
             if (target == null) return CmdReturn.NoSelected;
-            Item item = (Item)argv[1];
-            uint amount = (uint)argv[2];
+            Item item = (Item)argv[0];
+            uint amount = (uint)argv[1];
             if (target.GetRequest() != null) return CmdReturn.RequestBusy;
             if (item.Amount < amount) return new CmdReturn("Vous n'avez pas assez d'objets", CmdReturn.CmdReturnType.WARNING);
             Request request = new Request(target, "Don", $"{player.FullName} veux vous donner un objet", player);
@@ -101,7 +101,7 @@ namespace Lambda.Commands
             Item item = (Item)argv[0];
             return new CmdReturn($"{item.GetBaseItem().Id} {item.GetBaseItem().Name} ({item.Amount}) : {item.MetaData}");
         }
-        [Permission("ADMIN_OBJET_DATA_MODIFIER")]
+        [Permission("ADMINISTRATEUR_OBJET_DATA_MODIFIER")]
         [Command(Command.CommandType.INVENTORY, 2)]
         [Syntax("Objet", "Valeur")]
         [SyntaxType(typeof(Item), typeof(string))]
@@ -140,8 +140,8 @@ namespace Lambda.Commands
             if (player.Inventory.Money < money) return new CmdReturn("Vous n'avez pas assez d'argent");
             player.Inventory.Money -= money;
             target.Inventory.Money += money;
-            target.SendMessage("Vous avez reçu " + money);
-            return new CmdReturn($"Vous avez donné " + money);
+            target.SendMessage("Vous avez reçu " + money + "$.");
+            return new CmdReturn($"Vous avez donné " + money + "$.");
         }
 
     }

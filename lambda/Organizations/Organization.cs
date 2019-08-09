@@ -19,7 +19,7 @@ namespace Lambda.Organizations
 
         public Permissions Permissions = new Permissions();
 
-        public uint BankMoney = 0;
+        public long BankMoney = 0;
 
         private List<Rank> ranks = new List<Rank>();
         private List<Member> members = new List<Member>();
@@ -29,6 +29,10 @@ namespace Lambda.Organizations
         public Organization(string name)
         {
             this.Name = name;
+            if(name == "Gouvernement")
+            {
+                Governement = this;
+            }
         }
 
         public void Rename(string name)
@@ -258,6 +262,10 @@ namespace Lambda.Organizations
             }
             return orgs.ToArray();
         }
+
+        public static uint BaseIncome = 1000;
+
+        public static Organization Governement = null;
 
         public static List<Organization> Organizations = new List<Organization>();
     }

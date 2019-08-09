@@ -26,7 +26,7 @@ namespace Lambda.Buildings
         public Building(Position pos, short dimension = 0)
         {
             Checkpoint = new Checkpoint(pos, dimension, player => { });
-            Blip = new Blip(pos, dimension);
+            //Blip = new Blip(pos, dimension);
         }
         public virtual Dictionary<string, string> GetData()
         {

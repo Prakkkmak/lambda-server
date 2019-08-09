@@ -1,5 +1,6 @@
 ﻿using Lambda.Buildings;
 using Lambda.Entity;
+using Lambda.Organizations;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,7 +10,7 @@ namespace Lambda.Commands
     class BankCommands
     {
         [Permission("CIVIL_BANQUE_BALANCE")]
-        [Command(Command.CommandType.HOUSE)]
+        [Command(Command.CommandType.BANK)]
         public static CmdReturn Banque_Balance(Player player, object[] argv)
         {
             Bank bank = player.GetBuildings<Bank>(Bank.Banks);
@@ -34,7 +35,7 @@ namespace Lambda.Commands
         [Command(Command.CommandType.BANK, 1)]
         [Syntax("Montant")]
         [SyntaxType(typeof(uint))]
-        public static CmdReturn Banque_Rentirer(Player player, object[] argv)
+        public static CmdReturn Banque_Retirer(Player player, object[] argv)
         {
             uint amount = (uint)argv[0];
             Bank bank = player.GetBuildings<Bank>(Bank.Banks);
@@ -44,5 +45,6 @@ namespace Lambda.Commands
             player.BankMoney -= amount;
             return new CmdReturn("Votre nouvelle balance est de " + player.BankMoney + "$");
         }
+
     }
 }

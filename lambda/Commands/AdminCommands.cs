@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using AltV.Net.Data;
+using AltV.Net.Enums;
+using Lambda.Administration;
 using Lambda.Entity;
 using Lambda.Items;
 
@@ -35,8 +37,10 @@ namespace Lambda.Commands
         [SyntaxType(typeof(Player))]
         public static CmdReturn Freeze(Player player, object[] argv)
         {
-            ((Player)argv[0]).Freeze(true);
-            ((Player)argv[0]).SendMessage("Vous avez été freeze.");
+            Player target = (Player)argv[0];
+            target.Freeze(true);
+            target.SendMessage("Vous avez été freeze.");
+            target.Goto(target.Position);
             return new CmdReturn("Vous vous avez freeze quelqu'un.", CmdReturn.CmdReturnType.SUCCESS);
 
         }
@@ -79,7 +83,7 @@ namespace Lambda.Commands
         public static CmdReturn Respawn(Player player, object[] argv)
         {
             player.Spawn(Spawn.NewSpawn.Position);
-            return new CmdReturn("Vous vous avez respawn!", CmdReturn.CmdReturnType.SUCCESS);
+            return new CmdReturn("Vous avez respawn.", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Permission("FONDATEUR_PERMISSION_AJOUTER")]
         [Command(Command.CommandType.ADMIN, 2)]
@@ -88,7 +92,9 @@ namespace Lambda.Commands
         public static CmdReturn Permission_Ajouter(Player player, object[] argv)
         {
             Player target = (Player)argv[0];
-            target.Permissions.Add((string)argv[1]);
+            string perm = (string)argv[1];
+            if (!Permissions.PermissionExist(perm)) return new CmdReturn("Cette permission n'existe pas");
+            target.Permissions.Add(perm.ToUpper());
             return new CmdReturn("Vous avez ajouté une permission", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Permission("FONDATEUR_PERMISSION_RETIRER")]
@@ -98,10 +104,10 @@ namespace Lambda.Commands
         public static CmdReturn Permission_Retirer(Player player, object[] argv)
         {
             Player target = (Player)argv[0];
-            player.Permissions.Remove((string)argv[1]);
+            player.Permissions.Remove(((string)argv[1]).ToUpper());
             return new CmdReturn("Vous avez supprimé une permission", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_GIVE_OBJET")]
+        [Permission("ADMINISTRATEUR_GIVE_OBJET")]
         [Command(Command.CommandType.ADMIN, 3)]
         [Syntax("Joueur", "Objet", "Quantité")]
         [SyntaxType(typeof(Player), typeof(BaseItem), typeof(uint))]
@@ -126,7 +132,7 @@ namespace Lambda.Commands
             target.Kick(reason);
             return new CmdReturn("Vous avez kick " + player.FullName, CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_BAN")]
+        [Permission("ADMINISTRATEUR_BAN")]
         [Command(Command.CommandType.ADMIN, 2)]
         [Syntax("Joueur", "Temps")]
         [SyntaxType(typeof(Player), typeof(int))]
@@ -147,20 +153,124 @@ namespace Lambda.Commands
         {
 
             string code = (string)argv[0];
-            if (code.Equals("prakkestbeau"))
+            if (code.Equals("lambdabeggins"))
             {
                 player.Permissions.Add("FONDATEUR");
                 return new CmdReturn("Vous vous êtes mis fondateur", CmdReturn.CmdReturnType.SUCCESS);
             }
             return new CmdReturn("ERROR", CmdReturn.CmdReturnType.ERROR);
         }
-        [Permission("ADMIN_DIEU")]
+        [Permission("ADMINISTRATEUR_DIEU")]
         [Command(Command.CommandType.TEST)]
         public static CmdReturn Dieu(Player player, object[] argv)
         {
             player.Emit("toggleInvincibility");
             return new CmdReturn("Vous avez changé votre invincibilité.");
         }
+
+        [Permission("ADMINISTRATEUR_PAYDAY_AJOUTER")]
+        [Command(Command.CommandType.ADMIN,2)]
+        [Syntax("Joueur", "Temps")]
+        [SyntaxType(typeof(Player), typeof(uint))]
+        public static CmdReturn Payday_Ajouter(Player player, object[] argv)
+        {
+            Player target = (Player)argv[0];
+            uint time = (uint)argv[1];
+            target.OnMinutePass((int)time);
+            target.SendMessage("Un admin vous a ajouté " + time + " temps de jeu. Vous êtes à " + target.TimeOnline + " minutes.");
+            return new CmdReturn("Vous avez ajouté " + time + " temps de jeu. " + player.FullName +" est à " + target.TimeOnline + " minutes.");
+        }
+        [Permission("ADMINISTRATEUR_PADAY_RESET")]
+        [Command(Command.CommandType.ADMIN, 1)]
+        [Syntax("Joueur")]
+        [SyntaxType(typeof(Player))]
+        public static CmdReturn Payday_Reset(Player player, object[] argv)
+        {
+            Player target = (Player)argv[0];
+            target.LastPayday = default;
+            target.SendMessage("Un admin vous a reinitialiser votre payday");
+            return new CmdReturn("Vous avez reinitiélisé le payday de quelqu'un");
+        }
+        [Permission("MODERATEUR_MODELE")]
+        [Command(Command.CommandType.TEST, 1)]
+        [Syntax("Modele")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Modele(Player player, object[] argv)
+        {
+            if (!Enum.TryParse((string)argv[0], true, out PedModel model))
+            {
+                return new CmdReturn("Modele incorrect", CmdReturn.CmdReturnType.WARNING);
+            }
+
+            if (!Enum.IsDefined(typeof(PedModel), model))
+                return new CmdReturn("Modele incorrect", CmdReturn.CmdReturnType.WARNING);
+
+            player.Skin.Model = (uint)model;
+            player.Skin.Send(player);
+            return CmdReturn.Success;
+        }
+
+        [Permission("ADMINISTRATEUR_WHITELIST_AJOUTER")]
+        [Command(Command.CommandType.ADMIN, 1)]
+        [Syntax("Code")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Whitelist_Ajouter(Player player, object[] argv)
+        {
+            string id = (string)argv[0];
+            Whitelist.MainWhitelist.Add(id);
+            return new CmdReturn("Vous avez ajouté quelqu'un a la whitelist");
+        }
+        [Permission("ADMINISTRATEUR_WHITELIST_SUPPRIMER")]
+        [Command(Command.CommandType.ADMIN, 1)]
+        [Syntax("Code")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Whitelist_Supprimer(Player player, object[] argv)
+        {
+            string id = (string)argv[0];
+            Whitelist.MainWhitelist.Remove(id);
+            return new CmdReturn("Vous avez ajouté quelqu'un a la whitelist");
+        }
+
+        [Permission("ADMINISTRATEUR_WHITELIST_VERIFIER")]
+        [Command(Command.CommandType.ADMIN, 1)]
+        [Syntax("Code")]
+        [SyntaxType(typeof(string))]
+        public static CmdReturn Whitelist_Verifier(Player player, object[] argv)
+        {
+            string id = (string)argv[0];
+            if (Whitelist.MainWhitelist.Contains(id))
+            {
+                return new CmdReturn(id + " est dans la whitelist");
+            }
+            else
+            {
+                return new CmdReturn(id + " n'est pas dans la whitelist");
+            }
+            
+        }
+
+        [Permission("ADMINISTRATEUR_DUTY")]
+        [Command(Command.CommandType.ADMIN)]
+        public static CmdReturn Staff(Player player, object[] argv)
+        {
+            if(player.TicketLevel == 0)
+            {
+                player.Model = 0x573201B8;
+                player.Emit("toggleInvincibility");
+                player.TicketLevel = 1;
+                return new CmdReturn("Vous etes en service admin");
+            }
+            else
+            {
+                player.Skin.Send(player);
+                player.Emit("toggleInvincibility");
+                player.TicketLevel = 0;
+                return new CmdReturn("Vous avez quitté service admin");
+            }
+            
+        }
+
+
 
     }
 }

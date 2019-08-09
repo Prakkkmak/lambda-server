@@ -30,7 +30,7 @@ namespace Lambda.Entity
 
         public Rgba Color  = Rgba.Zero;
 
-        
+        public string Name = "";
 
         public CheckpointType Type = CheckpointType.Cyclinder;
         
@@ -38,7 +38,7 @@ namespace Lambda.Entity
 
         public ICheckpoint AltCheckpoint;
 
-        public Checkpoint(Position position, short dim, Action<Player> action, CheckpointType type = CheckpointType.Cyclinder, float range = 0.5f, float height = 1, Rgba color = default)
+        public Checkpoint(Position position, short dim, Action<Player> action, CheckpointType type = CheckpointType.Cyclinder, float range = 0.5f, float height = 1, Rgba color = default, string name = "")
         {
             Dimension = dim;
             Position = position;
@@ -46,6 +46,7 @@ namespace Lambda.Entity
             Height = height;
             Color = color;
             Action = action;
+            Name = name;
             DrawCheckpoint();
             Checkpoints.Add(this);
             
@@ -57,6 +58,24 @@ namespace Lambda.Entity
             AltCheckpoint = Alt.CreateCheckpoint(Type, GroundPosition, Range, Height, Color);
         }
 
+
+        public static void CreateFarmJobCheckpoints()
+        {
+            new Checkpoint(new Position(2016.62f, 4987.859f, 42.08569f), 0, (player) =>
+            {
+                player.SendMessage("Bienvenue à la ferme publique ! La ville vous a fourni un agréable endroit pour pratiquer votre passion.");
+                player.SendMessage("Faites /licence info pour en savoir plus sur cette licence");
+            }, CheckpointType.Cyclinder3, 1, 1, new Rgba(20,200,150,150), "farm");
+        }
+        public static Checkpoint[] GetCheckpointsByName(string name)
+        {
+            List<Checkpoint> checkpoints = new List<Checkpoint>();
+            foreach(Checkpoint checkpoint in Checkpoints)
+            {
+                if (checkpoint.Name.Equals(name)) checkpoints.Add(checkpoint);
+            }
+            return checkpoints.ToArray();
+        }
         public static List<Checkpoint> Checkpoints = new List<Checkpoint>();
 
     }

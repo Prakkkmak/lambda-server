@@ -33,13 +33,12 @@ namespace Lambda.Commands
             INVENTORY,
             VEHICLE,
             ORGANIZATION,
-            AREA,
-            SHOP,
             HOUSE,
             BANK,
             SKIN,
             ADMIN,
             POLICE,
+            GOVERNEMENT,
             HEALTHCARE,
             INSTRUCTOR,
             TAXI,
@@ -223,9 +222,9 @@ namespace Lambda.Commands
             string text = "";
             for (; i < parameters.Length; i++)
             {
-                text += parameters[i];
+                text += parameters[i] + " ";
             }
-
+            if(text.Length > 0)text.Remove(text.Length - 1, 1); // Remove the end space.
             result[syntax.Length] = text;
             return CmdReturn.Success;
         }

@@ -37,14 +37,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AltV.Net" Version="1.10.0" />
-    <PackageReference Include="AltV.Net.Async" Version="1.10.0" />
+    <PackageReference Include="AltV.Net" Version="1.11.1-beta" />
+    <PackageReference Include="AltV.Net.Async" Version="1.11.1-beta" />
     <PackageReference Include="morelinq" Version="3.2.0" />
     <PackageReference Include="MoreLinq.Source.MoreEnumerable.DistinctBy" Version="1.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MySqlConnector" Version="0.56.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -74,6 +75,10 @@
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="cd $(ProjectDir)&#xD;&#xA;copy /y &quot;$(TargetPath)&quot; &quot;E:/Lambda/server/resources/lambda&quot;&#xD;&#xA;" />
+  </Target>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="xcopy E:\Lambda\lambda-client\* E:\Lambda\server\resources\lambda-client /S /R /Y" />
   </Target>
 
 </Project>

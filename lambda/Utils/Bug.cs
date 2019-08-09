@@ -20,9 +20,12 @@ namespace Lambda.Utils
             SenderName = sender;
             Mail = new MailMessage(BugMail, TrelloMail)
             {
+
                 Subject = Text,
                 Body = SenderName
             };
+            Mail.BodyEncoding = System.Text.Encoding.UTF8;
+            Mail.SubjectEncoding = System.Text.Encoding.UTF8;
         }
 
 

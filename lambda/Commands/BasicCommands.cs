@@ -9,7 +9,7 @@ namespace Lambda.Commands
 {
     class BasicCommands
     {
-        [Permission("BASE_AIDE")]
+        [Permission("CIVIL_AIDE")]
         [Command(Command.CommandType.DEFAULT, 1)]
         [Syntax("Page")]
         [SyntaxType(typeof(uint))]
@@ -27,13 +27,16 @@ namespace Lambda.Commands
                 "Inventaire",
                 "Véhicule",
                 "Organisation",
-                "Zone",
-                "Magasin",
                 "Maison",
                 "Banque",
                 "Skin",
-                "Admin",
-                "Test"
+                "Administration",
+                "Police",
+                "Gouvernement",
+                "Santé",
+                "Instructeur",
+                "Taxi",
+                "Text",
             };
             string pagename = "Non défini";
             if (pages.Length > page)
@@ -41,21 +44,27 @@ namespace Lambda.Commands
                 pagename = pages[page];
             }
             string text = $"Voici la liste des commandes ({pagename}) {page}/{maxpage}:<br>";
+            string commandSyntaxes = "";
             foreach (Command command in commands)
             {
                 if (!player.IsAllowedTo(command.Permission)) continue;
                 if (command.Status == Command.CommandStatus.NEW) text += "{2980b9}";
                 if (command.Status == Command.CommandStatus.TOTEST) text += "{e67e22}";
-                text += "/" + command.Name + ", ";
+                commandSyntaxes += "/" + command.Name + ", ";
                 if (command.Status != Command.CommandStatus.DEFAULT) text += "{ecf0f1}";
             }
+            if (string.IsNullOrWhiteSpace(commandSyntaxes))
+            {
+                return new CmdReturn("Vous n'avez aucune permission dans cette partie.");
+            }
+            text += commandSyntaxes;
             return new CmdReturn(text);
         }
-        [Permission("BASE_BUG")]
+        [Permission("CIVIL_BUG")]
         [Command(Command.CommandType.DEFAULT, 1)]
         [Syntax("Texte")]
         [SyntaxType(typeof(string))]
-        public static CmdReturn Bug(Player player, object[] argv)
+        public static CmdReturn Feedback(Player player, object[] argv)
         {
             int minSize = 10;
             string text = "";
@@ -77,7 +86,7 @@ namespace Lambda.Commands
             bug.SendAsync(); // Send the bugg
             return new CmdReturn("Vous avez envoyé votre bug !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("TESTEUR_PERSONNAGE_NOM")]
+        [Permission("CIVIL_PERSONNAGE_NOM")]
         [Command(Command.CommandType.DEFAULT, 2)]
         [Syntax("Prenom", "nom")]
         [SyntaxType(typeof(string), typeof(string))]
@@ -92,7 +101,7 @@ namespace Lambda.Commands
             player.LastName = lastName;
             return new CmdReturn("Vous avez changé de nom !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("BASE_LISTE")]
+        [Permission("CIVIL_LISTE")]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Liste(Player player, object[] argv)
         {
@@ -101,7 +110,7 @@ namespace Lambda.Commands
             str = Player.Players.Aggregate(str, (current, p) => current + $"[{p.ServerId}]{p.FirstName} {p.LastName} <br>");
             return new CmdReturn(str);
         }
-        [Permission("BASE_POSITION")]
+        [Permission("CIVIL_POSITION")]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Position(Player player, object[] argv)
         {
@@ -109,7 +118,7 @@ namespace Lambda.Commands
             CmdReturn cmdReturn = new CmdReturn($"Votre position ( X:{pos.X} | Y:{pos.Y} | Z:{pos.Z} ) Dim : {player.Dimension}");
             return cmdReturn;
         }
-        [Permission("BASE_ACCEPTER")]
+        [Permission("CIVIL_ACCEPTER")]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Accepter(Player player, object[] argv)
         {
@@ -124,7 +133,7 @@ namespace Lambda.Commands
             player.SetRequest(null);
             return new CmdReturn("Vous avez accepté la demande !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("BASE_REFUSER")]
+        [Permission("CIVIL_REFUSER")]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Refuser(Player player, object[] argv)
         {
@@ -139,11 +148,17 @@ namespace Lambda.Commands
             player.SetRequest(null);
             return new CmdReturn("Vous avez refusé la demande !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("BASE_CLEAR")]
+        [Permission("CIVIL_CLEAR")]
         [Command(Command.CommandType.DEFAULT)]
         public static CmdReturn Clear(Player player, object[] argv)
         {
             return new CmdReturn("<br><br><br><br><br><br><br><br><br><br><br><br>", CmdReturn.CmdReturnType.SUCCESS);
+        }
+        [Permission("CIVIL_PAYDAY_INFO")]
+        [Command(Command.CommandType.BANK)]
+        public static CmdReturn Payday_Info(Player player, object[] argv)
+        {
+            return new CmdReturn("Vous avez joué " + player.TimeOnline + " depuis le dernier payday du " + player.Payday.Date);
         }
 
     }

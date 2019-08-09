@@ -9,6 +9,7 @@ using AltV.Net.Enums;
 using Items;
 using Lambda.Administration;
 using Lambda.Database;
+using Lambda.Entity;
 using Lambda.Items;
 using Player = Lambda.Entity.Player;
 using Vehicle = Lambda.Entity.Vehicle;
@@ -36,8 +37,10 @@ namespace Lambda
             Alt.OnClient("chatConsole", OnClientSendChatConsole);
             Alt.OnClient("changeSelectedPlayer", OnClientChangePlayerSelected);
             Alt.OnClient("save", OnClientSave);
+            Alt.OnClient("questComplete", OnClientCompleteQuest);
             Alt.OnPlayerEnterVehicle += OnVehicleEnter;
             Alt.OnPlayerLeaveVehicle += OnVehicleLeave;
+            
         }
         public static void OnClientSave(IPlayer altPlayer, object[] args)
         {
@@ -62,6 +65,8 @@ namespace Lambda
         private static void OnPlayerDead(IPlayer altPlayer, AltV.Net.Elements.Entities.IEntity killer, uint nbr)
         {
             Player player = (Player)altPlayer;
+            player.Health = 100;
+            player.Spawn(Spawn.NewSpawn.Position);
             //player.Spawn(Spawn.NewSpawn.Position);
         }
 
@@ -90,8 +95,21 @@ namespace Lambda
 
         public static void OnPlayerSetLicenseHash(IPlayer altPlayer, object[] args)
         {
+            
             Player player = (Player)altPlayer;
+
+            foreach (Prop prop in Prop.Props)
+            {
+              player.Emit("syncProp", prop.GetIdentity(), prop.Name, prop.Position, prop.Rotation);
+            }
+
             string license = (string)args[0];
+            string discordid = (string)args[1];
+            if (!Whitelist.MainWhitelist.Contains(discordid))
+            {
+                Alt.Log("Pas whitelist");
+                player.Kick("Pas whitelisté");
+            }
             Alt.Log("License set to " + license);
             altPlayer.SetData("license", license);
             player.Spawn(Spawn.NewSpawn.Position);
@@ -109,13 +127,15 @@ namespace Lambda
             }
             else
             {
-                player.Account = new Account(player.License);
+                player.Account = new Account(player.GameLicense);
                 //_ = player.SaveAsync();
 
             }
             Alt.Log($"[{player.ServerId}]{player.FullName} s'est connecté.");
             Player.AddPlayer(player);
+            if (!player.IsAllowedTo("CIVIL")) player.Permissions.Add("CIVIL");
             player.Emit("playerLoaded");
+
             //player.Skin.SendModel(player);
             //player.GetSkin().SendSkin(player);
         }
@@ -155,7 +175,7 @@ namespace Lambda
             Player player = (Player)altPlayer;
             string str = "";
             object[] test = (object[])args[0];
-            int[] converted = Array.ConvertAll(test, item => (int)(long)item); // TODO
+            float[] converted = Array.ConvertAll(test, item => (float)Convert.ToDouble(item)); // TODO
             player.Skin.SetFeatures(converted);
         }
         public static void OnClientSetProps(IPlayer altPlayer, object[] args)
@@ -192,6 +212,11 @@ namespace Lambda
             Alt.Log(args[0] + "");
         }
 
+        public static void OnClientCompleteQuest(IPlayer altPlayer, object[] args)
+        {
+            Player player = (Player)altPlayer;
+            if (player.Quest != null) player.Quest.Complete(player);
+        }
 
 
 

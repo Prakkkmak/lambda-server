@@ -12,8 +12,8 @@ namespace Lambda.Items
 {
     public class Item : IDBElement
     {
-        private Inventory inventory;
-        private BaseItem baseItem;
+        private Inventory inventory = null;
+        private BaseItem baseItem = null;
 
 
         public uint Id { get; set; }
@@ -31,6 +31,11 @@ namespace Lambda.Items
         {
             this.baseItem = baseItem;
             this.inventory = inventory;
+            Amount = amount;
+        }
+        public Item(BaseItem baseItem, uint amount) : this()
+        {
+            this.baseItem = baseItem;
             Amount = amount;
         }
 
@@ -166,9 +171,7 @@ namespace Lambda.Items
         }
         public void Save()
         {
-            long t = DateTime.Now.Ticks;
             DatabaseElement.Save(this);
-            Alt.Log("Item Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }
 
         public void Delete()
@@ -178,16 +181,12 @@ namespace Lambda.Items
 
         public async Task DeleteAsync()
         {
-            long t = DateTime.Now.Ticks;
             await DatabaseElement.DeleteAsync(this);
-            Alt.Log("Item deleted en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }
 
         public async Task SaveAsync()
         {
-            long t = DateTime.Now.Ticks;
             await DatabaseElement.SaveAsync(this);
-            Alt.Log("Item Saved en " + (t / TimeSpan.TicksPerMillisecond) + " ms ");
         }
 
 

@@ -41,7 +41,8 @@ namespace Lambda.Database
             {typeof(Message), "t_phonemessage_pme" },
             {typeof(Contact), "t_phonecontact_pco" },
             {typeof(Building), "t_building_bui" },
-            {typeof(House), "t_house_hou" }
+            {typeof(House), "t_house_hou" },
+            {typeof(Whitelist), "t_whitelist_whi" }
         };
 
         public static string GetPrefix(string str)
@@ -109,6 +110,7 @@ namespace Lambda.Database
                     else
                     {
                         entity.Id = (uint)await DbConnect.InsertAsync(tableName, datas);
+                        Alt.Log("New instance have id " + entity.Id);
                     }
                     
                     
@@ -173,8 +175,7 @@ namespace Lambda.Database
             entity.SetData(result);
             return entity;
         }
-        public static T
-            Get<T>(T entity, string where1, string param1) where T : IDBElement
+        public static T Get<T>(T entity, string where1, string param1) where T : IDBElement
         {
             string tableName = GetTableName(typeof(T));
             Dictionary<string, string> where = new Dictionary<string, string>();
@@ -223,6 +224,19 @@ namespace Lambda.Database
                 entity.SetData(result);
                 entity.Id = uint.Parse(result[GetPrefix(tableName) + "_id"]);
                 entities.Add(entity);
+            }
+
+            return entities.ToArray();
+        }
+
+        public static string[] GetAllWhitelisted(Whitelist whitelist)
+        {
+            string tableName = GetTableName(typeof(Whitelist));
+            List<string> entities = new List<string>();
+            List<Dictionary<string, string>> results = DbConnect.Select(tableName, new Dictionary<string, string>());
+            foreach (Dictionary<string, string> result in results)
+            {
+                entities.Add(result["whi_discordid"]);
             }
 
             return entities.ToArray();
@@ -427,6 +441,7 @@ namespace Lambda.Database
 
             return houses.ToArray();
         }
+
         /*
         public void SaveAll(T[] entities)
         {

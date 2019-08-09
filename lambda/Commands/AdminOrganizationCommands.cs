@@ -11,7 +11,7 @@ namespace Lambda.Commands
 {
     class AdminOrganizationCommands
     {
-        [Permission("ADMIN_ORGANISATION_CREER")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_CREER")]
         [Command(Command.CommandType.ORGANIZATION, 1)]
         [Syntax("Nom")]
         [SyntaxType(typeof(string))]
@@ -26,7 +26,7 @@ namespace Lambda.Commands
             Organization org = Organization.CreateOrganization(str);
             return new CmdReturn($"Vous avez créé l'organisation {org.Name} !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_NOM")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_NOM")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Nom")]
         [SyntaxType(typeof(Organization), typeof(string))]
@@ -46,7 +46,7 @@ namespace Lambda.Commands
             organization.Rename(str);
             return new CmdReturn($"Vous avez renommé l'organisation en {str}!", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_SUPPRIMER")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_SUPPRIMER")]
         [Command(Command.CommandType.ORGANIZATION, 1)]
         [Syntax("Organisation")]
         [SyntaxType(typeof(Organization))]
@@ -57,7 +57,7 @@ namespace Lambda.Commands
             _ = organization.DeleteAsync();
             return new CmdReturn($"Vous avez supprimé l'organisation {organization.Name}!", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_RANG_CREER")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_RANG_CREER")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Nom")]
         [SyntaxType(typeof(Organization), typeof(string))]
@@ -77,7 +77,7 @@ namespace Lambda.Commands
             Rank rank = org.AddRank((string)argv[1]);
             return new CmdReturn($"Vous avez créé le rang {rank.Name}", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_RANG_SUPPRIMER")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_RANG_SUPPRIMER")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Rang")]
         [SyntaxType(typeof(Organization), typeof(Rank))]
@@ -92,7 +92,7 @@ namespace Lambda.Commands
             org.RemoveRank(rank);
             return new CmdReturn($"Vous avez supprimé le rang {rank.Name}", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_RANG_RENOMMER")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_RANG_RENOMMER")]
         [Command(Command.CommandType.ORGANIZATION, 3)]
         [Syntax("Organisation", "Rang", "Nom")]
         [SyntaxType(typeof(Organization), typeof(Rank), typeof(string))]
@@ -146,7 +146,7 @@ namespace Lambda.Commands
             }
             return new CmdReturn(str, CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_RANGS")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_RANGS")]
         [Command(Command.CommandType.ORGANIZATION, 1)]
         [Syntax("Organisation")]
         [SyntaxType(typeof(Organization))]
@@ -160,7 +160,7 @@ namespace Lambda.Commands
             }
             return new CmdReturn(str, CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_AJOUTER")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_AJOUTER")]
         [Command(Command.CommandType.ORGANIZATION, 3)]
         [Syntax("Organisation", "Rang", "Joueur")]
         [SyntaxType(typeof(Organization), typeof(Rank), typeof(Player))]
@@ -174,7 +174,7 @@ namespace Lambda.Commands
             target.SendMessage("Vous avez été invité à l'organisation " + org.Name + " au rang de " + rank.Name + ".");
             return new CmdReturn($"Vous avez ajouté {target.FullName} à l'organisation {org.Name} au rang de {rank.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_RANG_NOM")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_RANG_NOM")]
         [Command(Command.CommandType.ORGANIZATION, 4)]
         [Syntax("Organisation", "Membre", "Organisation", "Rang")]
         [SyntaxType(typeof(Organization), typeof(Member), typeof(Organization), typeof(Rank))]
@@ -187,7 +187,7 @@ namespace Lambda.Commands
             org.ChangeMemberRank(member, rank);
             return new CmdReturn($"Vous avez changé le rang de {member.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_RANG_SALAIRE")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_RANG_SALAIRE")]
         [Command(Command.CommandType.ORGANIZATION, 3)]
         [Syntax("Organisation", "Rang", "Salaire")]
         [SyntaxType(typeof(Organization), typeof(Rank), typeof(uint))]
@@ -199,7 +199,7 @@ namespace Lambda.Commands
             rank.ChangeSalary(salary);
             return new CmdReturn($"Vous avez changé le salaire de {rank.Name} à {salary}$.", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_PERMISSION_AJOUTER")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_PERMISSION_AJOUTER")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Permission")]
         [SyntaxType(typeof(Organization), typeof(Permissions))]
@@ -224,7 +224,7 @@ namespace Lambda.Commands
             Organization org = (Organization)argv[0];
             return new CmdReturn($"{org.Permissions.ToString()}", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_PERMISSION_SUPPRIMER")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_PERMISSION_SUPPRIMER")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Permission")]
         [SyntaxType(typeof(Organization), typeof(Permissions))]
@@ -236,7 +236,7 @@ namespace Lambda.Commands
             _ = org.SaveAsync(); //TODO deplacer le save
             return new CmdReturn($"Vous avez supprimé la permission {perm} à {org.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_RANG_PERMISSION_AJOUTER")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_RANG_PERMISSION_AJOUTER")]
         [Command(Command.CommandType.ORGANIZATION, 3)]
         [Syntax("Organisation", "Rang", "Permission")]
         [SyntaxType(typeof(Organization), typeof(Rank), typeof(Permissions))]
@@ -249,7 +249,7 @@ namespace Lambda.Commands
             _ = rank.SaveAsync(); //TODO deplacer le save
             return new CmdReturn($"Vous avez ajouté la permission {perm} à {rank.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_RANG_PERMISSION_SUPPRIMER")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_RANG_PERMISSION_SUPPRIMER")]
         [Command(Command.CommandType.ORGANIZATION, 3)]
         [Syntax("Organisation", "Rang", "Permission")]
         [SyntaxType(typeof(Organization), typeof(Rank), typeof(Permissions))]
@@ -262,7 +262,7 @@ namespace Lambda.Commands
             _ = rank.SaveAsync(); //TODO deplacer le save
             return new CmdReturn($"Vous avez supprimé la permission {perm} à {rank.Name}.", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_ORGANISATION_RANG_PERMISSION_SUPPRIMER")]
+        [Permission("ADMINISTRATEUR_ORGANISATION_RANG_PERMISSION_SUPPRIMER")]
         [Command(Command.CommandType.ORGANIZATION, 2)]
         [Syntax("Organisation", "Membre")]
         [SyntaxType(typeof(Organization), typeof(Member))]

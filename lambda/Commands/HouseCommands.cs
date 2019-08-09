@@ -10,7 +10,7 @@ namespace Lambda.Commands
 {
     class HouseCommands
     {
-        [Permission("ADMIN_MAISON_CREER")]
+        [Permission("ADMINISTRATEUR_MAISON_CREER")]
         [Command(Command.CommandType.ADMIN)]
         public static CmdReturn Maison_Creer(Player player, object[] argv)
         {
@@ -18,7 +18,7 @@ namespace Lambda.Commands
             _ = house.SaveAsync();
             return new CmdReturn("Vous avez créé une maison !", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_MAISON_INTERIEUR")]
+        [Permission("ADMINISTRATEUR_MAISON_INTERIEUR")]
         [Command(Command.CommandType.ADMIN, 1)]
         [Syntax("IPL1,IPL2,...")]
         [SyntaxType(typeof(string))]
@@ -29,9 +29,9 @@ namespace Lambda.Commands
             if (house == null) return new CmdReturn("Pas de maison ici", CmdReturn.CmdReturnType.WARNING);
             house.SetIpls(ipls);
             _ = house.SaveAsync();
-            return new CmdReturn("Vous avez créé une maison !", CmdReturn.CmdReturnType.SUCCESS);
+            return new CmdReturn("Vous avez changé l'interieur de la maison.", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_MAISON_POSITION")]
+        [Permission("ADMINISTRATEUR_MAISON_POSITION")]
         [Command(Command.CommandType.ADMIN, 3)]
         [Syntax("x", "y", "z")]
         [SyntaxType(typeof(int), typeof(int), typeof(int))]
@@ -41,9 +41,9 @@ namespace Lambda.Commands
             House house = player.GetHouse();
             if (house == null) return new CmdReturn("Pas de maison ici", CmdReturn.CmdReturnType.WARNING);
             house.SetInterior(pos);
-            //house.SetExterior(house.Checkpoint.Position);
+            house.SetExterior(house.Checkpoint.Position);
             _ = house.SaveAsync();
-            return new CmdReturn("Vous avez créé une maison !", CmdReturn.CmdReturnType.SUCCESS);
+            return new CmdReturn("Vous avez changé la position de la maison.", CmdReturn.CmdReturnType.SUCCESS);
         }
         [Permission("CIVIL_MAISON_ACHETER")]
         [Command(Command.CommandType.HOUSE)]
@@ -69,7 +69,7 @@ namespace Lambda.Commands
             _ = house.SaveAsync();
             return new CmdReturn($"Proprio : {house.Owner} prix de vente: {house.Price}", CmdReturn.CmdReturnType.SUCCESS);
         }
-        [Permission("ADMIN_MAISON_PRIX")]
+        [Permission("ADMINISTRATEUR_MAISON_PRIX")]
         [Command(Command.CommandType.HOUSE, 1)]
         [Syntax("Prix")]
         [SyntaxType(typeof(uint))]
